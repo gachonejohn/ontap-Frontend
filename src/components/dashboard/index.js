@@ -7,14 +7,18 @@ import EmployeeDashboardContent from "../employees/EmployeeContent";
 import { useGetEmployeesQuery } from "@store/services/employees/employeesService";
 import RecentEmployees from "./RecentEmployees";
 
+
 export default function Dashboard() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const [showAddEmployeeModal, setShowAddEmployeeModal] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
+
   const { user } = useAppSelector(state => state.auth);
   const { data: employeesData, isLoading, error } = useGetEmployeesQuery({}, { refetchOnMountOrArgChange: true });
+
+
 
   // Get dashboard permission
   const dashboardPermission = user?.role?.permissions?.find(
@@ -110,6 +114,9 @@ export default function Dashboard() {
     },
   ];
 
+
+
+
   return (
     <div className="flex flex-col gap-6">
       {canViewAll ? (
@@ -200,6 +207,8 @@ export default function Dashboard() {
               </div>
             </div>
           </div>
+
+
 
           {/* Table + Leave Requests */}
           <div className="flex flex-col lg:flex-row gap-6 w-full">
