@@ -1,13 +1,11 @@
-// src/components/tasks/EmployeeTasksDashboardContent.jsx
 import React, { useState } from "react";
 import {
   useGetMyTasksQuery,
-  useUpdateTaskStatusMutation,
   useCreateTaskMutation,
   useGetTaskDetailQuery,
 } from "../../store/services/tasks/tasksService";
-import LogTaskModal from "./modals/LogTaskModal";
-import TaskModal from "./modals/TaskModal";
+import LogTaskModal from "./LogTaskModal"; // Changed from "./modals/LogTaskModal"
+import TaskModal from "./TaskModal"; // Changed from "./modals/TaskModal"
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 
@@ -21,10 +19,10 @@ const TaskCard = ({ task, onClick }) => {
   const title = detail.title || task.title;
   const dueDate = detail.due_date || task.due_date;
   const priority = detail.priority || task.priority;
-  const assigneeName = detail.assignee_name || task.assignee_name || "Unassigned";
   const progress = detail.progress_percentage || task.progress_percentage || 0;
   const status = detail.status || task.status;
   const createdByName = detail.created_by_name || task.created_by_name || "System";
+  const isOverdue = detail.is_overdue || task.is_overdue;
 
   const priorityMap = {
     LOW: "Low",
@@ -42,6 +40,9 @@ const TaskCard = ({ task, onClick }) => {
     ON_HOLD: "bg-gray-100 text-gray-800",
   };
 
+  // Check if task is overdue and not completed
+  const showOverdueBadge = isOverdue && status !== "COMPLETED";
+
   return (
     <div
       key={task.id}
@@ -51,9 +52,16 @@ const TaskCard = ({ task, onClick }) => {
       {/* Title and Status */}
       <div className="flex justify-between items-start gap-2">
         <div className="text-sm text-neutral-900 font-semibold flex-1">{title}</div>
-        <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[status] || "bg-gray-100 text-gray-800"}`}>
-          {status?.replace('_', ' ') || 'Unknown'}
-        </span>
+        <div className="flex flex-col items-end gap-1">
+          {showOverdueBadge && (
+            <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+              Overdue
+            </span>
+          )}
+          <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[status] || "bg-gray-100 text-gray-800"}`}>
+            {status?.replace('_', ' ') || 'Unknown'}
+          </span>
+        </div>
       </div>
 
       {/* Description */}
@@ -65,8 +73,11 @@ const TaskCard = ({ task, onClick }) => {
       <div className="flex justify-between items-center pt-2">
         <div className="flex items-center gap-1">
           <img width="12.2" height="12.2" src="/images/calendar1.png" alt="Calendar" />
-          <div className="text-[10px] text-gray-600 font-medium">
+          <div className={`text-[10px] font-medium ${
+            showOverdueBadge ? "text-red-600" : "text-gray-600"
+          }`}>
             {dueDate ? new Date(dueDate).toLocaleDateString() : "No due date"}
+            {showOverdueBadge && " • Overdue"}
           </div>
         </div>
         <div
@@ -138,7 +149,8 @@ const EmployeeTasksDashboardContent = () => {
     "COMPLETED": "Completed",
     "UNDER_REVIEW": "Under Review",
     "ON_HOLD": "On Hold",
-    "CANCELLED": "Cancelled"
+    "CANCELLED": "Cancelled",
+    "OVERDUE": "Overdue"
   };
 
   const statusOptions = Object.entries(statusMap).map(([key, value]) => ({ key, value }));
@@ -146,22 +158,34 @@ const EmployeeTasksDashboardContent = () => {
   // Get logged-in user
   const currentUser = useSelector((state) => state.auth.user);
 
+  // Get task permissions
+  const taskPermissions = useSelector((state) => {
+    const permissions = state.auth.user?.role?.permissions;
+    return permissions?.find(p => p.feature_code === "task" || p.feature_code === "task_management");
+  });
+
+  const canCreateTask = taskPermissions?.can_create;
+
   // Employee only sees their own tasks with status filter
   const { data: tasksData, isLoading, error, refetch } = useGetMyTasksQuery({
     search: searchTerm || undefined,
-    status: statusFilter !== "All" ? statusFilter : undefined,
+    status: statusFilter !== "All" && statusFilter !== "OVERDUE" ? statusFilter : undefined,
   });
 
   const [createTask] = useCreateTaskMutation();
-  const [updateTaskStatus] = useUpdateTaskStatusMutation();
 
   const tasks = tasksData?.results || [];
 
+  // Filter tasks based on overdue filter
+  const filteredTasks = statusFilter === "OVERDUE" 
+    ? tasks.filter(task => task.is_overdue && task.status !== "COMPLETED")
+    : tasks;
+
   // Group tasks by status
   const groupedTasks = {
-    todo: tasks.filter((task) => task.status === "TO_DO"),
-    inProgress: tasks.filter((task) => task.status === "IN_PROGRESS"),
-    completed: tasks.filter((task) => task.status === "COMPLETED"),
+    todo: filteredTasks.filter((task) => task.status === "TO_DO"),
+    inProgress: filteredTasks.filter((task) => task.status === "IN_PROGRESS"),
+    completed: filteredTasks.filter((task) => task.status === "COMPLETED"),
   };
 
   // Handle new task creation
@@ -170,22 +194,46 @@ const EmployeeTasksDashboardContent = () => {
       const formatDate = (date) =>
         date ? new Date(date).toISOString().split("T")[0] : null;
 
-      const payload = {
-        title: formData.title,
-        description: formData.description || "",
-        status: formData.status || "TO_DO",
-        priority: formData.priority || "MEDIUM",
-        assignee: currentUser?.id, // 👈 employee is always the assignee
-        department: formData.department || null,
-        start_date: formatDate(formData.startDate),
-        due_date: formatDate(formData.dueDate),
-        progress_percentage: formData.progressPercentage || 0,
-        estimated_hours: formData.estimatedHours || null,
-        is_urgent: formData.isUrgent || false,
-        requires_approval: formData.requiresApproval || false,
-      };
+      // Create FormData object for file upload
+      const formDataObj = new FormData();
+      
+      // Append all task data
+      formDataObj.append("title", formData.title || "");
+      formDataObj.append("description", formData.description || "");
+      formDataObj.append("status", formData.status || "TO_DO");
+      formDataObj.append("priority", formData.priority || "MEDIUM");
+      formDataObj.append("assignee", currentUser?.id); // 👈 employee is always the assignee
+      
+      if (formData.department) formDataObj.append("department", formData.department);
+      
+      const startDate = formatDate(formData.start_date || formData.startDate);
+      const dueDate = formatDate(formData.due_date || formData.dueDate);
+      
+      if (startDate) formDataObj.append("start_date", startDate);
+      if (dueDate) formDataObj.append("due_date", dueDate);
+      
+      formDataObj.append("progress_percentage", formData.progress_percentage || 0);
+      
+      if (formData.estimated_hours || formData.estimatedHours) {
+        formDataObj.append("estimated_hours", 
+          parseFloat(formData.estimated_hours || formData.estimatedHours)
+        );
+      }
+      
+      formDataObj.append("is_urgent", Boolean(formData.is_urgent || formData.isUrgent));
+      formDataObj.append("requires_approval", Boolean(
+        formData.requires_approval || formData.requiresApproval
+      ));
 
-      await createTask(payload).unwrap();
+      // Append files
+      if (formData.files && formData.files.length > 0) {
+        formData.files.forEach((file) => {
+          formDataObj.append("files", file);
+        });
+      }
+
+      // Use the FormData object for the API call
+      await createTask(formDataObj).unwrap();
       toast.success("Task created successfully!");
       setIsLogTaskModalOpen(false);
       refetch();
@@ -235,24 +283,26 @@ const EmployeeTasksDashboardContent = () => {
             Manage and track your assigned tasks
           </div>
         </div>
-        <div
-          className="flex justify-center items-center rounded-md w-[180px] h-12 bg-teal-500 cursor-pointer hover:bg-teal-600 transition-colors"
-          onClick={() => setIsLogTaskModalOpen(true)}
-        >
-          <div className="flex flex-row items-center gap-2">
-            <div className="flex justify-center items-center w-5 h-5">
-              <img
-                width="15.3px"
-                height="15.3px"
-                src="/images/addtask.png"
-                alt="Add Task icon"
-              />
-            </div>
-            <div className="text-sm text-white font-medium">
-              New Task
+        {canCreateTask && (
+          <div
+            className="flex justify-center items-center rounded-md w-[180px] h-12 bg-teal-500 cursor-pointer hover:bg-teal-600 transition-colors"
+            onClick={() => setIsLogTaskModalOpen(true)}
+          >
+            <div className="flex flex-row items-center gap-2">
+              <div className="flex justify-center items-center w-5 h-5">
+                <img
+                  width="15.3px"
+                  height="15.3px"
+                  src="/images/addtask.png"
+                  alt="Add Task icon"
+                />
+              </div>
+              <div className="text-sm text-white font-medium">
+                New Task
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Search and Filter */}
@@ -475,19 +525,19 @@ const EmployeeTasksDashboardContent = () => {
                 <div className="flex flex-col justify-start items-start gap-2.5 p-1 rounded border border-neutral-200 h-5 overflow-hidden">
                   <div className="flex flex-row justify-center items-center gap-1 h-4">
                     <div className="text-xs text-neutral-900 font-semibold">
-                      {tasks.filter(t => t.is_overdue).length}
+                      {tasks.filter(t => t.is_overdue && t.status !== "COMPLETED").length}
                     </div>
                   </div>
                 </div>
               </div>
               <div className="text-lg text-red-500 font-semibold">
-                {tasks.filter(t => t.is_overdue).length} Tasks
+                {tasks.filter(t => t.is_overdue && t.status !== "COMPLETED").length} Tasks
               </div>
               <div className="w-full h-2 bg-gray-200 rounded-full">
                 <div 
                   className="h-full bg-red-500 rounded-full" 
                   style={{ 
-                    width: `${tasks.length > 0 ? (tasks.filter(t => t.is_overdue).length / tasks.length) * 100 : 0}%` 
+                    width: `${tasks.length > 0 ? (tasks.filter(t => t.is_overdue && t.status !== "COMPLETED").length / tasks.length) * 100 : 0}%` 
                   }}
                 ></div>
               </div>
@@ -537,15 +587,14 @@ const EmployeeTasksDashboardContent = () => {
         isOpen={isLogTaskModalOpen}
         onClose={() => setIsLogTaskModalOpen(false)}
         onSubmit={handleCreateTask}
-        isHR={false}
       />
 
       <TaskModal
         isOpen={isTaskModalOpen}
         onClose={() => setIsTaskModalOpen(false)}
         task={selectedTask}
-        isHR={false}
         refetch={refetch}
+        taskPermissions={taskPermissions}
       />
     </div>
   );

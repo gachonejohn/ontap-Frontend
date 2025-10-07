@@ -10,7 +10,6 @@ import {
 import { formatClockTime, formatHoursWorked } from "../../utils/dates";
 import ActionModal from "../common/Modals/ActionModal";
 import { useNavigate } from "react-router-dom";
-import LogTaskModal from "@components/tasks/modals/LogTaskModal";
 
 const EmployLeaveDashboardContent = () => {
   const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
