@@ -1,4 +1,3 @@
-// src/store/services/tasks/tasksService.js
 import { apiSlice } from "../../api/apiSlice";
 
 // Enhanced normalizeTask function with better field handling
@@ -115,66 +114,68 @@ export const tasksApi = apiSlice.injectEndpoints({
 
     /**
      * ========================
-     * TASK COMMENTS - ENHANCED
+     * TASK COMMENTS - FIXED
      * ========================
      */
 
     getTaskComments: builder.query({
-      query: (taskPk, { page, page_size, ordering = "-created_at" } = {}) => {
+      query: (task_pk, { page, page_size, ordering = "-created_at" } = {}) => {
         const params = {};
         if (page) params.page = page;
         if (page_size) params.page_size = page_size;
         if (ordering) params.ordering = ordering;
         
         return { 
-          url: `tasks/api/tasks/${taskPk}/comments/`, 
+          url: `tasks/api/tasks/${task_pk}/comments/`, 
           method: "GET", 
           params 
         };
       },
-      providesTags: (result, error, taskPk) => [
-        { type: "TaskComments", id: taskPk }
+      providesTags: (result, error, task_pk) => [
+        { type: "TaskComments", id: task_pk }
       ],
     }),
 
     createTaskComment: builder.mutation({
-      query: ({ taskPk, data }) => ({
-        url: `tasks/api/tasks/${taskPk}/comments/`,
+      query: ({ task_pk, data }) => ({
+        url: `tasks/api/tasks/${task_pk}/comments/`,
         method: "POST",
         body: {
           content: data.content,
-          is_internal: data.is_internal || false,
           user: data.user,
-          ...data
+          // Remove is_internal since it's not required and causing issues
         },
       }),
-      invalidatesTags: (result, error, { taskPk }) => [
-        { type: "TaskComments", id: taskPk },
-        { type: "TaskDetail", id: taskPk },
+      invalidatesTags: (result, error, { task_pk }) => [
+        { type: "TaskComments", id: task_pk },
+        { type: "TaskDetail", id: task_pk },
         "TaskAnalytics"
       ],
     }),
 
     updateTaskComment: builder.mutation({
-      query: ({ taskPk, id, data }) => ({
-        url: `tasks/api/tasks/${taskPk}/comments/${id}/`,
+      query: ({ task_pk, id, data }) => ({
+        url: `tasks/api/tasks/${task_pk}/comments/${id}/`,
         method: "PUT",
-        body: data,
+        body: {
+          content: data.content,
+          user: data.user,
+        },
       }),
-      invalidatesTags: (result, error, { taskPk }) => [
-        { type: "TaskComments", id: taskPk },
-        { type: "TaskDetail", id: taskPk },
+      invalidatesTags: (result, error, { task_pk }) => [
+        { type: "TaskComments", id: task_pk },
+        { type: "TaskDetail", id: task_pk },
       ],
     }),
 
     deleteTaskComment: builder.mutation({
-      query: ({ taskPk, id }) => ({
-        url: `tasks/api/tasks/${taskPk}/comments/${id}/`,
+      query: ({ task_pk, id }) => ({
+        url: `tasks/api/tasks/${task_pk}/comments/${id}/`,
         method: "DELETE",
       }),
-      invalidatesTags: (result, error, { taskPk }) => [
-        { type: "TaskComments", id: taskPk },
-        { type: "TaskDetail", id: taskPk },
+      invalidatesTags: (result, error, { task_pk }) => [
+        { type: "TaskComments", id: task_pk },
+        { type: "TaskDetail", id: task_pk },
         "TaskAnalytics"
       ],
     }),
@@ -186,34 +187,47 @@ export const tasksApi = apiSlice.injectEndpoints({
      */
 
     createTask: builder.mutation({
-      query: (data) => ({ 
+      query: (formData) => ({ 
         url: "tasks/api/tasks/", 
         method: "POST", 
-        body: {
-          title: data.title,
-          description: data.description || "",
-          status: data.status || "TO_DO",
-          priority: data.priority || "MEDIUM",
-          assignee: data.assignee,
-          department: data.department,
-          start_date: data.start_date || data.startDate,
-          due_date: data.due_date || data.dueDate,
-          progress_percentage: data.progress_percentage || data.progressPercentage || 0,
-          estimated_hours: data.estimated_hours || data.estimatedHours,
-          parent_task: data.parent_task || data.parentTask,
-          is_urgent: data.is_urgent || data.isUrgent || false,
-          requires_approval: data.requires_approval || data.requiresApproval || false,
-        }
+        body: formData,
+        // Note: No Content-Type header needed - browser will set it automatically with boundary
       }),
       invalidatesTags: ["Tasks", "MyTasks", "TaskAnalytics"],
     }),
 
     updateTask: builder.mutation({
-      query: ({ id, ...data }) => ({ 
-        url: `tasks/api/tasks/${id}/`, 
-        method: "PATCH", 
-        body: data 
-      }),
+      query: ({ id, ...data }) => {
+        // Ensure required fields are always included with current values
+        const updateData = {
+          title: data.title || data.currentTitle, // Use current title if not provided
+          description: data.description || data.currentDescription, // Use current description if not provided
+          status: data.status,
+          priority: data.priority,
+          assignee: data.assignee,
+          department: data.department,
+          start_date: data.start_date || data.startDate,
+          due_date: data.due_date || data.dueDate,
+          progress_percentage: data.progress_percentage || data.progressPercentage,
+          estimated_hours: data.estimated_hours || data.estimatedHours,
+          parent_task: data.parent_task || data.parentTask,
+          is_urgent: data.is_urgent || data.isUrgent,
+          requires_approval: data.requires_approval || data.requiresApproval,
+        };
+        
+        // Remove undefined values
+        Object.keys(updateData).forEach(key => {
+          if (updateData[key] === undefined) {
+            delete updateData[key];
+          }
+        });
+        
+        return { 
+          url: `tasks/api/tasks/${id}/`, 
+          method: "PUT", 
+          body: updateData
+        };
+      },
       invalidatesTags: (result, error, { id }) => [
         "Tasks",
         "MyTasks",
@@ -272,39 +286,50 @@ export const tasksApi = apiSlice.injectEndpoints({
      */
 
     getTaskAttachments: builder.query({
-      query: (taskPk) => ({ 
-        url: `tasks/api/tasks/${taskPk}/attachments/`, 
-        method: "GET" 
+      query: (task_pk) => ({
+        url: `tasks/api/tasks/${task_pk}/attachments/`,
+        method: "GET",
       }),
-      providesTags: (result, error, taskPk) => [
-        { type: "TaskAttachments", id: taskPk }
+      providesTags: (result, error, task_pk) => [
+        { type: "TaskAttachments", id: task_pk }
       ],
     }),
 
-    // Update your uploadTaskAttachment mutation in tasksService.js
-uploadTaskAttachment: builder.mutation({
-  query: ({ taskPk, formData }) => ({
-    url: `tasks/api/tasks/${taskPk}/attachments/`,
-    method: "POST",
-    body: formData,
-    // Remove headers to let browser set Content-Type with boundary
-  }),
-  invalidatesTags: (result, error, { taskPk }) => [
-    { type: "TaskAttachments", id: taskPk },
-    { type: "TaskDetail", id: taskPk },
-    "Tasks",
-    "MyTasks",
-  ],
-}),
+    uploadTaskAttachment: builder.mutation({
+      query: ({ task_pk, formData }) => ({
+        url: `tasks/api/tasks/${task_pk}/attachments/`,
+        method: "POST",
+        body: formData,
+      }),
+      invalidatesTags: (result, error, { task_pk }) => [
+        { type: "TaskAttachments", id: task_pk },
+        { type: "TaskDetail", id: task_pk },
+        "Tasks",
+        "MyTasks",
+      ],
+    }),
+
+    // 🔹 NEW: update attachment (PUT or PATCH)
+    updateTaskAttachment: builder.mutation({
+      query: ({ task_pk, id, formData, partial = true }) => ({
+        url: `tasks/api/tasks/${task_pk}/attachments/${id}/`,
+        method: partial ? "PATCH" : "PUT",
+        body: formData,
+      }),
+      invalidatesTags: (result, error, { task_pk, id }) => [
+        { type: "TaskAttachments", id: task_pk },
+        { type: "TaskDetail", id: task_pk },
+      ],
+    }),
 
     deleteTaskAttachment: builder.mutation({
-      query: ({ taskPk, id }) => ({
-        url: `tasks/api/tasks/${taskPk}/attachments/${id}/`,
+      query: ({ task_pk, id }) => ({
+        url: `tasks/api/tasks/${task_pk}/attachments/${id}/`,
         method: "DELETE",
       }),
-      invalidatesTags: (result, error, { taskPk }) => [
-        { type: "TaskAttachments", id: taskPk },
-        { type: "TaskDetail", id: taskPk },
+      invalidatesTags: (result, error, { task_pk }) => [
+        { type: "TaskAttachments", id: task_pk },
+        { type: "TaskDetail", id: task_pk },
       ],
     }),
 
@@ -341,13 +366,13 @@ uploadTaskAttachment: builder.mutation({
 
     // Get task status history
     getTaskStatusHistory: builder.query({
-      query: (taskPk) => ({
-        url: `tasks/api/tasks/${taskPk}/`, // This will include status_history in the detail response
+      query: (task_pk) => ({
+        url: `tasks/api/tasks/${task_pk}/`, // This will include status_history in the detail response
         method: "GET",
       }),
       transformResponse: (response) => response.status_history || [],
-      providesTags: (result, error, taskPk) => [
-        { type: "TaskStatusHistory", id: taskPk }
+      providesTags: (result, error, task_pk) => [
+        { type: "TaskStatusHistory", id: task_pk }
       ],
     }),
 
@@ -419,48 +444,48 @@ uploadTaskAttachment: builder.mutation({
 
     // Start time tracking for a task
     startTimeTracking: builder.mutation({
-      query: ({ taskPk, data }) => ({
-        url: `tasks/api/tasks/${taskPk}/time_logs/`,
+      query: ({ task_pk, data }) => ({
+        url: `tasks/api/tasks/${task_pk}/time_logs/`,
         method: "POST",
         body: { ...data, start_time: new Date().toISOString() },
       }),
-      invalidatesTags: (result, error, { taskPk }) => [
-        { type: "TaskDetail", id: taskPk },
+      invalidatesTags: (result, error, { task_pk }) => [
+        { type: "TaskDetail", id: task_pk },
         "TaskAnalytics"
       ],
     }),
 
     // Stop time tracking for a task
     stopTimeTracking: builder.mutation({
-      query: ({ taskPk, timeLogId, description }) => ({
-        url: `tasks/api/tasks/${taskPk}/time_logs/${timeLogId}/`,
+      query: ({ task_pk, timeLogId, description }) => ({
+        url: `tasks/api/tasks/${task_pk}/time_logs/${timeLogId}/`,
         method: "PATCH",
         body: { 
           end_time: new Date().toISOString(),
           description 
         },
       }),
-      invalidatesTags: (result, error, { taskPk }) => [
-        { type: "TaskDetail", id: taskPk },
+      invalidatesTags: (result, error, { task_pk }) => [
+        { type: "TaskDetail", id: task_pk },
         "TaskAnalytics"
       ],
     }),
 
     // Get time logs for a task
     getTaskTimeLogs: builder.query({
-      query: (taskPk) => ({
-        url: `tasks/api/tasks/${taskPk}/`, // This will include time_logs in the detail response
+      query: (task_pk) => ({
+        url: `tasks/api/tasks/${task_pk}/`, // This will include time_logs in the detail response
         method: "GET",
       }),
       transformResponse: (response) => response.time_logs || [],
-      providesTags: (result, error, taskPk) => [
-        { type: "TaskTimeLogs", id: taskPk }
+      providesTags: (result, error, task_pk) => [
+        { type: "TaskTimeLogs", id: task_pk }
       ],
     }),
   }),
 });
 
-// Export all hooks
+// Export all hooks with CORRECTED parameter names
 export const {
   // Core task queries
   useGetTasksQuery,
@@ -468,7 +493,7 @@ export const {
   useGetTaskAnalyticsQuery,
   useGetTaskDetailQuery,
   
-  // Comment hooks
+  // Comment hooks - FIXED parameter names
   useGetTaskCommentsQuery,
   useCreateTaskCommentMutation,
   useUpdateTaskCommentMutation,
