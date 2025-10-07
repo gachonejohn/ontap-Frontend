@@ -3,8 +3,8 @@ import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import DropdownAuthenticationModal from "../../dashboards/employee/components/DropdownAuthenticationModal";
 import LeaveModal from "../../dashboards/employee/components/LeaveModal.js";
-import LogTaskModal from "../tasks/modals/LogTaskModal";
-import TaskModal from "../tasks/modals/TaskModal";
+import LogTaskModal from "../tasks/LogTaskModal";
+import TaskModal from "../tasks/TaskModal";
 import {
   useGetMyTasksQuery,
   useCreateTaskMutation,
@@ -145,6 +145,16 @@ const EmployeeDashboardContent = () => {
 
   // Get logged-in user
   const currentUser = useSelector((state) => state.auth.user);
+
+  // Get task permissions
+  const taskPermissions = useSelector((state) => {
+    const permissions = state.auth.user?.role?.permissions;
+    return permissions?.find(
+      (p) => p.feature_code === "task" || p.feature_code === "task_management"
+    );
+  });
+
+  const canCreateTask = taskPermissions?.can_create;
 
   // Fetch tasks from backend
   const { data: tasksData, isLoading: tasksLoading, error: tasksError, refetch: refetchTasks } = useGetMyTasksQuery();
@@ -403,32 +413,31 @@ const EmployeeDashboardContent = () => {
               </div>
             </div>
 
-
-{/* Profile Section */}
-<div className="flex flex-row justify-start items-center gap-2 mt-2">
-  <img
-    className="rounded-full border-2 border-emerald-300 overflow-hidden"
-    src="/images/avatar.png"
-    alt="Profile"
-    width="35px"
-    height="35px"
-  />
-  <div className="flex flex-col justify-start items-start gap-0.5">
-    <div className="text-xs font-bold">
-      {currentUser?.first_name} {currentUser?.last_name}
-    </div>
-    <div className="text-[10px] text-teal-100 font-medium">
-      {/* Safely handle role which might be an object */}
-      {currentUser?.role ? (
-        typeof currentUser.role === 'string' ? currentUser.role : 
-        currentUser.role.name || currentUser.role.title || "Employee"
-      ) : "Employee"}
-    </div>
-    <div className="text-[10px] text-teal-100 font-medium">
-      ID: {currentUser?.employee_id || "N/A"}
-    </div>
-  </div>
-</div>
+            {/* Profile Section */}
+            <div className="flex flex-row justify-start items-center gap-2 mt-2">
+              <img
+                className="rounded-full border-2 border-emerald-300 overflow-hidden"
+                src="/images/avatar.png"
+                alt="Profile"
+                width="35px"
+                height="35px"
+              />
+              <div className="flex flex-col justify-start items-start gap-0.5">
+                <div className="text-xs font-bold">
+                  {currentUser?.first_name} {currentUser?.last_name}
+                </div>
+                <div className="text-[10px] text-teal-100 font-medium">
+                  {/* Safely handle role which might be an object */}
+                  {currentUser?.role ? (
+                    typeof currentUser.role === 'string' ? currentUser.role : 
+                    currentUser.role.name || currentUser.role.title || "Employee"
+                  ) : "Employee"}
+                </div>
+                <div className="text-[10px] text-teal-100 font-medium">
+                  ID: {currentUser?.employee_id || "N/A"}
+                </div>
+              </div>
+            </div>
 
             {/* Status Badge */}
             <div className="absolute bottom-3 right-3 flex justify-center items-center rounded-lg px-2 h-5 bg-white">
@@ -463,12 +472,15 @@ const EmployeeDashboardContent = () => {
             </button>
           )}
           
-          <button
-            onClick={() => setIsLogTaskModalOpen(true)}
-            className="flex justify-center items-center rounded-md h-10 w-full max-w-[120px] shadow-sm bg-white text-neutral-900 text-sm font-normal hover:bg-gray-100 transition-colors"
-          >
-            Log Task
-          </button>
+          {/* Permission-based Log Task Button */}
+          {canCreateTask && (
+            <button
+              onClick={() => setIsLogTaskModalOpen(true)}
+              className="flex justify-center items-center rounded-md h-10 w-full max-w-[120px] shadow-sm bg-white text-neutral-900 text-sm font-normal hover:bg-gray-100 transition-colors"
+            >
+              Log Task
+            </button>
+          )}
         </div>
       </div>
 
@@ -657,14 +669,12 @@ const EmployeeDashboardContent = () => {
         isOpen={isLogTaskModalOpen}
         onClose={() => setIsLogTaskModalOpen(false)}
         onSubmit={handleCreateTask}
-        isHR={false}
       />
 
       <TaskModal
         isOpen={isTaskModalOpen}
         onClose={() => setIsTaskModalOpen(false)}
         task={selectedTask}
-        isHR={false}
         refetch={refetchTasks}
       />
 
