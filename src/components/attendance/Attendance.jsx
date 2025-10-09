@@ -4,6 +4,7 @@ import { useFilters } from "../../hooks/useFIlters";
 import {
   CustomDate,
   formatClockTime,
+  formatHoursWorked,
   YearMonthCustomDate,
 } from "../../utils/dates";
 import DataTable from "../common/DataTable";
@@ -115,6 +116,15 @@ const AttendanceList = () => {
         </span>
       ),
     },
+    {
+      header: "Hours Worked",
+      accessor: "hours_worked",
+      cell: (item) => (
+        <span className="text-xs font-medium">
+          {formatHoursWorked(item?.hours_worked ?? "")}
+        </span>
+      ),
+    },
 
     {
       header: "Date",
@@ -163,47 +173,7 @@ const AttendanceList = () => {
               View which employees have checked in and out
             </div>
           </div>
-          {/* <div
-            className="flex flex-col  lg:p-0
-           lg:flex-row md:flex-row md:items-center md:space-x-2 lg:items-center gap-2"
-          >
-            <button
-              onClick={() => refetch()}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg w-full border
-             border-teal-500 text-teal-600 text-sm hover:bg-teal-50 transition-colors"
-            >
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path
-                  fillRule="evenodd"
-                  d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.24 4.5a.75.75 0 01-1.08 0l-4.24-4.5a.75.75 0 01.02-1.06z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              Live Updates
-            </button>
-            <FilterSelect
-              options={departmentsOptions}
-              value={
-                departmentsOptions.find(
-                  (option) => option.value === filters.department
-                ) || { value: "", label: "All Departments" }
-              }
-              onChange={handleDepartmentChange}
-              placeholder=""
-              defaultLabel="All Departments"
-            />
-            <FilterSelect
-              options={attendanceStatusOptions}
-              value={
-                attendanceStatusOptions.find(
-                  (option) => option.value === filters.status
-                ) || { value: "", label: "All Status" }
-              }
-              onChange={handleStatusChange}
-              placeholder=""
-              defaultLabel="All Status"
-            />
-          </div> */}
+         
           <div className="flex flex-row p-2 items-center gap-2">
             
               <div className="flex flex-col">
@@ -249,7 +219,8 @@ const AttendanceList = () => {
           <div className="flex flex-col lg:flex-row md:flex-row md:items-center p-2 md:justify-between lg:items-center lg:justify-between">
             <div
               className="relative w-full md:w-auto border bg-white
-             border-gray-300 md:min-w-[40%] flex items-center gap-2 text-gray-500 px-2 rounded-md shadow-sm"
+             border-gray-300 md:min-w-[40%] flex items-center
+              text-gray-500 px-2 rounded-md shadow-sm"
             >
               <GoSearch size={20} className="" />
               <input
@@ -257,8 +228,9 @@ const AttendanceList = () => {
                 name="search"
                 value={filters.search}
                 onChange={handleFilterChange}
-                placeholder="Search by employee no ,first name, phone number"
-                className="w-full bg-white text-gray-900 text-sm px-2 py-2 bg-transparent outline-none"
+                placeholder="Search by employee no ,first name, phone no"
+                className="w-full bg-white text-gray-900 text-sm px-2 
+                py-2 bg-transparent outline-none"
               />
             </div>
             {/* <div className="flex flex-row p-2 items-center gap-2">

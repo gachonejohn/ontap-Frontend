@@ -315,7 +315,9 @@ export default function MainLeaveAttendanceDashboardContent() {
          {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
         {/* Pending Requests Card */}
-        <div className="flex flex-col justify-between p-4 rounded-xl h-[120px] shadow-lg bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl">
+        <div className="flex flex-col justify-between p-4 rounded-xl h-[120px]
+         shadow-sm border
+         bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
           <div className="flex justify-between items-center">
             <div className="flex flex-col">
               <div className="text-sm text-gray-600 font-medium">
@@ -336,7 +338,8 @@ export default function MainLeaveAttendanceDashboardContent() {
         </div>
 
         {/* Approved This Month Card */}
-        <div className="flex flex-col justify-between p-4 rounded-xl h-[120px] shadow-lg bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl">
+        <div className="flex flex-col justify-between p-4 rounded-xl h-[120px]  shadow-sm border
+         bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
           <div className="flex justify-between items-center">
             <div className="flex flex-col">
               <div className="text-sm text-gray-600 font-medium">
@@ -357,7 +360,8 @@ export default function MainLeaveAttendanceDashboardContent() {
         </div>
 
         {/* Total Days Requested Card */}
-        <div className="flex flex-col justify-between p-4 rounded-xl h-[120px] shadow-lg bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl">
+        <div className="flex flex-col justify-between p-4 rounded-xl h-[120px]  shadow-sm border
+         bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
           <div className="flex justify-between items-center">
             <div className="flex flex-col">
               <div className="text-sm text-gray-600 font-medium">
@@ -378,7 +382,8 @@ export default function MainLeaveAttendanceDashboardContent() {
         </div>
 
         {/* Average Attendance Card */}
-        <div className="flex flex-col justify-between p-4 rounded-xl h-[120px] shadow-lg bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl">
+        <div className="flex flex-col justify-between p-4 rounded-xl h-[120px]  shadow-sm border
+         bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
           <div className="flex justify-between items-center">
             <div className="flex flex-col">
               <div className="text-sm text-gray-600 font-medium">
@@ -402,7 +407,7 @@ export default function MainLeaveAttendanceDashboardContent() {
       {/* Today's Clock-ins & Todo's */}
       <AttendanceList />
       {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 min-h-[300px]">
         {/* Attendance Trends */}
         <div className="">
           <AttendanceTrendsChart data={data} isLoading={isLoading} />;

@@ -57,8 +57,37 @@ export const employeesApi = apiSlice.injectEndpoints({
         };
       },
     }),
+    getTimezones: builder.query({
+      query: ({ page, page_size, search } = {}) => {
+        const queryParams = {};
+        if (page) queryParams.page = page;
+        if (page_size) queryParams.page_size = page_size;
+        if (search) queryParams.search = search;
+        return {
+          url: `users/timezone-choices/`,
+          method: "GET",
+          params: queryParams,
+        };
+      },
+    }),
+    getProfileInfo: builder.query({
+      query: () => {
+    
+        return {
+          url: `users/profile/`,
+          method: "GET"
+        };
+      },
+    }),
 
   
+    setTimezone: builder.mutation({
+      query: (data) => ({
+        url: `users/update-timezone/`,
+        method: "POST",
+        body: data,
+      }),
+    }),
     createEmployee: builder.mutation({
       query: (data) => ({
         url: `employees/staff/create/`,
@@ -224,6 +253,27 @@ export const employeesApi = apiSlice.injectEndpoints({
         method: "DELETE",
       }),
     }),
+     createEmployeeRole: builder.mutation({
+      query: (data) => ({
+        url: `employees/employee-roles/create/`,
+        method: "POST",
+        body: data,
+      }),
+    }),
+     updateEmployeeRole: builder.mutation({
+      query: ({id, data}) => ({
+        url: `employees/employee-roles/${id}/`,
+        method: "PATCH",
+        body: data,
+      }),
+    }),
+     removeEmployeeRole: builder.mutation({
+      query: (id) => ({
+        url: `employees/employee-roles/${id}/`,
+        method: "DELETE",
+      }),
+    }),
+
   }),
 });
 
@@ -254,7 +304,11 @@ export const {
   useDeleteStatutoryInfoMutation,
   useCreateEducationInfoMutation,
   useEditEducationInfoMutation,
-  useDeleteEducationInfoMutation
-
-
+  useDeleteEducationInfoMutation,
+  useCreateEmployeeRoleMutation,
+  useUpdateEmployeeRoleMutation,
+  useRemoveEmployeeRoleMutation,
+  useGetTimezonesQuery,
+  useSetTimezoneMutation,
+  useGetProfileInfoQuery,
 } = employeesApi;
