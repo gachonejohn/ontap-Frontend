@@ -5,8 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { CreateEmployeeEducationSchema } from "@schemas/employees/employeeSchema";
 import { useGetDocumentTypesQuery } from "@store/services/companies/documentsService";
 import {
-  useCreateEducationInfoMutation,
-  useCreateStatutoryInfoMutation,
+  useCreateEducationInfoMutation
 } from "@store/services/employees/employeesService";
 import { getApiErrorMessage } from "@utils/errorHandler";
 import { useRef, useState } from "react";

@@ -61,9 +61,11 @@ const EmployeeLayoutWrapper = ({ children, customTitle, customDescription, custo
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+      <div className="grid grid-cols-1 
+      sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
         {/* Total Employees Card */}
-        <div className="flex flex-col justify-between p-4 rounded-xl h-[120px] shadow-lg bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl">
+        <div className="flex flex-col justify-between p-4 rounded-xl h-[120px]  
+        shadow-sm border bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
           <div className="flex justify-between items-center">
             <div className="flex flex-col">
               <div className="text-sm text-gray-600 font-medium">
@@ -84,7 +86,8 @@ const EmployeeLayoutWrapper = ({ children, customTitle, customDescription, custo
         </div>
 
         {/* Active Employees Card */}
-        <div className="flex flex-col justify-between p-4 rounded-xl h-[120px] shadow-lg bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl">
+        <div className="flex flex-col justify-between p-4 rounded-xl h-[120px] 
+        shadow-sm border bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
           <div className="flex justify-between items-center">
             <div className="flex flex-col">
               <div className="text-sm text-gray-600 font-medium">Active</div>
@@ -103,7 +106,8 @@ const EmployeeLayoutWrapper = ({ children, customTitle, customDescription, custo
         </div>
 
         {/* On Leave Card */}
-        <div className="flex flex-col justify-between p-4 rounded-xl h-[120px] shadow-lg bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl">
+        <div className="flex flex-col justify-between p-4 rounded-xl h-[120px] shadow-sm border 
+         bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
           <div className="flex justify-between items-center">
             <div className="flex flex-col">
               <div className="text-sm text-gray-600 font-medium">On Leave</div>
@@ -122,7 +126,8 @@ const EmployeeLayoutWrapper = ({ children, customTitle, customDescription, custo
         </div>
 
         {/* Departments Card */}
-        <div className="flex flex-col justify-between p-4 rounded-xl h-[120px] shadow-lg bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl">
+        <div className="flex flex-col justify-between p-4 rounded-xl h-[120px] shadow-sm border
+         bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
           <div className="flex justify-between items-center">
             <div className="flex flex-col">
               <div className="text-sm text-gray-600 font-medium">

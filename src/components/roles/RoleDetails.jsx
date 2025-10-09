@@ -139,7 +139,7 @@ const RolesDetails = () => {
 
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="space-y-6  font-montserrat"
+        className="space-y-6  font-montserrat max-h-[90vh] overflow-y-auto"
       >
         {role.permissions.map((feature, i) => (
           <div key={feature.feature_id} className="border rounded p-3">

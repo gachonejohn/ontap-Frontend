@@ -104,7 +104,7 @@ const Settings = () => {
               Settings
             </h2>
           </div>
-          <div className="flex flex-col space-y-5 p-4">
+          <div className="flex flex-col space-y-5 p-2">
             {tabs.map((tab) => (
               <button
                 key={tab.id}

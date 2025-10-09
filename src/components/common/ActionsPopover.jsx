@@ -7,7 +7,7 @@ const ButtonDropdown = ({ children }) => {
   const buttonRef = useRef();
   const dropdownRef = useRef();
 
-  // Close dropdown if clicking outside
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -23,7 +23,6 @@ const ButtonDropdown = ({ children }) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Calculate dropdown position
   useEffect(() => {
     if (!open) return;
 
@@ -31,7 +30,6 @@ const ButtonDropdown = ({ children }) => {
     const viewportHeight = window.innerHeight;
     const dropdownHeight = dropdownRef.current?.offsetHeight || 200;
 
-    // If not enough space below, open upwards
     if (buttonRect.bottom + dropdownHeight > viewportHeight) {
       setPositionUp(true);
     } else {
@@ -52,7 +50,8 @@ const ButtonDropdown = ({ children }) => {
       {open && (
         <div
           ref={dropdownRef}
-          className={`absolute right-0 bg-white border w-full min-w-[180px] border-gray-200 rounded-lg shadow-lg overflow-hidden z-50
+          className={`absolute right-0 bg-white border w-full min-w-[186px] p-2 border-gray-200
+             rounded-lg shadow-lg overflow-hidden z-50
     ${positionUp ? "bottom-full mb-2" : "mt-2"} min-w-max`}
         >
           {React.Children.map(children, (child) =>

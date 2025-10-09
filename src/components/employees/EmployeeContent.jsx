@@ -53,7 +53,10 @@ const TaskCard = ({ task, onClick }) => {
   return (
     <div
       key={task.id}
-      className="flex flex-col gap-3 p-4 rounded-xl bg-slate-50/80 cursor-pointer hover:bg-slate-100/80 transition-colors border border-transparent hover:border-slate-200"
+      className="flex flex-col gap-3 p-4 rounded-xl
+       bg-slate-50/80 cursor-pointer hover:bg-slate-100/
+        transition-colors border border-transparent
+         hover:border-slate-200"
       onClick={() => onClick(detail)}
     >
       {/* Title and Status */}
@@ -313,7 +316,8 @@ const EmployeeDashboardContent = () => {
   return (
     <div className="flex flex-col gap-6">
       {/* Status Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+      <div className="grid grid-cols-1 
+      sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
         {/* Today's Status with Sticker */}
         <div className="relative flex items-center p-4 rounded-xl h-[120px] shadow-lg text-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl overflow-hidden">
           {/* Sticker Image as Background */}

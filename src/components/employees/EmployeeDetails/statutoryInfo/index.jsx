@@ -1,20 +1,18 @@
-import { useState } from "react";
+import ButtonDropdown from "@components/common/ActionsPopover";
 import ActionModal from "@components/common/Modals/ActionModal";
+import NoDataFound from "@components/common/NoData";
 import {
-  useDeleteEmergencyContactMutation,
-  useDeleteStatutoryInfoMutation,
+  useDeleteStatutoryInfoMutation
 } from "@store/services/employees/employeesService";
 import { YearMonthCustomDate } from "@utils/dates";
 import { getApiErrorMessage } from "@utils/errorHandler";
-import { FiDownload, FiEdit, FiTrash2 } from "react-icons/fi";
+import { useState } from "react";
+import { FiDownload, FiTrash2 } from "react-icons/fi";
 import { toast } from "react-toastify";
-import ButtonDropdown from "@components/common/ActionsPopover";
-import NoDataFound from "@components/common/NoData";
-import { useNavigate, useSearchParams } from "react-router-dom";
 
-import { NewStatutoryInfo } from "./NewStatutoryInfo";
 import DataTable from "@components/common/DataTable";
 import { EditStatutoryInfo } from "./EditStatutoryInfo";
+import { NewStatutoryInfo } from "./NewStatutoryInfo";
 export const StatutoryInfo = ({ data: employeeData, refetch }) => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 

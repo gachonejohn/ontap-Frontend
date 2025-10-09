@@ -132,7 +132,8 @@ export default function Dashboard() {
           {/* Stats Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
             {/* Card 1 - Total Employees */}
-            <div className="flex flex-col justify-between p-4 rounded-xl h-[120px] shadow-lg bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl">
+            <div className="flex flex-col justify-between p-4 rounded-xl h-[120px] 
+             bg-white transition-transform duration-200 hover:-translate-y-1 shadow-sm border hover:shadow-md">
               <div className="flex justify-between items-center">
                 <div className="flex flex-col">
                   <div className="text-sm text-gray-600 font-medium">Total Employees</div>
@@ -152,7 +153,8 @@ export default function Dashboard() {
             </div>
 
             {/* Card 2 - New Hires This Month */}
-            <div className="flex flex-col justify-between p-4 rounded-xl h-[120px] shadow-lg bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl">
+            <div className="flex flex-col justify-between p-4 rounded-xl h-[120px] 
+             bg-white transition-transform duration-200 hover:-translate-y-1 shadow-sm border hover:shadow-md">
               <div className="flex justify-between items-center">
                 <div className="flex flex-col">
                   <div className="text-sm text-gray-600 font-medium">New Hires This Month</div>
@@ -172,7 +174,8 @@ export default function Dashboard() {
             </div>
 
             {/* Card 3 - Pending Leave Requests (static for now) */}
-            <div className="flex flex-col justify-between p-4 rounded-xl h-[120px] shadow-lg bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl">
+            <div className="flex flex-col justify-between p-4 rounded-xl h-[120px] 
+             bg-white transition-transform duration-200 hover:-translate-y-1 shadow-sm border hover:shadow-md">
               <div className="flex justify-between items-center">
                 <div className="flex flex-col">
                   <div className="text-sm text-gray-600 font-medium">Pending Leave Requests</div>
@@ -190,7 +193,8 @@ export default function Dashboard() {
             </div>
 
             {/* Card 4 - Payroll Summary (static for now) */}
-            <div className="flex flex-col justify-between p-4 rounded-xl h-[120px] shadow-lg bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl">
+            <div className="flex flex-col justify-between p-4 rounded-xl h-[120px] 
+             bg-white transition-transform duration-200 hover:-translate-y-1 shadow-sm border hover:shadow-md">
               <div className="flex justify-between items-center">
                 <div className="flex flex-col">
                   <div className="text-sm text-gray-600 font-medium">Payroll Summary</div>
