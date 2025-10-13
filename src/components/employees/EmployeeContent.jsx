@@ -33,6 +33,7 @@ const TaskCard = ({ task, onClick }) => {
   const progress = detail.progress_percentage || task.progress_percentage || 0;
   const status = detail.status || task.status;
   const createdByName = detail.created_by_name || task.created_by_name || "System";
+  const isOverdue = detail.is_overdue || task.is_overdue;
 
   const priorityMap = {
     LOW: "Low",
@@ -50,6 +51,9 @@ const TaskCard = ({ task, onClick }) => {
     ON_HOLD: "bg-gray-100 text-gray-800",
   };
 
+  // Check if task is overdue and not completed
+  const showOverdueBadge = isOverdue && status !== "COMPLETED";
+
   return (
     <div
       key={task.id}
@@ -59,9 +63,16 @@ const TaskCard = ({ task, onClick }) => {
       {/* Title and Status */}
       <div className="flex justify-between items-start gap-2">
         <div className="text-sm text-neutral-900 font-semibold flex-1">{title}</div>
-        <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[status] || "bg-gray-100 text-gray-800"}`}>
-          {status?.replace('_', ' ') || 'Unknown'}
-        </span>
+        <div className="flex flex-col items-end gap-1">
+          {showOverdueBadge && (
+            <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+              Overdue
+            </span>
+          )}
+          <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[status] || "bg-gray-100 text-gray-800"}`}>
+            {status?.replace('_', ' ') || 'Unknown'}
+          </span>
+        </div>
       </div>
 
       {/* Description */}
@@ -73,8 +84,11 @@ const TaskCard = ({ task, onClick }) => {
       <div className="flex justify-between items-center pt-2">
         <div className="flex items-center gap-1">
           <img width="12.2" height="12.2" src="/images/calendar1.png" alt="Calendar" />
-          <div className="text-[10px] text-gray-600 font-medium">
+          <div className={`text-[10px] font-medium ${
+            showOverdueBadge ? "text-red-600" : "text-gray-600"
+          }`}>
             {dueDate ? new Date(dueDate).toLocaleDateString() : "No due date"}
+            {showOverdueBadge && " • Overdue"}
           </div>
         </div>
         <div
@@ -129,6 +143,34 @@ const TaskCard = ({ task, onClick }) => {
   );
 };
 
+// Blue rectangle component for column headers
+const ColumnHeader = ({ icon, title, count, bgColor = "bg-blue-500" }) => (
+  <div className={`flex flex-col justify-center items-center gap-2.5 pr-2 pl-2 rounded-lg h-12 shadow-sm ${bgColor}`}>
+    <div className="flex flex-row justify-between items-center gap-9 w-full h-5">
+      <div className="flex flex-row justify-start items-start gap-1">
+        <img
+          width="18px"
+          height="18px"
+          src="/images/taskstatus.png"
+          alt={`${title} icon`}
+        />
+        <div className="flex flex-row justify-center items-center gap-2.5 w-11 h-5">
+          <div className="font-inter text-base min-w-[45px] whitespace-nowrap text-white text-opacity-100 leading-tight font-medium">
+            {title}
+          </div>
+        </div>
+      </div>
+      <div className="flex justify-center items-center rounded border-neutral-200 border-t border-b border-l border-r border-solid border w-5 h-5">
+        <div className="flex flex-row justify-center items-center gap-1 h-4">
+          <div className="font-inter text-xs min-w-[8px] whitespace-nowrap text-white text-opacity-100 leading-snug tracking-normal font-semibold">
+            {count}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
 const EmployeeDashboardContent = () => {
   const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
   const [isLogTaskModalOpen, setIsLogTaskModalOpen] = useState(false);
@@ -156,8 +198,15 @@ const EmployeeDashboardContent = () => {
 
   const canCreateTask = taskPermissions?.can_create;
 
-  // Fetch tasks from backend
-  const { data: tasksData, isLoading: tasksLoading, error: tasksError, refetch: refetchTasks } = useGetMyTasksQuery();
+  // Fetch tasks from backend with increased page size to get all tasks for counting
+  const { 
+    data: tasksData, 
+    isLoading: tasksLoading, 
+    error: tasksError, 
+    refetch: refetchTasks 
+  } = useGetMyTasksQuery({
+    page_size: 100, // Get all tasks to count properly
+  });
   
   // Fetch attendance data from backend
   const {
@@ -175,11 +224,18 @@ const EmployeeDashboardContent = () => {
   const clockIn = attendanceData?.clock_in;
   const clockOut = attendanceData?.clock_out;
 
-  // Group tasks by status
+  // Group tasks by status - limit to 2 latest for display, but count all
   const groupedTasks = {
-    todo: tasks.filter((task) => task.status === "TO_DO"),
-    inProgress: tasks.filter((task) => task.status === "IN_PROGRESS"),
-    completed: tasks.filter((task) => task.status === "COMPLETED"),
+    todo: tasks.filter((task) => task.status === "TO_DO").slice(0, 2), // Limit to 2 latest for display
+    inProgress: tasks.filter((task) => task.status === "IN_PROGRESS").slice(0, 2), // Limit to 2 latest for display
+    completed: tasks.filter((task) => task.status === "COMPLETED").slice(0, 2), // Limit to 2 latest for display
+  };
+
+  // Get total counts for display (using actual counts from all tasks)
+  const totalCounts = {
+    todo: tasks.filter((task) => task.status === "TO_DO").length,
+    inProgress: tasks.filter((task) => task.status === "IN_PROGRESS").length,
+    completed: tasks.filter((task) => task.status === "COMPLETED").length,
   };
 
   const toggleAmountVisibility = () => {
@@ -493,17 +549,14 @@ const EmployeeDashboardContent = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
           {/* To Do Column */}
           <div className="flex flex-col gap-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <img width="14" height="14" src="/images/todo.png" alt="To Do icon" />
-                <div className="text-base text-neutral-900 font-medium">To Do</div>
-              </div>
-              <div className="flex items-center justify-center rounded border border-neutral-200 w-5 h-5">
-                <div className="text-xs text-neutral-900 font-semibold">{groupedTasks.todo.length}</div>
-              </div>
-            </div>
+            <ColumnHeader
+              icon="/images/taskstatus.png"
+              title="To Do"
+              count={totalCounts.todo}
+              bgColor="bg-blue-500"
+            />
 
-            {/* Task Cards */}
+            {/* Task Cards - Limited to 2 latest */}
             <div className="flex flex-col gap-4">
               {groupedTasks.todo.map((task) => (
                 <TaskCard key={task.id} task={task} onClick={handleCardClick} />
@@ -513,22 +566,24 @@ const EmployeeDashboardContent = () => {
                   No tasks to do
                 </div>
               )}
+              {totalCounts.todo > 2 && (
+                <div className="text-center text-teal-600 text-sm py-2 font-medium">
+                  +{totalCounts.todo - 2} more tasks in Task Management
+                </div>
+              )}
             </div>
           </div>
 
           {/* In Progress Column */}
           <div className="flex flex-col gap-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <img width="14" height="14" src="/images/inprogress.png" alt="In Progress" />
-                <div className="text-base text-neutral-900 font-medium">In Progress</div>
-              </div>
-              <div className="flex items-center justify-center rounded border border-neutral-200 w-5 h-5">
-                <div className="text-xs text-neutral-900 font-semibold">{groupedTasks.inProgress.length}</div>
-              </div>
-            </div>
+            <ColumnHeader
+              icon="/images/taskstatus.png"
+              title="In Progress"
+              count={totalCounts.inProgress}
+              bgColor="bg-yellow-500"
+            />
 
-            {/* Task Cards */}
+            {/* Task Cards - Limited to 2 latest */}
             <div className="flex flex-col gap-4">
               {groupedTasks.inProgress.map((task) => (
                 <TaskCard key={task.id} task={task} onClick={handleCardClick} />
@@ -538,22 +593,24 @@ const EmployeeDashboardContent = () => {
                   No tasks in progress
                 </div>
               )}
+              {totalCounts.inProgress > 2 && (
+                <div className="text-center text-teal-600 text-sm py-2 font-medium">
+                  +{totalCounts.inProgress - 2} more tasks in Task Management
+                </div>
+              )}
             </div>
           </div>
 
           {/* Completed Column */}
           <div className="flex flex-col gap-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <img width="14" height="14" src="/images/completed.png" alt="Completed" />
-                <div className="text-base text-neutral-900 font-medium">Completed</div>
-              </div>
-              <div className="flex items-center justify-center rounded border border-neutral-200 w-5 h-5">
-                <div className="text-xs text-neutral-900 font-semibold">{groupedTasks.completed.length}</div>
-              </div>
-            </div>
+            <ColumnHeader
+              icon="/images/taskstatus.png"
+              title="Completed"
+              count={totalCounts.completed}
+              bgColor="bg-green-500"
+            />
 
-            {/* Task Cards */}
+            {/* Task Cards - Limited to 2 latest */}
             <div className="flex flex-col gap-4">
               {groupedTasks.completed.map((task) => (
                 <TaskCard key={task.id} task={task} onClick={handleCardClick} />
@@ -561,6 +618,11 @@ const EmployeeDashboardContent = () => {
               {groupedTasks.completed.length === 0 && (
                 <div className="text-center text-gray-500 text-sm py-4">
                   No completed tasks
+                </div>
+              )}
+              {totalCounts.completed > 2 && (
+                <div className="text-center text-teal-600 text-sm py-2 font-medium">
+                  +{totalCounts.completed - 2} more tasks in Task Management
                 </div>
               )}
             </div>

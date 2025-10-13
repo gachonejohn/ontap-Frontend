@@ -4,8 +4,8 @@ import {
   useCreateTaskMutation,
   useGetTaskDetailQuery,
 } from "../../store/services/tasks/tasksService";
-import LogTaskModal from "./LogTaskModal"; // Changed from "./modals/LogTaskModal"
-import TaskModal from "./TaskModal"; // Changed from "./modals/TaskModal"
+import LogTaskModal from "./LogTaskModal";
+import TaskModal from "./TaskModal";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 
@@ -132,6 +132,34 @@ const TaskCard = ({ task, onClick }) => {
   );
 };
 
+// Blue rectangle component for column headers
+const ColumnHeader = ({ icon, title, count, bgColor = "bg-blue-500" }) => (
+  <div className={`flex flex-col justify-center items-center gap-2.5 pr-2 pl-2 rounded-lg h-12 shadow-sm ${bgColor}`}>
+    <div className="flex flex-row justify-between items-center gap-9 w-full h-5">
+      <div className="flex flex-row justify-start items-start gap-1">
+        <img
+          width="18px"
+          height="18px"
+          src="/images/taskstatus.png"
+          alt={`${title} icon`}
+        />
+        <div className="flex flex-row justify-center items-center gap-2.5 w-11 h-5">
+          <div className="font-inter text-base min-w-[45px] whitespace-nowrap text-white text-opacity-100 leading-tight font-medium">
+            {title}
+          </div>
+        </div>
+      </div>
+      <div className="flex justify-center items-center rounded border-neutral-200 border-t border-b border-l border-r border-solid border w-5 h-5">
+        <div className="flex flex-row justify-center items-center gap-1 h-4">
+          <div className="font-inter text-xs min-w-[8px] whitespace-nowrap text-white text-opacity-100 leading-snug tracking-normal font-semibold">
+            {count}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
 const EmployeeTasksDashboardContent = () => {
   const [isLogTaskModalOpen, setIsLogTaskModalOpen] = useState(false);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
@@ -166,27 +194,35 @@ const EmployeeTasksDashboardContent = () => {
 
   const canCreateTask = taskPermissions?.can_create;
 
-  // Employee only sees their own tasks with status filter
+  // Employee only sees their own tasks with status filter and increased page size
   const { data: tasksData, isLoading, error, refetch } = useGetMyTasksQuery({
     search: searchTerm || undefined,
     status: statusFilter !== "All" && statusFilter !== "OVERDUE" ? statusFilter : undefined,
+    page_size: 100, // Increased page size to get all tasks
   });
 
   const [createTask] = useCreateTaskMutation();
 
   const tasks = tasksData?.results || [];
+  // Use the total count from API response instead of just the current page results
+  const totalTasksCount = tasksData?.count || tasks.length;
 
   // Filter tasks based on overdue filter
   const filteredTasks = statusFilter === "OVERDUE" 
     ? tasks.filter(task => task.is_overdue && task.status !== "COMPLETED")
     : tasks;
 
-  // Group tasks by status
+  // Group tasks by status - show ALL tasks for employee
   const groupedTasks = {
     todo: filteredTasks.filter((task) => task.status === "TO_DO"),
     inProgress: filteredTasks.filter((task) => task.status === "IN_PROGRESS"),
     completed: filteredTasks.filter((task) => task.status === "COMPLETED"),
   };
+
+  // Calculate counts for analytics using the total count
+  const completedCount = groupedTasks.completed.length;
+  const inProgressCount = groupedTasks.inProgress.length;
+  const overdueCount = tasks.filter(t => t.is_overdue && t.status !== "COMPLETED").length;
 
   // Handle new task creation
   const handleCreateTask = async (formData) => {
@@ -202,7 +238,8 @@ const EmployeeTasksDashboardContent = () => {
       formDataObj.append("description", formData.description || "");
       formDataObj.append("status", formData.status || "TO_DO");
       formDataObj.append("priority", formData.priority || "MEDIUM");
-      formDataObj.append("assignee", currentUser?.id); // 👈 employee is always the assignee
+      // Use user ID, not employee ID
+      formDataObj.append("assignee", currentUser?.id);
       
       if (formData.department) formDataObj.append("department", formData.department);
       
@@ -388,20 +425,17 @@ const EmployeeTasksDashboardContent = () => {
       </div>
 
       {activeTab === 'taskManagement' ? (
-        /* Task Columns */
+        /* Task Columns - Show ALL tasks with scrollable containers */
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
           {/* To Do Column */}
           <div className="flex flex-col gap-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <img width="14" height="14" src="/images/todo.png" alt="To Do icon" />
-                <div className="text-base text-neutral-900 font-medium">To Do</div>
-              </div>
-              <div className="flex items-center justify-center rounded border border-neutral-200 w-5 h-5">
-                <div className="text-xs text-neutral-900 font-semibold">{groupedTasks.todo.length}</div>
-              </div>
-            </div>
-            <div className="flex flex-col gap-4">
+            <ColumnHeader
+              icon="/images/taskstatus.png"
+              title="To Do"
+              count={groupedTasks.todo.length}
+              bgColor="bg-blue-500"
+            />
+            <div className="flex flex-col gap-4 max-h-[600px] overflow-y-auto">
               {groupedTasks.todo.map((task) => (
                 <TaskCard key={task.id} task={task} onClick={handleCardClick} />
               ))}
@@ -415,16 +449,13 @@ const EmployeeTasksDashboardContent = () => {
 
           {/* In Progress Column */}
           <div className="flex flex-col gap-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <img width="14" height="14" src="/images/inprogress.png" alt="In Progress" />
-                <div className="text-base text-neutral-900 font-medium">In Progress</div>
-              </div>
-              <div className="flex items-center justify-center rounded border border-neutral-200 w-5 h-5">
-                <div className="text-xs text-neutral-900 font-semibold">{groupedTasks.inProgress.length}</div>
-              </div>
-            </div>
-            <div className="flex flex-col gap-4">
+            <ColumnHeader
+              icon="/images/taskstatus.png"
+              title="In Progress"
+              count={groupedTasks.inProgress.length}
+              bgColor="bg-yellow-500"
+            />
+            <div className="flex flex-col gap-4 max-h-[600px] overflow-y-auto">
               {groupedTasks.inProgress.map((task) => (
                 <TaskCard key={task.id} task={task} onClick={handleCardClick} />
               ))}
@@ -438,16 +469,13 @@ const EmployeeTasksDashboardContent = () => {
 
           {/* Completed Column */}
           <div className="flex flex-col gap-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <img width="14" height="14" src="/images/completed.png" alt="Completed" />
-                <div className="text-base text-neutral-900 font-medium">Completed</div>
-              </div>
-              <div className="flex items-center justify-center rounded border border-neutral-200 w-5 h-5">
-                <div className="text-xs text-neutral-900 font-semibold">{groupedTasks.completed.length}</div>
-              </div>
-            </div>
-            <div className="flex flex-col gap-4">
+            <ColumnHeader
+              icon="/images/taskstatus.png"
+              title="Completed"
+              count={groupedTasks.completed.length}
+              bgColor="bg-green-500"
+            />
+            <div className="flex flex-col gap-4 max-h-[600px] overflow-y-auto">
               {groupedTasks.completed.map((task) => (
                 <TaskCard key={task.id} task={task} onClick={handleCardClick} />
               ))}
@@ -469,11 +497,11 @@ const EmployeeTasksDashboardContent = () => {
                 <div className="text-sm text-gray-600 font-medium">Total Tasks</div>
                 <div className="flex flex-col justify-start items-start gap-2.5 p-1 rounded border border-neutral-200 h-5 overflow-hidden">
                   <div className="flex flex-row justify-center items-center gap-1 h-4">
-                    <div className="text-xs text-neutral-900 font-semibold">{tasks.length}</div>
+                    <div className="text-xs text-neutral-900 font-semibold">{totalTasksCount}</div>
                   </div>
                 </div>
               </div>
-              <div className="text-lg text-neutral-900 font-semibold">{tasks.length} Tasks</div>
+              <div className="text-lg text-neutral-900 font-semibold">{totalTasksCount} Tasks</div>
               <div className="w-full h-2 bg-gray-200 rounded-full">
                 <div className="h-full bg-blue-500 rounded-full" style={{ width: '100%' }}></div>
               </div>
@@ -484,16 +512,16 @@ const EmployeeTasksDashboardContent = () => {
                 <div className="text-sm text-gray-600 font-medium">Completed</div>
                 <div className="flex flex-col justify-start items-start gap-2.5 p-1 rounded border border-neutral-200 h-5 overflow-hidden">
                   <div className="flex flex-row justify-center items-center gap-1 h-4">
-                    <div className="text-xs text-neutral-900 font-semibold">{groupedTasks.completed.length}</div>
+                    <div className="text-xs text-neutral-900 font-semibold">{completedCount}</div>
                   </div>
                 </div>
               </div>
-              <div className="text-lg text-green-500 font-semibold">{groupedTasks.completed.length} Tasks</div>
+              <div className="text-lg text-green-500 font-semibold">{completedCount} Tasks</div>
               <div className="w-full h-2 bg-gray-200 rounded-full">
                 <div 
                   className="h-full bg-green-500 rounded-full" 
                   style={{ 
-                    width: `${tasks.length > 0 ? (groupedTasks.completed.length / tasks.length) * 100 : 0}%` 
+                    width: `${totalTasksCount > 0 ? (completedCount / totalTasksCount) * 100 : 0}%` 
                   }}
                 ></div>
               </div>
@@ -504,16 +532,16 @@ const EmployeeTasksDashboardContent = () => {
                 <div className="text-sm text-gray-600 font-medium">In Progress</div>
                 <div className="flex flex-col justify-start items-start gap-2.5 p-1 rounded border border-neutral-200 h-5 overflow-hidden">
                   <div className="flex flex-row justify-center items-center gap-1 h-4">
-                    <div className="text-xs text-neutral-900 font-semibold">{groupedTasks.inProgress.length}</div>
+                    <div className="text-xs text-neutral-900 font-semibold">{inProgressCount}</div>
                   </div>
                 </div>
               </div>
-              <div className="text-lg text-yellow-500 font-semibold">{groupedTasks.inProgress.length} Tasks</div>
+              <div className="text-lg text-yellow-500 font-semibold">{inProgressCount} Tasks</div>
               <div className="w-full h-2 bg-gray-200 rounded-full">
                 <div 
                   className="h-full bg-yellow-500 rounded-full" 
                   style={{ 
-                    width: `${tasks.length > 0 ? (groupedTasks.inProgress.length / tasks.length) * 100 : 0}%` 
+                    width: `${totalTasksCount > 0 ? (inProgressCount / totalTasksCount) * 100 : 0}%` 
                   }}
                 ></div>
               </div>
@@ -525,19 +553,19 @@ const EmployeeTasksDashboardContent = () => {
                 <div className="flex flex-col justify-start items-start gap-2.5 p-1 rounded border border-neutral-200 h-5 overflow-hidden">
                   <div className="flex flex-row justify-center items-center gap-1 h-4">
                     <div className="text-xs text-neutral-900 font-semibold">
-                      {tasks.filter(t => t.is_overdue && t.status !== "COMPLETED").length}
+                      {overdueCount}
                     </div>
                   </div>
                 </div>
               </div>
               <div className="text-lg text-red-500 font-semibold">
-                {tasks.filter(t => t.is_overdue && t.status !== "COMPLETED").length} Tasks
+                {overdueCount} Tasks
               </div>
               <div className="w-full h-2 bg-gray-200 rounded-full">
                 <div 
                   className="h-full bg-red-500 rounded-full" 
                   style={{ 
-                    width: `${tasks.length > 0 ? (tasks.filter(t => t.is_overdue && t.status !== "COMPLETED").length / tasks.length) * 100 : 0}%` 
+                    width: `${totalTasksCount > 0 ? (overdueCount / totalTasksCount) * 100 : 0}%` 
                   }}
                 ></div>
               </div>
@@ -554,8 +582,8 @@ const EmployeeTasksDashboardContent = () => {
                 <div className="flex flex-col justify-start items-start gap-2 w-full">
                   <div className="text-base text-blue-900 font-medium">Completion Rate</div>
                   <div className="text-xs text-blue-700 font-medium">
-                    You have completed {groupedTasks.completed.length} out of {tasks.length} tasks. 
-                    Your current completion rate is {tasks.length > 0 ? ((groupedTasks.completed.length / tasks.length) * 100).toFixed(1) : 0}%.
+                    You have completed {completedCount} out of {totalTasksCount} tasks. 
+                    Your current completion rate is {totalTasksCount > 0 ? ((completedCount / totalTasksCount) * 100).toFixed(1) : 0}%.
                   </div>
                 </div>
               </div>

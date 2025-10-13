@@ -22,6 +22,7 @@ export default function DashboardLayout() {
     );
   }
   return (
+<<<<<<< Updated upstream
     <div className="flex w-full h-screen overflow-hidden">
       {/* Sidebar (role aware) */}
       <Sidebar />
@@ -35,6 +36,20 @@ export default function DashboardLayout() {
 
 </div>
 
+=======
+    <div className="flex w-full min-h-screen overflow-y-auto">
+      <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+      <div
+        className={`flex flex-col flex-1 w-full overflow-y-hidden bg-[#F9F9FA] transition-all duration-300 ${
+          sidebarOpen ? "ml-[272px]" : "ml-[64px]"
+        }`}
+      >
+        <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+        <div className="flex-1 px-4 mt-15 py-8 bg-white">
+          <Outlet />
+        </div>
+      </div>
+>>>>>>> Stashed changes
     </div>
   );
 }
