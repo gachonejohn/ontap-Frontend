@@ -19,7 +19,8 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit }) => {
     description: "",
     status: "TO_DO",
     priority: "",
-    assignee: "",
+    assignee: "", // Single assignee (for backward compatibility)
+    assignees: [], // New field for multiple assignees
     department: "",
     start_date: "",
     due_date: "",
@@ -27,10 +28,11 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit }) => {
     estimated_hours: "",
     is_urgent: false,
     requires_approval: false,
-    files: [], // New field for file uploads
+    files: [],
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formErrors, setFormErrors] = useState({});
 
   // Fetch employees only if user can view all tasks (Admin/Manager)
   const { data: employeesData } = useGetEmployeesQuery({}, { skip: !canViewAll });
@@ -68,6 +70,12 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit }) => {
     value,
   }));
 
+  // Prepare employee options for react-select
+  const employeeOptions = employees.map((emp) => ({
+    value: emp.user?.id,
+    label: `${emp.user?.first_name} ${emp.user?.last_name}`,
+  }));
+
   useEffect(() => {
     if (isOpen) {
       setFormData({
@@ -76,6 +84,7 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit }) => {
         status: "TO_DO",
         priority: "",
         assignee: "",
+        assignees: [],
         department: "",
         start_date: "",
         due_date: "",
@@ -85,9 +94,47 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit }) => {
         requires_approval: false,
         files: [],
       });
+      setFormErrors({});
       setIsSubmitting(false);
     }
   }, [isOpen]);
+
+  const validateForm = () => {
+    const errors = {};
+
+    if (!formData.title.trim()) {
+      errors.title = "Task title is required";
+    }
+
+    if (!formData.priority) {
+      errors.priority = "Priority is required";
+    }
+
+    if (!formData.description.trim()) {
+      errors.description = "Description is required";
+    }
+
+    if (!formData.start_date) {
+      errors.start_date = "Start date is required";
+    }
+
+    if (!formData.due_date) {
+      errors.due_date = "Due date is required";
+    }
+
+    // Validate that due date is not before start date
+    if (formData.start_date && formData.due_date) {
+      const startDate = new Date(formData.start_date);
+      const dueDate = new Date(formData.due_date);
+      
+      if (dueDate < startDate) {
+        errors.due_date = "Due date cannot be before start date";
+      }
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -95,10 +142,28 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit }) => {
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
+
+    // Clear error when user starts typing
+    if (formErrors[name]) {
+      setFormErrors(prev => ({
+        ...prev,
+        [name]: ""
+      }));
+    }
   };
 
   const handleAssigneeChange = (e) => {
     setFormData((prev) => ({ ...prev, assignee: e.target.value }));
+  };
+
+  const handleMultipleAssigneesChange = (selectedOptions) => {
+    const selectedValues = selectedOptions ? selectedOptions.map(option => option.value) : [];
+    setFormData((prev) => ({ 
+      ...prev, 
+      assignees: selectedValues,
+      // Maintain backward compatibility - set the first assignee as the primary one
+      assignee: selectedValues.length > 0 ? selectedValues[0] : ""
+    }));
   };
 
   const handleDepartmentChange = (selected) => {
@@ -125,6 +190,11 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit }) => {
 
   const handleCreateTask = async (e) => {
     e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+
     if (!onSubmit) return;
     setIsSubmitting(true);
     try {
@@ -180,9 +250,13 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit }) => {
               value={formData.title}
               onChange={handleChange}
               placeholder="Enter task title"
-              required
-              className="w-full p-3 rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+              className={`w-full p-3 rounded-lg border bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 ${
+                formErrors.title ? "border-red-500" : "border-neutral-200"
+              }`}
             />
+            {formErrors.title && (
+              <p className="text-red-500 text-xs mt-1">{formErrors.title}</p>
+            )}
           </div>
 
           {/* Status & Priority */}
@@ -195,7 +269,6 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit }) => {
                 name="status"
                 value={formData.status}
                 onChange={handleChange}
-                required
                 className="w-full p-3 rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
               >
                 {statusOptions.map(({ key, value }) => (
@@ -213,8 +286,9 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit }) => {
                 name="priority"
                 value={formData.priority}
                 onChange={handleChange}
-                required
-                className="w-full p-3 rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+                className={`w-full p-3 rounded-lg border bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 ${
+                  formErrors.priority ? "border-red-500" : "border-neutral-200"
+                }`}
               >
                 <option value="">Select Priority</option>
                 {priorityOptions.map(({ key, value }) => (
@@ -223,6 +297,9 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit }) => {
                   </option>
                 ))}
               </select>
+              {formErrors.priority && (
+                <p className="text-red-500 text-xs mt-1">{formErrors.priority}</p>
+              )}
             </div>
           </div>
 
@@ -237,9 +314,13 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit }) => {
               onChange={handleChange}
               placeholder="Enter task description"
               rows="3"
-              required
-              className="w-full p-3 rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+              className={`w-full p-3 rounded-lg border bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 ${
+                formErrors.description ? "border-red-500" : "border-neutral-200"
+              }`}
             />
+            {formErrors.description && (
+              <p className="text-red-500 text-xs mt-1">{formErrors.description}</p>
+            )}
           </div>
 
           {/* File Upload - Styled like first version */}
@@ -294,25 +375,61 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit }) => {
             )}
           </div>
 
-          {/* Assignee (only for users with can_view_all permission) */}
+          {/* Assignee (only for users with can_view_all permission) - Updated for multiple selection */}
           {canViewAll && employees.length > 0 && (
             <div className="flex flex-col gap-2 w-full">
               <label className="text-sm text-neutral-900 font-medium">
-                Assignee
+                Assignees
               </label>
-              <select
-                name="assignee"
-                value={formData.assignee}
-                onChange={handleAssigneeChange}
-                className="w-full p-3 rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
-              >
-                <option value="">Unassigned</option>
-                {employees.map((emp) => (
-                  <option key={emp.id} value={emp.user?.id}>
-                    {emp.user?.first_name} {emp.user?.last_name}
-                  </option>
-                ))}
-              </select>
+              <Select
+                isMulti
+                options={employeeOptions}
+                value={employeeOptions.filter(option => 
+                  formData.assignees.includes(option.value)
+                )}
+                onChange={handleMultipleAssigneesChange}
+                placeholder="Select assignees..."
+                menuPortalTarget={document.body}
+                menuPlacement="auto"
+                styles={{
+                  menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                  control: (base, state) => ({
+                    ...base,
+                    minHeight: "48px",
+                    borderColor: "#d1d5db",
+                    borderRadius: "8px",
+                    "&:hover": { borderColor: "#9ca3af" },
+                    "&:focus-within": {
+                      borderColor: "#14b8a6",
+                      boxShadow: "0 0 0 2px rgba(20,184,166,0.2)",
+                    },
+                  }),
+                  multiValue: (base) => ({
+                    ...base,
+                    backgroundColor: "#e0f2fe",
+                    borderRadius: "6px",
+                  }),
+                  multiValueLabel: (base) => ({
+                    ...base,
+                    color: "#0369a1",
+                    fontWeight: "500",
+                  }),
+                  multiValueRemove: (base) => ({
+                    ...base,
+                    color: "#0369a1",
+                    ":hover": {
+                      backgroundColor: "#bae6fd",
+                      color: "#0c4a6e",
+                    },
+                  }),
+                }}
+              />
+              <div className="text-xs text-gray-500 mt-1">
+                {formData.assignees.length > 0 
+                  ? `${formData.assignees.length} assignee(s) selected`
+                  : "Select one or more assignees"
+                }
+              </div>
             </div>
           )}
 
@@ -357,27 +474,37 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit }) => {
           <div className="flex flex-row gap-4 w-full">
             <div className="flex flex-col gap-2 w-full">
               <label className="text-sm text-neutral-900 font-medium">
-                Start Date
+                Start Date *
               </label>
               <input
                 type="date"
                 name="start_date"
                 value={formData.start_date}
                 onChange={handleChange}
-                className="w-full p-3 rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+                className={`w-full p-3 rounded-lg border bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 ${
+                  formErrors.start_date ? "border-red-500" : "border-neutral-200"
+                }`}
               />
+              {formErrors.start_date && (
+                <p className="text-red-500 text-xs mt-1">{formErrors.start_date}</p>
+              )}
             </div>
             <div className="flex flex-col gap-2 w-full">
               <label className="text-sm text-neutral-900 font-medium">
-                Due Date
+                Due Date *
               </label>
               <input
                 type="date"
                 name="due_date"
                 value={formData.due_date}
                 onChange={handleChange}
-                className="w-full p-3 rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+                className={`w-full p-3 rounded-lg border bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 ${
+                  formErrors.due_date ? "border-red-500" : "border-neutral-200"
+                }`}
               />
+              {formErrors.due_date && (
+                <p className="text-red-500 text-xs mt-1">{formErrors.due_date}</p>
+              )}
             </div>
           </div>
 
