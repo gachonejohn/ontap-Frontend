@@ -214,7 +214,7 @@ export default function MainLeaveAttendanceDashboardContent() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Attendance Trends */}
         <div className="">
-          <AttendanceTrendsChart data={data} isLoading={isLoading} />;
+          <AttendanceTrendsChart data={data} isLoading={isLoading} />
         </div>
 
         {/* Leave Distribution */}
