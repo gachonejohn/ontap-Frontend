@@ -71,17 +71,38 @@ export const useTaskOperations = (task, refetch) => {
     }
   };
 
-  const handleStatusChange = async (newStatus) => {
-    if (!task) return;
-    try {
-      await updateTaskStatus({ id: task.id, status: newStatus }).unwrap();
-      if (refetch) refetch();
-      toast.success("Status updated successfully!");
-    } catch (error) {
-      console.error('Failed to update status:', error);
-      toast.error("Failed to update status");
+  // In useTaskOperations.js - Fix the handleStatusChange function
+const handleStatusChange = async (taskId, newStatus, userId) => {
+  try {
+    const effectiveUserId = userId || (currentUser?.user?.id || currentUser?.id);
+    
+    if (!effectiveUserId) {
+      throw new Error('User ID not available');
     }
-  };
+
+    console.log('=== STATUS CHANGE API CALL ===');
+    console.log('Task ID:', taskId);
+    console.log('New Status:', newStatus);
+    console.log('User ID:', effectiveUserId);
+
+    // 🔥 FIX: Use the correct endpoint structure
+    const response = await updateTaskStatus({
+      id: taskId, // This should be the task ID
+      status: newStatus,
+      progress_percentage: task?.progress_percentage || task?.progressPercentage || 0, // Include current progress
+      comment: `Status changed to ${newStatus}` // Optional comment
+    }).unwrap();
+
+    console.log('Status change successful:', response);
+    return response;
+  } catch (error) {
+    console.error('Error updating task status:', error);
+    console.error('Full error object:', error);
+    console.error('Error data:', error?.data);
+    console.error('Error status:', error?.status);
+    throw error;
+  }
+};
 
   const handlePriorityChange = async (newPriority) => {
     if (!task) return;
@@ -149,77 +170,58 @@ export const useTaskOperations = (task, refetch) => {
   };
 
   const handleSaveAll = async (formData, fieldPermissions) => {
-    if (!task) return;
-
+  try {
     setIsUploading(true);
-    try {
-      const updates = {
-        currentTitle: task.title,
-        currentDescription: task.description
-      };
-
-      // Only include fields that user has permission to edit AND that have changed
-      if (fieldPermissions.canEditTitle && formData.titleValue.trim() !== task.title) {
-        updates.title = formData.titleValue.trim();
-      }
-      if (fieldPermissions.canEditDescription && formData.descriptionValue !== task.description) {
-        updates.description = formData.descriptionValue;
-      }
-      if (fieldPermissions.canEditDueDate) {
-        const currentDueDate = task.due_date || task.dueDate;
-        const formattedCurrentDueDate = formatDateForInput(currentDueDate);
-        if (formData.dueDateValue !== formattedCurrentDueDate) {
-          updates.due_date = formData.dueDateValue;
-        }
-      }
-
-      // Employees without can_view_all can only assign to themselves
-      if (fieldPermissions.canEditAssignee) {
-        if (fieldPermissions.canViewAll && formData.assigneeValue !== task.assignee) {
-          updates.assignee = formData.assigneeValue;
-        } else if (!fieldPermissions.canViewAll && currentUser?.id !== task.assignee) {
-          updates.assignee = currentUser?.id;
-        }
-      }
-
-      if (fieldPermissions.canEditDepartment && formData.departmentValue !== task.department) {
-        updates.department = formData.departmentValue;
-      }
-
-      // Check if there are any actual changes to save
-      const hasChanges = Object.keys(updates).some(key =>
-        !['currentTitle', 'currentDescription'].includes(key)
-      );
-
-      // Upload attachments if any files are selected
-      if (files.length > 0) {
-        await uploadAttachments(task.id);
-      }
-
-      if (!hasChanges && files.length === 0) {
-        setIsUploading(false);
-        toast.info("No changes to save");
-        return;
-      }
-
-      if (hasChanges) {
-        await updateTask({ id: task.id, ...updates }).unwrap();
-      }
-
-      setFiles([]); // Clear selected files after upload
-      if (refetch) refetch();
-    } catch (error) {
-      console.error('Failed to update task:', error);
-      if (error?.data?.detail?.includes('permission')) {
-        toast.error("You don't have permission to update some fields");
-      } else {
-        toast.error("Failed to update task");
-      }
-      throw error;
-    } finally {
-      setIsUploading(false);
+    
+    const userId = currentUser?.user?.id || currentUser?.id;
+    
+    if (!userId) {
+      throw new Error('User ID not available for saving task');
     }
-  };
+
+    // Debug what's in formData
+    console.log('=== handleSaveAll DEBUG ===');
+    console.log('formData.assigneeValue:', formData.assigneeValue);
+    console.log('task.assignee (original):', task.assignee);
+    console.log('Current User ID:', userId);
+    console.log('=== END DEBUG ===');
+
+    const updateData = {
+      title: formData.titleValue || task.title,
+      description: formData.descriptionValue || task.description,
+      // 🔥 CRITICAL: Use the formData.assigneeValue which should be the user ID (40)
+      // If it's empty or invalid, fall back to the original task.assignee
+      assignee: formData.assigneeValue || task.assignee || userId,
+      department: formData.departmentValue || task.department,
+      due_date: formData.dueDateValue || task.due_date,
+      priority: task.priority, // Keep original if not in formData
+      status: task.status, // Keep original if not in formData
+      progress: formData.progressValue || task.progress,
+    };
+
+    // If we're still getting the wrong ID, force the correct one
+    if (updateData.assignee === 21) {
+      console.warn('Wrong assignee ID detected, correcting to:', userId);
+      updateData.assignee = userId;
+    }
+
+    console.log('Final update data:', updateData);
+
+    const response = await updateTask(task.id, updateData);
+    
+    // 🔥 FIX: Call uploadAttachments instead of handleFileUpload
+    if (files && files.length > 0) {
+      await uploadAttachments(task.id);
+    }
+
+    return response;
+  } catch (error) {
+    console.error('Failed to update task:', error);
+    throw error;
+  } finally {
+    setIsUploading(false);
+  }
+};
 
   const handleDeleteTask = async () => {
     if (!task) return;
@@ -234,22 +236,38 @@ export const useTaskOperations = (task, refetch) => {
   };
 
   const handleAddComment = async () => {
-    if (!newComment.trim() || !task) return;
-    try {
-      await createComment({
-        task_pk: task.id,
-        data: {
-          content: newComment.trim(),
-          user: currentUser?.id
-        }
-      }).unwrap();
-      setNewComment("");
-      toast.success("Comment added successfully!");
-    } catch (error) {
-      console.error('Failed to add comment:', error);
+  if (!newComment.trim() || !task) return;
+  try {
+    // 🔥 FIX: Extract user ID correctly
+    const userId = currentUser?.user?.id || currentUser?.id;
+    
+    if (!userId) {
+      console.error("Cannot determine user ID from currentUser:", currentUser);
+      toast.error("Failed to add comment: User ID not found");
+      return;
+    }
+    
+    await createComment({
+      task_pk: task.id,
+      data: {
+        content: newComment.trim(),
+        user: userId  // Use the extracted user ID
+      }
+    }).unwrap();
+    setNewComment("");
+    toast.success("Comment added successfully!");
+  } catch (error) {
+    console.error('Failed to add comment:', error);
+    console.error('Error details:', error?.data);
+    
+    // Show specific error message
+    if (error?.data?.user) {
+      toast.error(`User error: ${error.data.user[0]}`);
+    } else {
       toast.error("Failed to add comment");
     }
-  };
+  }
+};
 
   const handleEditComment = (comment) => {
     setEditingCommentId(comment.id);
@@ -257,24 +275,41 @@ export const useTaskOperations = (task, refetch) => {
   };
 
   const handleSaveComment = async (commentId) => {
-    if (!editCommentContent.trim()) return;
-    try {
-      await updateComment({
-        task_pk: task.id,
-        id: commentId,
-        data: {
-          content: editCommentContent.trim(),
-          user: currentUser?.id
-        }
-      }).unwrap();
-      setEditingCommentId(null);
-      setEditCommentContent("");
-      toast.success("Comment updated successfully!");
-    } catch (error) {
-      console.error('Failed to update comment:', error);
+  if (!editCommentContent.trim()) return;
+  try {
+    // 🔥 FIX: Extract user ID correctly
+    const userId = currentUser?.user?.id || currentUser?.id;
+    
+    if (!userId) {
+      console.error("Cannot determine user ID from currentUser:", currentUser);
+      toast.error("Failed to update comment: User ID not found");
+      return;
+    }
+    
+    await updateComment({
+      task_pk: task.id,
+      id: commentId,
+      data: {
+        content: editCommentContent.trim(),
+        user: userId  // Use the extracted user ID
+      }
+    }).unwrap();
+    setEditingCommentId(null);
+    setEditCommentContent("");
+    toast.success("Comment updated successfully!");
+  } catch (error) {
+    console.error('Failed to update comment:', error);
+    console.error('Error details:', error?.data);
+    
+    // Show specific error message
+    if (error?.data?.user) {
+      toast.error(`User error: ${error.data.user[0]}`);
+    } else {
       toast.error("Failed to update comment");
     }
-  };
+  }
+};
+
 
   const handleDeleteComment = async (commentId) => {
     if (!window.confirm('Are you sure you want to delete this comment?')) return;

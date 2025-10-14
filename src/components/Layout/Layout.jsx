@@ -30,7 +30,7 @@ export default function DashboardLayout() {
         }`}
       >
         <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-        <div className="flex-1 px-4 mt-15 py-8 bg-gray-50">
+        <div className="flex-1 px-4 mt-15 py-8 bg-white">
           <Outlet />
         </div>
       </div>
