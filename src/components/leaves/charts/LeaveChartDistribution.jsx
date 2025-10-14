@@ -54,10 +54,11 @@ const LeaveDistributionChart = () => {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-md border p-6 min-h-[300px]">
+    <div className="bg-white rounded-xl shadow-sm border p-6 min-h-[300px] h-full">
       <h2 className="text-md font-semibold text-gray-800 mb-4">
         Leave Type Distribution
       </h2>
+      <div className="flex items-center gap-3 min-h-4"></div>
       <ReactApexChart
         options={options}
         series={series}

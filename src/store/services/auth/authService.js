@@ -1,4 +1,3 @@
-
 import Cookies from "js-cookie";
 import { userLoading, userLoggedIn, userLoggedOut } from "./authSlice";
 import { apiSlice } from "../../api/apiSlice";
@@ -6,26 +5,26 @@ import { apiSlice } from "../../api/apiSlice";
 export const authApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     login: builder.mutation({
-      query: ({email,password}) => ({
+      query: ({ email, password }) => ({
         url: `users/login/`,
         method: "POST",
-        body: {email,password},
+        body: { email, password },
       }),
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
         try {
           dispatch(userLoading());
           const result = await queryFulfilled;
-          console.log("result", result);
 
           Cookies.set("accessToken", result.data.access);
           Cookies.set("refreshToken", result.data.refresh);
 
           try {
-            const permissions = await dispatch(
+            const permissionsData = await dispatch(
               authApi.endpoints.getPermissions.initiate()
             ).unwrap();
 
-            console.log("permissions", permissions);
+            // Get the active role from profile.roles or use the first role
+            const activeRole = permissionsData.profile?.roles?.[0];
 
             dispatch(
               userLoggedIn({
@@ -33,9 +32,12 @@ export const authApi = apiSlice.injectEndpoints({
                 refreshToken: result.data.refresh,
                 user: {
                   ...result.data.user,
+                  ...permissionsData.profile, // Merge profile data
                   role: {
-                    ...result.data.user.role,
-                    permissions: permissions.role?.permissions || [],
+                    name: permissionsData.role,
+                    permissions: permissionsData.permissions || [],
+                    profile: permissionsData.profile, // Keep full profile for role switching
+                    ...activeRole, // Merge active role details
                   },
                 },
               })
@@ -95,6 +97,56 @@ export const authApi = apiSlice.injectEndpoints({
         method: "GET",
       }),
     }),
+
+    switchRole: builder.mutation({
+      query: (data) => ({
+        url: `users/switch-role/`,
+        method: "POST",
+        body: data,
+      }),
+      async onQueryStarted(arg, { queryFulfilled, dispatch, getState }) {
+        try {
+          const result = await queryFulfilled;
+          const currentState = getState();
+          const currentUser = currentState.auth.user;
+
+          const accessToken = Cookies.get("accessToken");
+          const refreshToken = Cookies.get("refreshToken");
+
+          // Fetch fresh permissions after role switch
+          const permissionsData = await dispatch(
+            authApi.endpoints.getPermissions.initiate(undefined, { forceRefetch: true })
+          ).unwrap();
+
+          console.log("Fresh permissions after switch:", permissionsData);
+
+          // Get the active role from profile.roles
+          const activeRole = permissionsData.profile?.roles?.find(r => r.name === permissionsData.role) 
+            || permissionsData.profile?.roles?.[0];
+
+          // Update user with new role data and permissions
+          dispatch(
+            userLoggedIn({
+              accessToken: accessToken,
+              refreshToken: refreshToken,
+              user: {
+                ...currentUser,
+                ...permissionsData.profile, // Update profile data
+                role: {
+                  name: permissionsData.role,
+                  permissions: permissionsData.permissions || [],
+                  profile: permissionsData.profile, // Keep full profile for role switching
+                  ...activeRole, // Merge active role details
+                },
+              },
+            })
+          );
+        } catch (error) {
+          console.error("Failed to switch role:", error);
+          throw error;
+        }
+      },
+    }),
   }),
 });
 
@@ -102,4 +154,5 @@ export const {
   useLoginMutation,
   useLogoutUserMutation,
   useGetPermissionsQuery,
+  useSwitchRoleMutation,
 } = authApi;

@@ -3,12 +3,27 @@ import LeaveChartDistribution from "./charts/LeaveChartDistribution";
 
 import AttendanceList from "../attendance/Attendance";
 import AttendanceTrendsChart from "./charts/AttendaceTrends";
+import { toast } from "react-toastify";
+import { FiClock } from "react-icons/fi";
+import { formatClockTime, formatHoursWorked } from "../../utils/dates";
+
 import {
   useGetAttendaceQuery,
   useGetAttendanceTrendsQuery,
 } from "@store/services/attendance/attendanceService";
 
+import {
+  useGetTodayAttendaceQuery,
+  useCheckInMutation,
+  useCheckOutMutation,
+} from "@store/services/attendance/attendanceService";
+
+import ActionModal from "../common/Modals/ActionModal";
+
 export default function MainLeaveAttendanceDashboardContent() {
+  const [modalType, setModalType] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
   const { data, isLoading, error } = useGetAttendanceTrendsQuery(
     {},
     { refetchOnMountOrArgChange: true }
@@ -18,6 +33,20 @@ export default function MainLeaveAttendanceDashboardContent() {
     isLoading: aattendanceLoading,
     error: aattendanceError,
   } = useGetAttendaceQuery({}, { refetchOnMountOrArgChange: true });
+
+  const {
+    data: attendanceData,
+    isLoading: attendanceLoading,
+    error: attendanceError,
+    refetch: refetchAttendance,
+  } = useGetTodayAttendaceQuery({}, { refetchOnMountOrArgChange: true });
+
+  const [checkIn, { isLoading: isClockingIn }] = useCheckInMutation();
+  const [checkOut, { isLoading: isClockingOut }] = useCheckOutMutation();
+
+  const clockIn = attendanceData?.clock_in;
+  const clockOut = attendanceData?.clock_out;
+
   const [leaveRequests, setLeaveRequests] = useState([
     {
       id: 1,
@@ -85,11 +114,11 @@ export default function MainLeaveAttendanceDashboardContent() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 4;
 
-  const attendanceData = {
-    engineering: [75, 78, 76, 80, 85],
-    design: [60, 65, 62, 64, 66],
-    product: [50, 52, 55, 58, 60],
-  };
+  // const attendanceData = {
+  //   engineering: [75, 78, 76, 80, 85],
+  //   design: [60, 65, 62, 64, 66],
+  //   product: [50, 52, 55, 58, 60],
+  // };
 
   const toggleActionMenu = (id) => {
     setActiveActionId(activeActionId === id ? null : id);
@@ -100,10 +129,64 @@ export default function MainLeaveAttendanceDashboardContent() {
     setActiveActionId(null);
   };
 
+      const openClockInModal = () => {
+    setModalType("clockIn");
+    setIsModalOpen(true);
+  };
+
+  const openClockOutModal = (id) => {
+    setSelectedItem(id);
+    setModalType("clockOut");
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleClockIn = async () => {
+    try {
+      const res = await checkIn().unwrap();
+      const msg = res?.message || "Clocked in successfully!";
+      toast.success(msg);
+    } catch (error) {
+      console.log("error", error);
+      if (error && typeof error === "object" && "data" in error && error.data) {
+        const errorData = error.data;
+        toast.error(errorData.error || "Error clocking in!.");
+      } else {
+        toast.error("Unexpected Error occured. Please try again.");
+      }
+    } finally {
+      closeModal();
+      refetchAttendance();
+    }
+  };
+
+  const handleCheckOut = async () => {
+    try {
+      const res = await checkOut(selectedItem).unwrap();
+      const msg = res?.message || "Clocked out successfully!";
+      toast.success(msg);
+      setSelectedItem(null);
+    } catch (error) {
+      console.log("error", error);
+      if (error && typeof error === "object" && "data" in error && error.data) {
+        const errorData = error.data;
+        toast.error(errorData.error || "Error clocking out!.");
+      } else {
+        toast.error("Unexpected Error occured. Please try again.");
+      }
+    } finally {
+      closeModal();
+      refetchAttendance();
+    }
+  };
+
   return (
     <div className="flex flex-col gap-6">
       {/* Header section */}
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center mb-3 py-2">
         <div className="flex flex-col gap-1.5">
           <div className="text-lg text-neutral-900 font-semibold">
             Leave & Attendance
@@ -122,10 +205,119 @@ export default function MainLeaveAttendanceDashboardContent() {
         </button>
       </div>
 
-      {/* Stats Cards */}
+   
+
+       <div className="grid grid-cols-4 gap-4 w-full items-center">
+        {/* Today's Status with Sticker */}
+        <div className="relative flex items-center p-4 rounded-xl h-[120px] shadow-lg text-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl overflow-hidden">
+          {/* Sticker Image as Background */}
+          <img
+            src="/images/card1.png"
+            alt="Sticker background"
+            className="absolute inset-0 w-full h-full object-cover rounded-xl z-0"
+          />
+
+          {/* Content */}
+          <div className="flex flex-col justify-center h-full w-full relative z-10">
+            {/* Status Text & Clock Icon */}
+            <div className="flex flex-row justify-between items-center w-full">
+              <div className="flex flex-col">
+                <div className="text-sm font-medium">Today's Status</div>
+                <div className="text-lg font-semibold">
+                  {clockIn
+                    ? `Clocked In: ${formatClockTime(clockIn)}`
+                    : "Not clocked In"}
+                </div>
+              </div>
+              <div className="flex items-center justify-center p-1 rounded-2xl h-8 w-8  shadow-md">
+                {/* <img
+                  width="23"
+                  height="23"
+                  src="/images/clock.png"
+                  alt="Clock Icon"
+                /> */}
+                <FiClock className="w-5 h-5 text-white" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Hours Today Card */}
+        <div className="flex flex-col justify-between p-4 rounded-xl h-[120px] shadow-lg bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl">
+          <div className="flex justify-between items-center">
+            <div className="text-sm text-gray-600 font-medium">Hours Today</div>
+            <div className="flex items-center justify-center p-1 rounded-2xl h-8 w-8 bg-blue-100 shadow-sm">
+              <img
+                width="20px"
+                height="18px"
+                src="/images/payday.png"
+                alt="Payday icon"
+              />
+            </div>
+          </div>
+          <div className="text-lg text-neutral-900 font-semibold">
+            {formatHoursWorked(attendanceData?.hours_worked)}
+          </div>
+        </div>
+
+        {/* Status Card */}
+        <div className="flex flex-col justify-between p-4 rounded-xl h-[120px] shadow-lg bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl">
+          <div className="flex justify-between items-center">
+            <div className="text-sm text-gray-600 font-medium">Status</div>
+            <div className="flex items-center justify-center p-1 rounded-2xl h-8 w-8 bg-green-100 shadow-sm">
+              <img
+                width="20px"
+                height="18px"
+                src="/images/greenclock.png"
+                alt="Status icon"
+              />
+            </div>
+          </div>
+          <div className="text-lg text-teal-500 font-semibold">
+            {attendanceData?.status || "Unknown"}
+          </div>
+        </div>
+
+        {/* Clock Out Button */}
+        <div className="flex justify-center items-center">
+          {/* If user hasn't clocked in yet */}
+          {!clockIn ? (
+            <button
+              onClick={openClockInModal}
+              className="flex justify-center items-center rounded-md w-[260px] h-[60px] bg-primary cursor-pointer hover:bg-primary-600 transition-colors text-white shadow-md"
+            >
+              Clock In
+            </button>
+          ) : clockIn && !attendanceData.clock_out ? (
+            // If clocked in but not clocked out yet
+            <button
+              onClick={() => openClockOutModal(attendanceData.id)}
+              className="flex justify-center items-center rounded-md w-[260px] h-[60px] bg-danger-600 cursor-pointer hover:bg-red-700 transition-colors text-white shadow-md"
+            >
+              Clock Out
+            </button>
+          ) : (
+            <div className="flex flex-col items-center gap-2 bg-amber-100 min-h-[120px] shadow-sm rounded-xl px-6 py-4 border border-amber-500">
+              <div className="flex items-center gap-2 text-teal-600">
+                <span className="text-base font-medium text-amber-700">
+                  Clocked out at
+                </span>
+                <FiClock className="w-5 h-5 text-amber-500" />
+              </div>
+              <span className="text-2xl font-bold text-amber-700">
+                {formatClockTime(attendanceData.clock_out)}
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
+
+         {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
         {/* Pending Requests Card */}
-        <div className="flex flex-col justify-between p-4 rounded-xl h-[120px] shadow-lg bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl">
+        <div className="flex flex-col justify-between p-4 rounded-xl h-[120px]
+         shadow-sm border
+         bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
           <div className="flex justify-between items-center">
             <div className="flex flex-col">
               <div className="text-sm text-gray-600 font-medium">
@@ -146,7 +338,8 @@ export default function MainLeaveAttendanceDashboardContent() {
         </div>
 
         {/* Approved This Month Card */}
-        <div className="flex flex-col justify-between p-4 rounded-xl h-[120px] shadow-lg bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl">
+        <div className="flex flex-col justify-between p-4 rounded-xl h-[120px]  shadow-sm border
+         bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
           <div className="flex justify-between items-center">
             <div className="flex flex-col">
               <div className="text-sm text-gray-600 font-medium">
@@ -167,7 +360,8 @@ export default function MainLeaveAttendanceDashboardContent() {
         </div>
 
         {/* Total Days Requested Card */}
-        <div className="flex flex-col justify-between p-4 rounded-xl h-[120px] shadow-lg bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl">
+        <div className="flex flex-col justify-between p-4 rounded-xl h-[120px]  shadow-sm border
+         bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
           <div className="flex justify-between items-center">
             <div className="flex flex-col">
               <div className="text-sm text-gray-600 font-medium">
@@ -188,7 +382,8 @@ export default function MainLeaveAttendanceDashboardContent() {
         </div>
 
         {/* Average Attendance Card */}
-        <div className="flex flex-col justify-between p-4 rounded-xl h-[120px] shadow-lg bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl">
+        <div className="flex flex-col justify-between p-4 rounded-xl h-[120px]  shadow-sm border
+         bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
           <div className="flex justify-between items-center">
             <div className="flex flex-col">
               <div className="text-sm text-gray-600 font-medium">
@@ -208,13 +403,14 @@ export default function MainLeaveAttendanceDashboardContent() {
           </div>
         </div>
       </div>
+
       {/* Today's Clock-ins & Todo's */}
       <AttendanceList />
       {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 min-h-[300px]">
         {/* Attendance Trends */}
         <div className="">
-          <AttendanceTrendsChart data={data} isLoading={isLoading} />;
+          <AttendanceTrendsChart data={data} isLoading={isLoading} />
         </div>
 
         {/* Leave Distribution */}
@@ -457,6 +653,33 @@ export default function MainLeaveAttendanceDashboardContent() {
           </div>
         </div>
       </div>
+            <ActionModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        actionType={modalType === "clockIn" ? "submit" : "delete"}
+        onDelete={modalType === "clockIn" ? handleClockIn : handleCheckOut}
+        isDeleting={isClockingIn || isClockingOut}
+        title={
+          modalType === "clockIn" ? "Confirm Clock In" : "Confirm Clock Out"
+        }
+        confirmationMessage={
+          modalType === "clockIn"
+            ? "Are you sure you want to clock in now?"
+            : "Are you sure you want to clock out now?"
+        }
+        extraInfo={
+    modalType === "clockOut"
+      ? {
+          pending: attendanceData?.pending_tasks ?? 0,
+          inProgress: attendanceData?.in_progress_tasks ?? 0,
+          link: "/dashboard/tasks",
+          linkText: "Go to Tasks Dashboard"
+        }
+      : null
+  }
+        deleteMessage="This action will update your attendance records."
+        actionText={modalType === "clockIn" ? "Clock In" : "Clock Out"}
+      />
     </div>
   );
 }
