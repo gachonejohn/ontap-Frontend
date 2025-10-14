@@ -41,6 +41,9 @@ const TaskModal = ({ isOpen, onClose, task, refetch }) => {
 
     if (!isOpen || !task) return null;
 
+    // Safe user ID extraction
+    const userId = currentUser?.user?.id || currentUser?.id;
+
     const handleDeleteConfirm = async () => {
         try {
             await taskOperations.handleDeleteTask();
@@ -53,16 +56,89 @@ const TaskModal = ({ isOpen, onClose, task, refetch }) => {
         }
     };
 
+    // In TaskModal.jsx - Update handleSaveAll
+const handleSaveAll = async () => {
+  try {
+    // 🔥 Pass the correct user ID to handleSaveAll if needed
+    await taskOperations.handleSaveAll(formData, fieldPermissions);
+    setIsEditingMode(false);
+    if (refetch) refetch();
+    toast.success("Task updated successfully!");
+  } catch (error) {
+    console.error("Failed to update task:", error);
+    
+    // More detailed error logging
+    if (error.response?.data) {
+      console.error("Error details:", error.response.data);
+      if (error.response.data.assignee) {
+        toast.error(`Assignee error: ${error.response.data.assignee}`);
+      }
+    }
+    
+    toast.error("Failed to update task");
+  }
+};
 
-    const handleSaveAll = async () => {
+    // Enhanced status change handler
+    // In TaskModal.jsx - Update handleStatusChange with better error handling
+const handleStatusChange = async (newStatus) => {
+  try {
+    if (!userId) {
+      toast.error("User authentication required");
+      return;
+    }
+    
+    console.log('=== TASK MODAL STATUS CHANGE ===');
+    console.log('Task ID:', task?.id);
+    console.log('New Status:', newStatus);
+    console.log('User ID:', userId);
+    
+    await taskOperations.handleStatusChange(task.id, newStatus, userId);
+    
+    // 🔥 Force refetch with error handling
+    if (refetch) {
+      try {
+        await refetch();
+        console.log('Refetch successful after status change');
+      } catch (refetchError) {
+        console.error('Refetch failed:', refetchError);
+        // Continue anyway - the status change was successful
+      }
+    }
+    
+    toast.success("Status updated successfully!");
+    
+  } catch (error) {
+    console.error("Failed to update status:", error);
+    
+    // More detailed error information
+    if (error?.data) {
+      console.error("Backend error details:", error.data);
+      if (typeof error.data === 'object') {
+        // Show specific field errors
+        Object.entries(error.data).forEach(([field, messages]) => {
+          console.error(`Field ${field}:`, messages);
+        });
+      }
+    }
+    
+    toast.error("Failed to update status. Please try again.");
+  }
+};
+
+    // Enhanced priority change handler
+    const handlePriorityChange = async (newPriority) => {
         try {
-            await taskOperations.handleSaveAll(formData, fieldPermissions);
-            setIsEditingMode(false);
+            if (!userId) {
+                toast.error("User authentication required");
+                return;
+            }
+            await taskOperations.handlePriorityChange(newPriority, userId);
             if (refetch) refetch();
-            toast.success("Task updated successfully!");
+            toast.success("Priority updated successfully!");
         } catch (error) {
-            console.error("Failed to update task:", error);
-            toast.error("Failed to update task");
+            console.error("Failed to update priority:", error);
+            toast.error("Failed to update priority");
         }
     };
 
@@ -86,12 +162,13 @@ const TaskModal = ({ isOpen, onClose, task, refetch }) => {
                     onClose={onClose}
                     isUploading={isUploading}
                     task={task}
-                    onStatusChange={taskOperations.handleStatusChange}
-                    onPriorityChange={taskOperations.handlePriorityChange}
+                    onStatusChange={handleStatusChange}
+                    onPriorityChange={handlePriorityChange}
                     onTitleChange={(value) => updateFormData("titleValue", value)}
                     titleValue={formData.titleValue}
                     isAssignee={fieldPermissions.isAssignee}
                     canViewAll={fieldPermissions.canViewAll}
+                    currentUser={currentUser} // Pass currentUser to TaskHeader
                 />
 
                 <TaskProgress

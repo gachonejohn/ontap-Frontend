@@ -196,10 +196,13 @@ const EmployeeTasksDashboardContent = () => {
 
   // Employee only sees their own tasks with status filter and increased page size
   const { data: tasksData, isLoading, error, refetch } = useGetMyTasksQuery({
-    search: searchTerm || undefined,
-    status: statusFilter !== "All" && statusFilter !== "OVERDUE" ? statusFilter : undefined,
-    page_size: 100, // Increased page size to get all tasks
-  });
+  search: searchTerm || undefined,
+  status: statusFilter !== "All" && statusFilter !== "OVERDUE" ? statusFilter : undefined,
+  page_size: 100,
+}, {
+  // 🔥 Add polling or refetch options
+  refetchOnMountOrArgChange: true,
+});
 
   const [createTask] = useCreateTaskMutation();
 

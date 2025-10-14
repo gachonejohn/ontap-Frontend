@@ -14,10 +14,14 @@ const TaskHeader = ({
   onStatusChange,
   onPriorityChange,
   isAssignee,
-  canViewAll
+  canViewAll,
+  currentUser // Add currentUser prop to get the correct ID
 }) => {
   const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
   const [isPriorityDropdownOpen, setIsPriorityDropdownOpen] = useState(false);
+
+  // Safe user ID extraction
+  const userId = currentUser?.user?.id || currentUser?.id;
 
   const statusMap = {
     'TO_DO': 'To Do',
@@ -37,18 +41,42 @@ const TaskHeader = ({
 
   const statusOptions = Object.entries(statusMap).map(([key, value]) => ({ key, value }));
   
-  // Get upgradable priority options based on current priority
   const getUpgradablePriorityOptions = () => {
     const priorities = Object.entries(priorityMap);
     const currentPriorityIndex = priorities.findIndex(([key]) => key === task?.priority);
     
     if (currentPriorityIndex === -1) return [];
     
-    // Return only higher priorities (upgradable)
     return priorities.slice(currentPriorityIndex).map(([key, value]) => ({ key, value }));
   };
 
   const priorityOptions = getUpgradablePriorityOptions();
+
+  // Enhanced status change handler
+  const handleStatusChange = (newStatus) => {
+    if (!userId) {
+      console.error('User ID not available for status change');
+      return;
+    }
+    
+    if (onStatusChange) {
+      onStatusChange(newStatus, userId); // Pass userId to the parent
+    }
+    setIsStatusDropdownOpen(false);
+  };
+
+  // Enhanced priority change handler
+  const handlePriorityChange = (newPriority) => {
+    if (!userId) {
+      console.error('User ID not available for priority change');
+      return;
+    }
+    
+    if (onPriorityChange) {
+      onPriorityChange(newPriority, userId); // Pass userId to the parent
+    }
+    setIsPriorityDropdownOpen(false);
+  };
 
   return (
     <>
@@ -156,10 +184,7 @@ const TaskHeader = ({
                     key={key}
                     className={`px-3 py-2 text-xs cursor-pointer hover:bg-gray-100 ${task?.status === key ? "bg-teal-100 text-teal-800" : "text-neutral-900"
                       }`}
-                    onClick={() => {
-                      onStatusChange(key);
-                      setIsStatusDropdownOpen(false);
-                    }}
+                    onClick={() => handleStatusChange(key)}
                   >
                     {value}
                   </div>
@@ -205,10 +230,7 @@ const TaskHeader = ({
                         ? "bg-teal-100 text-teal-800" 
                         : "text-neutral-900"
                     }`}
-                    onClick={() => {
-                      onPriorityChange(key);
-                      setIsPriorityDropdownOpen(false);
-                    }}
+                    onClick={() => handlePriorityChange(key)}
                   >
                     {value}
                   </div>
