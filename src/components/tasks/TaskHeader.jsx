@@ -80,10 +80,6 @@ const TaskHeader = ({
                   onClick={onEditToggle}
                   className="flex items-center gap-1 px-3 py-1 text-xs text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
                 >
-                  <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
-                    <path d="M13.5 1.5L14.5 2.5L13.5 3.5L12.5 2.5L13.5 1.5Z" fill="currentColor"/>
-                    <path d="M12.5 2.5L3.5 11.5L1.5 13.5L3.5 11.5L12.5 2.5Z" stroke="currentColor" strokeWidth="1.5"/>
-                  </svg>
                   Edit Task
                 </button>
               )}
@@ -95,9 +91,6 @@ const TaskHeader = ({
               className="flex items-center gap-1 px-3 py-1 text-xs text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors"
               title="Delete Task"
             >
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
-                <path d="M6 2a1 1 0 00-1 1v1H3a1 1 0 000 2h1v8a2 2 0 002 2h4a2 2 0 002-2V6h1a1 1 0 100-2h-2V3a1 1 0 00-1-1H6z"/>
-              </svg>
               Delete
             </button>
           )}
