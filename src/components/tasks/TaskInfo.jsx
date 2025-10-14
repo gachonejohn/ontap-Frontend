@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Select from "react-select";
 import { useGetEmployeesQuery } from "../../store/services/employees/employeesService";
 import { useGetDepartmentsQuery } from "../../store/services/companies/departmentsService";
@@ -14,7 +14,7 @@ const TaskInfo = ({
   onFormDataUpdate,
   currentUser,
 }) => {
-  //  Fetch employees and departments based on permissions
+  // Fetch employees and departments based on permissions
   const { data: employeesData } = useGetEmployeesQuery(
     {},
     { skip: !fieldPermissions.canViewAll }
@@ -27,7 +27,7 @@ const TaskInfo = ({
   );
   let departments = departmentsData || [];
 
-  //  Fallback for limited permissions
+  // Fallback for limited permissions
   if (!fieldPermissions.canViewAll && currentUser) {
     employees = [
       {
@@ -58,12 +58,15 @@ const TaskInfo = ({
   // Assign Task mutation
   const [assignTask, { isLoading: isAssigning }] = useAssignTaskMutation();
 
-  //  Local state for reason modal
+  // Local state for reason modal
   const [isReasonPromptOpen, setIsReasonPromptOpen] = useState(false);
   const [pendingAssigneeId, setPendingAssigneeId] = useState(null);
   const [reasonText, setReasonText] = useState("");
 
-  //  Triggered when user selects a new assignee
+  // Local state for live countdown
+  const [timeRemaining, setTimeRemaining] = useState("");
+
+  // Triggered when user selects a new assignee
   const handleAssigneeChange = (e) => {
     const newAssigneeId = e.target.value;
     onFormDataUpdate("assigneeValue", newAssigneeId);
@@ -73,7 +76,7 @@ const TaskInfo = ({
     setIsReasonPromptOpen(true);
   };
 
-  //  Confirm and send assign_task request
+  // Confirm and send assign_task request
   const confirmReassignment = async () => {
     if (!pendingAssigneeId) return;
     try {
@@ -92,6 +95,37 @@ const TaskInfo = ({
       setPendingAssigneeId(null);
     }
   };
+
+  // Calculate live countdown
+  useEffect(() => {
+    if (!task?.due_date) return;
+
+    const updateCountdown = () => {
+      const now = new Date();
+      const due = new Date(task.due_date);
+      const diff = due - now;
+
+      if (diff <= 0) {
+        setTimeRemaining("Expired");
+        return;
+      }
+
+      const hours = Math.floor(diff / 1000 / 60 / 60);
+      const minutes = Math.floor((diff / 1000 / 60) % 60);
+      const seconds = Math.floor((diff / 1000) % 60);
+
+      setTimeRemaining(
+        `${hours.toString().padStart(2, "0")}:${minutes
+          .toString()
+          .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
+      );
+    };
+
+    updateCountdown(); // initial call
+    const intervalId = setInterval(updateCountdown, 1000);
+
+    return () => clearInterval(intervalId);
+  }, [task?.due_date]);
 
   const getDueDateForDisplay = () => {
     const dueDate = task?.due_date || task?.dueDate;
@@ -207,7 +241,7 @@ const TaskInfo = ({
             </div>
           </div>
 
-          {/* Due Date */}
+          {/* Due Date with live countdown */}
           <div className="flex flex-row justify-between items-center w-full">
             <div className="text-xs text-gray-600 font-medium">Due Date</div>
             {isEditingMode && fieldPermissions.canEditDueDate ? (
@@ -221,14 +255,16 @@ const TaskInfo = ({
               />
             ) : (
               <div className="text-xs text-gray-600 font-medium">
-                {getDueDateForDisplay()}
+                {task?.due_date
+                  ? `${formatDate(task.due_date)} | Time left: ${timeRemaining}`
+                  : "No due date"}
               </div>
             )}
           </div>
         </div>
       </div>
 
-      {/* 🔹 Simple inline modal for reason input */}
+      {/* Simple inline modal for reason input */}
       {isReasonPromptOpen && (
         <div className="absolute inset-0 bg-black/40 flex justify-center items-center z-50">
           <div className="bg-white p-4 rounded-xl shadow-md w-[220px]">
