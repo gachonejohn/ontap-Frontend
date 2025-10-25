@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import LeaveChartDistribution from "./charts/LeaveChartDistribution";
+import { useGetEmployeeBreaksQuery } from "@store/services/policies/policyService";
+import { CreateBreak } from "@components/attendance/breaks/CreateBreak";
 
 import AttendanceList from "../attendance/Attendance";
 import AttendanceTrendsChart from "./charts/AttendaceTrends";
@@ -19,6 +21,8 @@ import {
 } from "@store/services/attendance/attendanceService";
 
 import ActionModal from "../common/Modals/ActionModal";
+import { isBreakActive } from "@utils/isBreakActive";
+import Countdown from "react-countdown";
 
 export default function MainLeaveAttendanceDashboardContent() {
   const [modalType, setModalType] = useState("");
@@ -40,6 +44,12 @@ export default function MainLeaveAttendanceDashboardContent() {
     error: attendanceError,
     refetch: refetchAttendance,
   } = useGetTodayAttendaceQuery({}, { refetchOnMountOrArgChange: true });
+const {
+    data: breakData,
+    isLoading: loadingBreakData,
+    error: breakError,
+    refetch: refetchBreak,
+  } = useGetEmployeeBreaksQuery({}, { refetchOnMountOrArgChange: true });
 
   const [checkIn, { isLoading: isClockingIn }] = useCheckInMutation();
   const [checkOut, { isLoading: isClockingOut }] = useCheckOutMutation();
@@ -143,7 +153,10 @@ export default function MainLeaveAttendanceDashboardContent() {
   const closeModal = () => {
     setIsModalOpen(false);
   };
-
+const refetchInfo = () => {
+    refetchAttendance();
+    refetchBreak();
+  };
   const handleClockIn = async () => {
     try {
       const res = await checkIn().unwrap();
@@ -229,7 +242,8 @@ export default function MainLeaveAttendanceDashboardContent() {
                     : "Not clocked In"}
                 </div>
               </div>
-              <div className="flex items-center justify-center p-1 rounded-2xl h-8 w-8  shadow-md">
+              <div className="flex items-center justify-center p-1 
+              rounded-2xl h-8 w-8  shadow-sm">
                 {/* <img
                   width="23"
                   height="23"
@@ -243,7 +257,9 @@ export default function MainLeaveAttendanceDashboardContent() {
         </div>
 
         {/* Hours Today Card */}
-        <div className="flex flex-col justify-between p-4 rounded-xl h-[120px] shadow-lg bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl">
+        <div className="flex flex-col justify-between p-4 rounded-xl h-[120px] 
+        shadow-sm bg-white border
+         transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
           <div className="flex justify-between items-center">
             <div className="text-sm text-gray-600 font-medium">Hours Today</div>
             <div className="flex items-center justify-center p-1 rounded-2xl h-8 w-8 bg-blue-100 shadow-sm">
@@ -261,7 +277,9 @@ export default function MainLeaveAttendanceDashboardContent() {
         </div>
 
         {/* Status Card */}
-        <div className="flex flex-col justify-between p-4 rounded-xl h-[120px] shadow-lg bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl">
+        <div className="flex flex-col justify-between p-4 rounded-xl h-[120px] shadow-sm
+         bg-white transition-transform duration-200 hover:-translate-y-1 
+         hover:shadow-md border">
           <div className="flex justify-between items-center">
             <div className="text-sm text-gray-600 font-medium">Status</div>
             <div className="flex items-center justify-center p-1 rounded-2xl h-8 w-8 bg-green-100 shadow-sm">
@@ -278,38 +296,92 @@ export default function MainLeaveAttendanceDashboardContent() {
           </div>
         </div>
 
-        {/* Clock Out Button */}
-        <div className="flex justify-center items-center">
-          {/* If user hasn't clocked in yet */}
-          {!clockIn ? (
-            <button
-              onClick={openClockInModal}
-              className="flex justify-center items-center rounded-md w-[260px] h-[60px] bg-primary cursor-pointer hover:bg-primary-600 transition-colors text-white shadow-md"
+       <div className="flex flex-col justify-center items-center gap-3">
+                {/* If user hasn't clocked in yet */}
+                {!clockIn ? (
+                  <button
+                    onClick={openClockInModal}
+                    className="min-w-[150px] h-[50px] bg-primary text-white rounded-md shadow-md hover:bg-primary-600 transition-colors"
+                  >
+                    Clock In
+                  </button>
+                ) : clockIn && !attendanceData.clock_out ? (
+                  <>
+                    {/* If on break */}
+                    {breakData ? (
+                      isBreakActive(breakData.break_end) ? (
+                        <div className="flex flex-col items-center gap-2 bg-blue-50 rounded-xl p-4 border shadow-sm">
+                          <div className="text-blue-800 font-semibold">
+                            On Break — Ends in:
+                          </div>
+      
+                          <Countdown
+                            key={breakData.id}
+                            date={
+                              new Date(
+                                new Date().setHours(
+                                  ...breakData.break_end.split(":").map(Number)
+                                )
+                              )
+                            }
+                            renderer={({ minutes, seconds, completed }) => {
+                              if (completed) {
+                                return (
+                                  <span className="text-red-600 font-semibold">
+                                    Break ended
+                                  </span>
+                                );
+                              }
+                              return (
+                                <span className="text-lg font-semibold text-blue-700">
+                                  {String(minutes).padStart(2, "0")}:
+                                  {String(seconds).padStart(2, "0")}
+                                </span>
+                              );
+                            }}
+                          />
+      
+                          {/* <button
+              // onClick={handleEndBreak}
+              className="mt-2 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
             >
-              Clock In
-            </button>
-          ) : clockIn && !attendanceData.clock_out ? (
-            // If clocked in but not clocked out yet
-            <button
-              onClick={() => openClockOutModal(attendanceData.id)}
-              className="flex justify-center items-center rounded-md w-[260px] h-[60px] bg-danger-600 cursor-pointer hover:bg-red-700 transition-colors text-white shadow-md"
-            >
-              Clock Out
-            </button>
-          ) : (
-            <div className="flex flex-col items-center gap-2 bg-amber-100 min-h-[120px] shadow-sm rounded-xl px-6 py-4 border border-amber-500">
-              <div className="flex items-center gap-2 text-teal-600">
-                <span className="text-base font-medium text-amber-700">
-                  Clocked out at
-                </span>
-                <FiClock className="w-5 h-5 text-amber-500" />
+              End Break
+            </button> */}
+                        </div>
+                      ) : (
+                        <>
+                          <CreateBreak refetchData={refetchInfo} />
+                          <button
+                            onClick={() => openClockOutModal(attendanceData.id)}
+                            className="w-[150px] h-[50px] text-red-500 rounded-md shadow-md hover:bg-red-100 border border-red-500 transition-colors"
+                          >
+                            Clock Out
+                          </button>
+                        </>
+                      )
+                    ) : (
+                      <>
+                        <CreateBreak refetchData={refetchInfo} />
+                        <button
+                          onClick={() => openClockOutModal(attendanceData.id)}
+                          className="w-[150px] h-[50px] text-red-500 rounded-md shadow-md hover:bg-red-100 border border-red-500 transition-colors"
+                        >
+                          Clock Out
+                        </button>
+                      </>
+                    )}
+                  </>
+                ) : (
+                  <div className="flex flex-col items-center gap-2 bg-amber-50 rounded-xl p-4 border shadow-sm">
+                    <span className="text-base text-amber-700 font-medium">
+                      Clocked out at
+                    </span>
+                    <span className="text-2xl font-bold text-amber-700">
+                      {formatClockTime(attendanceData.clock_out)}
+                    </span>
+                  </div>
+                )}
               </div>
-              <span className="text-2xl font-bold text-amber-700">
-                {formatClockTime(attendanceData.clock_out)}
-              </span>
-            </div>
-          )}
-        </div>
       </div>
 
          {/* Stats Cards */}

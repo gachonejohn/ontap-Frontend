@@ -19,7 +19,7 @@ export const CreateEmployeeContractSchema = z.object({
   pay_frequency: z.string().optional(),
   work_location: z.string().optional(),
   reporting_to: z.string().optional(),
-
+  status: z.string().min(1, "Status is required"),
   contract_type: z.string().min(1, "Contract type is required"),
 
   is_paid: z.boolean().optional(),

@@ -35,14 +35,13 @@ export const docOptions = [
 ];
 
 
-// Pay frequency options
+
 export const payFrequencyOptions = [
   { value: "MONTHLY", label: "Monthly" },
   { value: "WEEKLY", label: "Weekly" },
   { value: "DAILY", label: "Daily" },
 ];
 
-// Contract type options
 export const contractTypeOptions = [
   { value: "Permanent", label: "Permanent" },
   { value: "Contract", label: "Contract" },
@@ -51,6 +50,15 @@ export const contractTypeOptions = [
   { value: "Volunteer", label: "Volunteer" },
   { value: "Other", label: "Other" },
 ];
+export const contractStatusOptions = [
+  { value: "ACTIVE", label: "Active" },
+  { value: "EXPIRED", label: "Expired" },
+  { value: "TERMINATED", label: "Terminated" },
+  { value: "SUSPENDED", label: "Suspended" },
+
+];
+
+ 
 
 export const workLocationOptions =[
   { value: "Remote", label: "Remote" },
@@ -93,4 +101,12 @@ export const educationLevelOptions = [
   { value: "Doctorate", label: "Doctorate / PhD" }, 
   { value: "PostDoctoral", label: "Postdoctoral Studies" },
   { value: "Other", label: "Other" }, 
+];
+
+
+
+export const attendancePolicyOptions = [
+  { value: "Check In", label: "Check In" },
+  { value: "Check Out", label: "Check Out" },
+
 ];

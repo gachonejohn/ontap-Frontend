@@ -114,7 +114,7 @@ console.log("Employee Data:", employeeData);
 
   return (
     <EmployeeLayoutWrapper>
-      <div className="w-full flex gap-3">
+      <div className="w-full flex gap-3 font-inter">
         {/* Sidebar Profile */}
         <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-3 w-1/4 min-h-screen flex flex-col">
           <div className="flex justify-center">
@@ -135,10 +135,10 @@ console.log("Employee Data:", employeeData);
 
           <div className="text-center space-y-2 w-full">
             <div className="mb-4">
-              <h2 className="text-xl font-semibold text-gray-900">
+              <h2 className="text-sm font-semibold font-inter text-gray-900">
                 {employeeData.user?.first_name} {employeeData.user?.last_name}
               </h2>
-              <p className="text-gray-600">
+              <p className="text-gray-600 text-sm">
                 {employeeData?.position?.title ?? "No Position Assigned"}
               </p>
             </div>
@@ -146,18 +146,18 @@ console.log("Employee Data:", employeeData);
 
           <div className="space-y-2 w-full">
             <div className="flex items-start gap-2 text-xs text-gray-600">
-              <FiMail className="w-4 h-4 flex-shrink-0" />
-              <span className="break-all w-0 flex-1">
+              <FiMail className="text-sm" />
+              <span className=" text-[12px]">
                 {employeeData?.user?.email ?? "No email"}
               </span>
             </div>
             <div className="flex items-center gap-2 text-xs text-gray-600">
-              <FiPhone className="w-3 h-3" />
-              <span>{employeeData.user?.phone_number || "Not available"}</span>
+              <FiPhone className="text-sm" />
+              <span className="text-[12px]">{employeeData.user?.phone_number || "Not available"}</span>
             </div>
             <div className="flex items-center gap-2 text-xs text-gray-600">
-              <FiCalendar className="w-3 h-3" />
-              <span>
+              <FiCalendar className="text-sm" />
+              <span className=" text-[12px]">
                 Started{" "}
                 {YearMonthCustomDate(
                   employeeData?.latest_contract?.start_date ?? ""
@@ -170,7 +170,7 @@ console.log("Employee Data:", employeeData);
         {/* Main Tabs */}
         <div className="bg-white border rounded-lg shadow-sm w-3/4">
           <div className="border-b border-gray-200">
-           <nav className="flex space-x-6 px-6 overflow-x-auto scrollbar-hide">
+           <nav className="flex space-x-6 px-4 overflow-x-auto scrollbar-hide">
   {tabs.map((tab) => (
     <button
       key={tab.id}
@@ -189,7 +189,7 @@ console.log("Employee Data:", employeeData);
 
           </div>
 
-          <div className="p-6">
+          <div className="px-4 py-3">
             {activeTab === "personal" && renderPersonalDetails()}
             {activeTab === "employment" && renderEmploymentDetails()}
             {activeTab === "documents" && renderDocuments()}
@@ -207,7 +207,7 @@ console.log("Employee Data:", employeeData);
           <FiArrowLeft className="w-4 h-4" />
           Back to Employees
         </button>
-      </div>
+      </div> 
     </EmployeeLayoutWrapper>
   );
 };

@@ -1,7 +1,7 @@
 import { genderOptions } from "@constants/constants";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { updateEmployeeSchema } from "@schemas/employees/employeeSchema";
+import { updateEmployeePersonalInfoSchema } from "@schemas/employees/employeeSchema";
 import { getApiErrorMessage } from "@utils/errorHandler";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -24,16 +24,16 @@ export const EditPersonalInfo = ({ refetchData, data }) => {
     handleSubmit,
     reset,
     setValue,
-    watch,
     formState: { isSubmitting, errors },
   } = useForm({
-    resolver: zodResolver(updateEmployeeSchema),
+    resolver: zodResolver(updateEmployeePersonalInfoSchema),
     defaultValues: {
       first_name: data?.user?.first_name ?? "",
       last_name: data?.user?.last_name ?? "",
       email: data?.user?.email ?? "",
       phone_number: data?.user?.phone_number ?? "",
       date_of_birth: data?.user?.date_of_birth ?? "",
+      gender: data?.user?.gender ?? "",
     },
   });
   useEffect(() => {
@@ -51,9 +51,7 @@ export const EditPersonalInfo = ({ refetchData, data }) => {
     } catch (error) {
       const message = getApiErrorMessage(error, "Error Updating info.");
       toast.error(message);
-    } finally {
-      refetchData();
-    }
+    } 
   };
   const handleGenderChange = (selected) => {
     if (selected) {
