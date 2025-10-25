@@ -1,15 +1,19 @@
+import { CreateBreak } from "@components/attendance/breaks/CreateBreak";
+import { useGetEmployeeBreaksQuery } from "@store/services/policies/policyService";
 import { useState } from "react";
-import { toast } from "react-toastify";
+import Countdown from "react-countdown";
 import { FiClock } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import LeaveModal from "../../dashboards/employee/components/LeaveModal";
 import {
-  useGetTodayAttendaceQuery,
   useCheckInMutation,
   useCheckOutMutation,
+  useGetTodayAttendaceQuery,
 } from "../../store/services/attendance/attendanceService";
 import { formatClockTime, formatHoursWorked } from "../../utils/dates";
 import ActionModal from "../common/Modals/ActionModal";
-import { useNavigate } from "react-router-dom";
+import { isBreakActive } from "@utils/isBreakActive";
 
 const EmployLeaveDashboardContent = () => {
   const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
@@ -24,17 +28,27 @@ const EmployLeaveDashboardContent = () => {
     error,
     refetch,
   } = useGetTodayAttendaceQuery({}, { refetchOnMountOrArgChange: true });
+
+  const {
+    data: breakData,
+    isLoading: loadingBreakData,
+    error: breakError,
+    refetch: refetchBreak,
+  } = useGetEmployeeBreaksQuery({}, { refetchOnMountOrArgChange: true });
+
   const [checkIn, { isLoading: isClockingIn }] = useCheckInMutation();
   const [checkOut, { isLoading: isClockingOut }] = useCheckOutMutation();
-const [isNavigating, setIsNavigating] = useState(false);
+
+  const [isNavigating, setIsNavigating] = useState(false);
   console.log("attendanceData", attendanceData);
   const clockIn = attendanceData?.clock_in;
   const clockOut = attendanceData?.clock_out;
+
   const openClockInModal = () => {
     setModalType("clockIn");
     setIsModalOpen(true);
   };
-
+  console.log("breakData", breakData);
   const openClockOutModal = (id) => {
     console.log("Clicked ID:", id);
     setSelectedItem(id);
@@ -45,33 +59,34 @@ const [isNavigating, setIsNavigating] = useState(false);
   const closeModal = () => {
     setIsModalOpen(false);
   };
+  const refetchInfo = () => {
+    refetch();
+    refetchBreak();
+  };
+  const handleClockIn = async () => {
+    try {
+      const res = await checkIn().unwrap();
+      const msg = res?.message || "Clocked in successfully!";
+      toast.success(msg);
 
-  
-const handleClockIn = async () => {
-  try {
-    const res = await checkIn().unwrap();
-    const msg = res?.message || "Clocked in successfully!";
-    toast.success(msg);
-    
-    setIsNavigating(true);
-    await refetch();
-    
-    setTimeout(() => {
-      navigate("/dashboard/tasks");
-    }, 300);
-    
-  } catch (error) {
-    console.log("error", error);
-    if (error && typeof error === "object" && "data" in error && error.data) {
-      const errorData = error.data;
-      toast.error(errorData.error || "Error clocking in!.");
-    } else {
-      toast.error("Unexpected Error occured. Please try again.");
+      setIsNavigating(true);
+      await refetch();
+
+      setTimeout(() => {
+        navigate("/dashboard/tasks");
+      }, 300);
+    } catch (error) {
+      console.log("error", error);
+      if (error && typeof error === "object" && "data" in error && error.data) {
+        const errorData = error.data;
+        toast.error(errorData.error || "Error clocking in!.");
+      } else {
+        toast.error("Unexpected Error occured. Please try again.");
+      }
+      closeModal();
+      setIsNavigating(false);
     }
-    closeModal();
-    setIsNavigating(false);
-  }
-};
+  };
   const handleCheckOut = async () => {
     console.log("selectedItem", selectedItem);
     try {
@@ -93,6 +108,20 @@ const handleClockIn = async () => {
       refetch();
     }
   };
+  const calculateBreakEndTime = (breakEndTime) => {
+    // breakEndTime: e.g. "16:15:00"
+    const [hours, minutes, seconds] = breakEndTime.split(":").map(Number);
+
+    const now = new Date();
+    const end = new Date(now);
+    end.setHours(hours, minutes, seconds, 0);
+
+    // If end time is already passed (e.g., API from earlier), return now
+    if (end < now) return now;
+
+    return end;
+  };
+
   return (
     <div className="flex flex-col gap-6">
       {/* Leave Header */}
@@ -128,7 +157,10 @@ const handleClockIn = async () => {
       {/* Status Cards */}
       <div className="grid grid-cols-4 gap-4 w-full items-center">
         {/* Today's Status with Sticker */}
-        <div className="relative flex items-center p-4 rounded-xl h-[120px] shadow-lg text-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl overflow-hidden">
+        <div
+          className="relative flex items-center p-4 rounded-xl min-h-[120px]  shadow-sm
+         text-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-md overflow-hidden"
+        >
           {/* Sticker Image as Background */}
           <img
             src="/images/card1.png"
@@ -162,7 +194,10 @@ const handleClockIn = async () => {
         </div>
 
         {/* Hours Today Card */}
-        <div className="flex flex-col justify-between p-4 rounded-xl h-[120px] shadow-lg bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl">
+        <div
+          className="flex flex-col justify-between p-4 rounded-xl min-h-[120px]  shadow-sm
+         bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-md"
+        >
           <div className="flex justify-between items-center">
             <div className="text-sm text-gray-600 font-medium">Hours Today</div>
             <div className="flex items-center justify-center p-1 rounded-2xl h-8 w-8 bg-blue-100 shadow-sm">
@@ -180,7 +215,10 @@ const handleClockIn = async () => {
         </div>
 
         {/* Status Card */}
-        <div className="flex flex-col justify-between p-4 rounded-xl h-[120px] shadow-lg bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl">
+        <div
+          className="flex flex-col justify-between p-4 rounded-xl min-h-[120px]  shadow-sm
+         bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-md"
+        >
           <div className="flex justify-between items-center">
             <div className="text-sm text-gray-600 font-medium">Status</div>
             <div className="flex items-center justify-center p-1 rounded-2xl h-8 w-8 bg-green-100 shadow-sm">
@@ -198,8 +236,8 @@ const handleClockIn = async () => {
         </div>
 
         {/* Clock Out Button */}
-        <div className="flex justify-center items-center">
-          {/* If user hasn't clocked in yet */}
+        {/* <div className="flex justify-center items-center">
+     
           {!clockIn ? (
             <button
               onClick={openClockInModal}
@@ -208,7 +246,7 @@ const handleClockIn = async () => {
               Clock In
             </button>
           ) : clockIn && !attendanceData.clock_out ? (
-            // If clocked in but not clocked out yet
+
             <button
               onClick={() => openClockOutModal(attendanceData.id)}
               className="flex justify-center items-center rounded-md w-[260px] h-[60px] bg-danger-600 cursor-pointer hover:bg-red-700 transition-colors text-white shadow-md"
@@ -216,13 +254,100 @@ const handleClockIn = async () => {
               Clock Out
             </button>
           ) : (
-            <div className="flex flex-col items-center gap-2 bg-amber-100 min-h-[120px] shadow-sm rounded-xl px-6 py-4 border border-amber-500">
+            <div className="flex flex-col items-center gap-2 bg-amber-50 min-h-[120px]  shadow-sm rounded-xl p-4 border ">
               <div className="flex items-center gap-2 text-teal-600">
                 <span className="text-base font-medium text-amber-700">
                   Clocked out at
                 </span>
                 <FiClock className="w-5 h-5 text-amber-500" />
               </div>
+              <span className="text-2xl font-bold text-amber-700">
+                {formatClockTime(attendanceData.clock_out)}
+              </span>
+            </div>
+          )}
+        </div> */}
+        {/* Clock & Break Controls */}
+        <div className="flex flex-col justify-center items-center gap-3">
+          {/* If user hasn't clocked in yet */}
+          {!clockIn ? (
+            <button
+              onClick={openClockInModal}
+              className="w-[260px] h-[60px] bg-primary text-white rounded-md shadow-md hover:bg-primary-600 transition-colors"
+            >
+              Clock In
+            </button>
+          ) : clockIn && !attendanceData.clock_out ? (
+            <>
+              {/* If on break */}
+              {breakData ? (
+                isBreakActive(breakData.break_end) ? (
+                  <div className="flex flex-col items-center gap-2 bg-blue-50 rounded-xl p-4 border shadow-sm">
+                    <div className="text-blue-800 font-semibold">
+                      On Break — Ends in:
+                    </div>
+
+                    <Countdown
+                      key={breakData.id}
+                      date={
+                        new Date(
+                          new Date().setHours(
+                            ...breakData.break_end.split(":").map(Number)
+                          )
+                        )
+                      }
+                      renderer={({ minutes, seconds, completed }) => {
+                        if (completed) {
+                          return (
+                            <span className="text-red-600 font-semibold">
+                              Break ended
+                            </span>
+                          );
+                        }
+                        return (
+                          <span className="text-lg font-semibold text-blue-700">
+                            {String(minutes).padStart(2, "0")}:
+                            {String(seconds).padStart(2, "0")}
+                          </span>
+                        );
+                      }}
+                    />
+
+                    {/* <button
+        // onClick={handleEndBreak}
+        className="mt-2 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
+      >
+        End Break
+      </button> */}
+                  </div>
+                ) : (
+                  <>
+                    <CreateBreak refetchData={refetchInfo} />
+                    <button
+                      onClick={() => openClockOutModal(attendanceData.id)}
+                      className="w-[150px] h-[50px] text-red-500 rounded-md shadow-md hover:bg-red-100 border border-red-500 transition-colors"
+                    >
+                      Clock Out
+                    </button>
+                  </>
+                )
+              ) : (
+                <>
+                  <CreateBreak refetchData={refetchInfo} />
+                  <button
+                    onClick={() => openClockOutModal(attendanceData.id)}
+                    className="w-[150px] h-[50px] text-red-500 rounded-md shadow-md hover:bg-red-100 border border-red-500 transition-colors"
+                  >
+                    Clock Out
+                  </button>
+                </>
+              )}
+            </>
+          ) : (
+            <div className="flex flex-col items-center gap-2 bg-amber-50 rounded-xl p-4 border shadow-sm">
+              <span className="text-base text-amber-700 font-medium">
+                Clocked out at
+              </span>
               <span className="text-2xl font-bold text-amber-700">
                 {formatClockTime(attendanceData.clock_out)}
               </span>
@@ -719,15 +844,15 @@ const handleClockIn = async () => {
             : "Are you sure you want to clock out now?"
         }
         extraInfo={
-    modalType === "clockOut"
-      ? {
-          pending: attendanceData?.pending_tasks ?? 0,
-          inProgress: attendanceData?.in_progress_tasks ?? 0,
-          link: "/dashboard/tasks",
-          linkText: "Go to Tasks Dashboard"
+          modalType === "clockOut"
+            ? {
+                pending: attendanceData?.pending_tasks ?? 0,
+                inProgress: attendanceData?.in_progress_tasks ?? 0,
+                link: "/dashboard/tasks",
+                linkText: "Go to Tasks Dashboard",
+              }
+            : null
         }
-      : null
-  }
         deleteMessage="This action will update your attendance records."
         actionText={modalType === "clockIn" ? "Clock In" : "Clock Out"}
       />

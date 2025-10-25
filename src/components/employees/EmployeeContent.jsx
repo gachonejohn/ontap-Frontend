@@ -436,7 +436,9 @@ const EmployeeDashboardContent = () => {
       {/* Status Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
         {/* Today's Status with Sticker */}
-        <div className="relative flex items-center p-4 rounded-xl h-[120px] shadow-lg text-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl overflow-hidden">
+        <div className="relative flex items-center p-4
+         rounded-xl min-h-[120px]  shadow-sm text-white 
+         transition-transform duration-200 hover:-translate-y-1 hover:shadow-md overflow-hidden">
           {/* Sticker Image as Background */}
           <img
             src="/images/card1.png"
@@ -469,7 +471,8 @@ const EmployeeDashboardContent = () => {
         </div>
 
         {/* Next Payday Card */}
-        <div className="flex items-center p-4 rounded-xl h-[120px] shadow-lg bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl">
+        <div className="flex items-center p-4 rounded-xl min-h-[120px] shadow-sm border
+         bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
           <div className="flex flex-col justify-between w-full h-full">
             {/* Top Row: Title + Date + Payday Icon */}
             <div className="flex flex-row justify-between items-center w-full">
@@ -512,7 +515,8 @@ const EmployeeDashboardContent = () => {
         </div>
 
         {/* ID Card - Teal Version */}
-        <div className="relative flex flex-col justify-start items-start p-4 rounded-xl h-[120px] shadow-lg text-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl overflow-hidden">
+        <div className="relative flex flex-col justify-start items-start p-4 rounded-xl min-h-[120px] shadow-sm
+         text-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-md overflow-hidden">
           {/* Teal Background */}
           <div className="absolute inset-0 w-full h-full bg-teal-500 rounded-xl z-0"></div>
 

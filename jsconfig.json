@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "ignoreDeprecations": "6.0",
     "baseUrl": "src",
     "paths": {
       "@components/*": ["components/*"],
@@ -11,7 +12,10 @@
       "@utils/*": ["utils/*"],
       "@pages/*": ["pages/*"],
       "@constants/*": ["constants/*"]
-    }
+    },
+    "module": "commonjs",
+    "target": "esnext",
+    "jsx": "react-jsx"
   },
   "include": ["src"]
 }
