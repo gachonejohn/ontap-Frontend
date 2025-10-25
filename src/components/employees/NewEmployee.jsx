@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { FiPlus, FiUserPlus } from "react-icons/fi";
+import { FiPlus } from "react-icons/fi";
 import { IoCloseOutline } from "react-icons/io5";
 import Select from "react-select";
 import { toast } from "react-toastify";
@@ -329,9 +329,9 @@ export const CreateEmployee = ({ refetchData }) => {
                         Position
                       </label>
                       <Select
-                        options={positionsData?.results?.map((item) => ({
+                        options={positionsData?.map((item) => ({
                           value: item.id,
-                          label: `${item.title} (${item.department.name})`,
+                          label: `${item.title}`,
                         }))}
                         menuPortalTarget={document.body}
                         menuPlacement="auto"
@@ -370,7 +370,7 @@ export const CreateEmployee = ({ refetchData }) => {
                         Role
                       </label>
                       <Select
-                        options={rolesData?.results?.map((item) => ({
+                        options={rolesData?.map((item) => ({
                           value: item.id,
                           label: `${item.name}`,
                         }))}

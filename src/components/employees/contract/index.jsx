@@ -2,11 +2,12 @@ import { CreateContract } from "./AddContract";
 import { UpdateContract } from "./EditContract";
 import { getApiErrorMessage } from "@utils/errorHandler";
 import { useState } from "react";
-import { CustomDate } from "@utils/dates";
+import { CustomDate, YearMonthCustomDate } from "@utils/dates";
 import { FiBriefcase, FiTrash2 } from "react-icons/fi";
 import { toast } from "react-toastify";
 import ActionModal from "@components/common/Modals/ActionModal";
 import { useDeleteContractMutation } from "@store/services/employees/employeesService";
+import { calculateExpiryProgress } from "./CalculateProgress";
 
 export const ContractsDetails = ({ data: employeeData, refetch }) => {
   const [selectedItem, setSelectedItem] = useState(null);
@@ -42,9 +43,9 @@ export const ContractsDetails = ({ data: employeeData, refetch }) => {
       case "ACTIVE":
         return "bg-green-100 text-green-800";
       case "EXPIRED":
-        return "bg-gray-100 text-gray-800";
+        return "bg-purple-500 text-white";
       case "TERMINATED":
-        return "bg-red-100 text-red-800";
+        return "bg-red-100 text-red-600";
       case "PENDING":
         return "bg-yellow-100 text-yellow-800";
       case "SUSPENDED":
@@ -73,12 +74,12 @@ export const ContractsDetails = ({ data: employeeData, refetch }) => {
             return (
               <div
                 key={contract.id || index}
-                className={`rounded-xl shadow-sm border p-5 hover:shadow-md transition-shadow ${
-                  isActive ? "border-primary" : "border-gray-200 bg-gray-50"
+                className={`rounded-xl shadow-md border p-4 hover:shadow-md transition-shadow ${
+                  isActive ? "border" : ""
                 }`}
               >
                 {/* Header */}
-                <div className="mb-4 border-b pb-2 flex items-center justify-between">
+                <div className="mb-4  flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <h4 className="text-base font-semibold text-gray-800">
                       {contract.contract_type || "Contract"}
@@ -102,7 +103,9 @@ export const ContractsDetails = ({ data: employeeData, refetch }) => {
                     </div>
                     <div
                       onClick={() => openDeleteModal(contract.id)}
-                      className="p-2 rounded-md bg-red-100 text-red-600 hover:bg-red-200 hover:text-red-700 cursor-pointer transition duration-200 shadow-sm"
+                      className="p-2 rounded-md border border-red-500
+                       text-red-600 hover:bg-red-200
+                       hover:text-red-700 cursor-pointer transition duration-200 shadow-sm"
                       title="Delete"
                     >
                       <FiTrash2 className="text-sm" />
@@ -129,7 +132,7 @@ export const ContractsDetails = ({ data: employeeData, refetch }) => {
                   <div>
                     <span className="font-medium text-gray-600">Salary:</span>{" "}
                     <span className="text-gray-900">
-                      {contract.salary_currency} {contract.basic_salary} 
+                      {contract.salary_currency} {contract.basic_salary}
                     </span>
                   </div>
                   <div>
@@ -148,29 +151,57 @@ export const ContractsDetails = ({ data: employeeData, refetch }) => {
                       {contract.reporting_to || "Not specified"}
                     </span>
                   </div>
-                  <div>
-                    <span className="font-medium text-gray-600">
-                      Date of Hire:
-                    </span>{" "}
-                    <span className="text-gray-900">
-                      {CustomDate(contract.start_date)}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="font-medium text-gray-600">End Date:</span>{" "}
-                    <span className="text-gray-900">
-                      {contract.end_date
-                        ? CustomDate(contract.end_date)
-                        : "Ongoing"}
-                    </span>
-                  </div>
+
                   <div>
                     <span className="font-medium text-gray-600">Paid:</span>{" "}
-                    <span className="text-gray-900">
+                    <span
+                      className={` px-2.5 py-1 rounded-full font-medium ${
+                        contract.is_paid
+                          ? "text-green-600 bg-green-100 border-green-500"
+                          : "text-red-600 bg-red-100 border-red-500"
+                      }`}
+                    >
                       {contract.is_paid ? "Yes" : "No"}
                     </span>
                   </div>
                 </div>
+                {contract.end_date && (
+                  <div className="mt-4">
+                    {(() => {
+                      const { percentage, daysLeft } = calculateExpiryProgress(
+                        contract.start_date,
+                        contract.end_date
+                      );
+                      console.log({ percentage, daysLeft });
+                      return (
+                        <>
+                          <div className="flex justify-between mb-1 text-sm text-gray-600">
+                            <span>
+                              Start Date:{" "}
+                              {YearMonthCustomDate(contract?.start_date ?? "")}
+                            </span>
+                            <span>
+                              End Date:{" "}
+                              {YearMonthCustomDate(contract?.end_date ?? "")}
+                            </span>
+                          </div>
+                          <div className="w-full bg-gray-200 rounded-full h-2.5">
+                            <div
+                              className="bg-green-500 h-2.5 rounded-full transition-all duration-500"
+                              style={{ width: `${percentage}%` }}
+                            ></div>
+                          </div>
+                          <div className="flex justify-between mt-1 text-sm items-center">
+                            <span>{daysLeft} days to expiry</span>
+                            <button className="mt-3 px-4 py-1.5 rounded-md bg-red-100 text-red-600 text-sm hover:bg-red-200 transition">
+                              Renew
+                            </button>
+                          </div>
+                        </>
+                      );
+                    })()}
+                  </div>
+                )}
               </div>
             );
           })}

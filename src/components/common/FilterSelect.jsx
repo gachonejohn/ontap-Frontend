@@ -41,7 +41,7 @@ const FilterSelect = ({
         }),
         control: (base) => ({
           ...base,
-          minHeight: "34px",
+          minHeight: "36px",
           minWidth: "90px",
           borderColor: "#d1d5db",
           boxShadow: "none",

@@ -8,17 +8,18 @@ import { IoCloseOutline } from "react-icons/io5";
 import Select from "react-select";
 import { toast } from "react-toastify";
 import {
+  contractStatusOptions,
   contractTypeOptions,
   payFrequencyOptions,
   workLocationOptions,
 } from "../../../constants/constants";
-import { useCreateContractMutation, useUpdateContractMutation } from "../../../store/services/employees/employeesService";
+import { useUpdateContractMutation } from "../../../store/services/employees/employeesService";
 import SubmitCancelButtons from "../../common/Buttons/ActionButton";
 import CreateUpdateButton from "../../common/Buttons/CreateUpdateButton";
 
 export const UpdateContract = ({ refetchData, data }) => {
   const [isOpen, setIsOpen] = useState(false);
-  console.log("data", data)
+  console.log("data", data);
   const [updateContract, { isLoading: isUpdating }] =
     useUpdateContractMutation();
 
@@ -27,7 +28,6 @@ export const UpdateContract = ({ refetchData, data }) => {
     handleSubmit,
     reset,
     setValue,
-    watch,
     formState: { isSubmitting, errors },
   } = useForm({
     resolver: zodResolver(CreateEmployeeContractSchema),
@@ -67,6 +67,11 @@ export const UpdateContract = ({ refetchData, data }) => {
       setValue("contract_type", selected.value);
     }
   };
+  const handleContractStatusChange = (selected) => {
+    if (selected) {
+      setValue("status", selected.value);
+    }
+  };
   const handlePayFrequencyChange = (selected) => {
     if (selected) {
       setValue("pay_frequency", selected.value);
@@ -90,7 +95,12 @@ export const UpdateContract = ({ refetchData, data }) => {
         title="Edit"
         label=""
         icon={<FiEdit className="w-4 h-4" />}
-        className="group relative p-2 bg-amber-100 text-amber-500 rounded-md hover:bg-amber-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-1 transition-all duration-200 shadow-sm hover:shadow-md"
+        className="group relative p-2
+         rounded-md  border border-amber-500 text-amber-600
+    focus:outline-none
+    hover:bg-amber-100 hover:text-amber-700
+           focus:ring-offset-1 transition-all 
+           duration-200 shadow-sm hover:shadow-md"
       />
       {isOpen && (
         <div
@@ -203,9 +213,8 @@ export const UpdateContract = ({ refetchData, data }) => {
                     <Select
                       options={contractTypeOptions}
                       defaultValue={{
-                        label:data.contract_type,
+                        label: data.contract_type,
                         value: data.contract_type,
-                     
                       }}
                       onChange={handleContractTypeChange}
                       placeholder="Contract Type"
@@ -236,7 +245,7 @@ export const UpdateContract = ({ refetchData, data }) => {
                     <Select
                       options={payFrequencyOptions}
                       defaultValue={{
-                        label:data.pay_frequency,
+                        label: data.pay_frequency,
                         value: data.pay_frequency,
                       }}
                       onChange={handlePayFrequencyChange}
@@ -268,9 +277,8 @@ export const UpdateContract = ({ refetchData, data }) => {
                     <Select
                       options={workLocationOptions}
                       defaultValue={{
-                        label:data.work_location,
+                        label: data.work_location,
                         value: data.work_location,
-                    
                       }}
                       onChange={handleWorkLocationChange}
                       placeholder="Work Location"
@@ -294,7 +302,6 @@ export const UpdateContract = ({ refetchData, data }) => {
                       </p>
                     )}
                   </div>
-                </div>
                 <div>
                   <label className="block text-sm font-medium mb-2">
                     Supervisor<span className="text-red-500"></span>
@@ -310,6 +317,40 @@ export const UpdateContract = ({ refetchData, data }) => {
                       {errors.reporting_to.message}
                     </p>
                   )}
+                </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                    Status<span className="text-red-500">*</span>
+                    </label>
+                    <Select
+                      options={contractStatusOptions}
+                      defaultValue={{
+                        label: data.status,
+                        value: data.status,
+                      }}
+                      onChange={handleContractStatusChange}
+                      placeholder="Contract Status"
+                      menuPortalTarget={document.body}
+                      menuPlacement="auto"
+                      isClearable
+                      styles={{
+                        menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                        control: (base) => ({
+                          ...base,
+                          minHeight: "36px",
+                          borderColor: "#d1d5db",
+                          boxShadow: "none",
+                          "&:hover": { borderColor: "#9ca3af" },
+                          backgroundColor: "#F3F4F6",
+                        }),
+                      }}
+                    />
+                    {errors.status && (
+                      <p className="text-red-500 text-[12px] mt-1">
+                        {errors.status.message}
+                      </p>
+                    )}
+                  </div>
                 </div>
                 <div className="flex items-center space-x-2 mb-4">
                   <input

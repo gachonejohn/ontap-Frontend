@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from "react";
+import { SetTimezone } from "@components/settings/timezone/EditTimezone";
 import { useAppSelector } from "@store/hooks";
-import { useGetEmployeeByUserQuery, useGetProfileInfoQuery } from "@store/services/employees/employeesService";
+import { useGetProfileInfoQuery } from "@store/services/employees/employeesService";
+import { useEffect, useState } from "react";
 import { FiMenu } from "react-icons/fi";
 import AccountMenu from "./ProfileMenu";
-import { FiGlobe, FiCalendar, FiBell } from "react-icons/fi";
-import { SetTimezone } from "@components/settings/timezone/EditTimezone";
 
 export default function Header({ sidebarOpen, setSidebarOpen }) {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
