@@ -30,6 +30,13 @@ const TaskCard = ({ task, onClick }) => {
     URGENT: "Urgent",
   };
 
+  const priorityFlags = {
+    LOW: "/images/lowflag.png",
+    MEDIUM: "/images/mediumflag.png",
+    HIGH: "/images/highflag.png",
+    URGENT: "/images/urgentflag.png",
+  };
+
   const statusColors = {
     TO_DO: "bg-blue-100 text-blue-800",
     IN_PROGRESS: "bg-yellow-100 text-yellow-800",
@@ -39,7 +46,6 @@ const TaskCard = ({ task, onClick }) => {
     ON_HOLD: "bg-gray-100 text-gray-800",
   };
 
-  // Check if task is overdue and not completed
   const showOverdueBadge = isOverdue && status !== "COMPLETED";
 
   return (
@@ -48,7 +54,6 @@ const TaskCard = ({ task, onClick }) => {
       className="flex flex-col gap-3 p-4 rounded-xl bg-slate-50/80 cursor-pointer hover:bg-slate-100/80 transition-colors border border-transparent hover:border-slate-200"
       onClick={() => onClick(detail)}
     >
-      {/* Title and Status */}
       <div className="flex justify-between items-start gap-2">
         <div className="text-sm text-neutral-900 font-semibold flex-1">
           {title}
@@ -59,22 +64,21 @@ const TaskCard = ({ task, onClick }) => {
               Overdue
             </span>
           )}
-          <span
-            className={`px-2 py-1 rounded-full text-xs font-medium ${
-              statusColors[status] || "bg-gray-100 text-gray-800"
-            }`}
-          >
-            {status?.replace("_", " ") || "Unknown"}
-          </span>
+          <img 
+            src={priorityFlags[priority] || priorityFlags.MEDIUM} 
+            alt={`${priorityMap[priority] || priority} priority`}
+            width="20"
+            height="20"
+            className="object-contain"
+            title={`${priorityMap[priority] || priority} Priority`}
+          />
         </div>
       </div>
 
-      {/* Description */}
       <div className="text-xs text-gray-700 line-clamp-3 leading-relaxed">
         {description}
       </div>
 
-      {/* Dates + Priority */}
       <div className="flex justify-between items-center pt-2">
         <div className="flex items-center gap-1">
           <img
@@ -113,7 +117,6 @@ const TaskCard = ({ task, onClick }) => {
         </div>
       </div>
 
-      {/* Assignee */}
       <div className="pt-2 border-t border-neutral-200">
         <div className="flex items-center gap-1">
           <img
@@ -128,7 +131,6 @@ const TaskCard = ({ task, onClick }) => {
         </div>
       </div>
 
-      {/* Progress bar */}
       {progress > 0 && (
         <div className="mt-2">
           <div className="flex justify-between text-[10px] text-gray-500 mb-1">
@@ -147,7 +149,6 @@ const TaskCard = ({ task, onClick }) => {
   );
 };
 
-// Blue rectangle component for column headers
 const ColumnHeader = ({ icon, title, count, bgColor = "bg-blue-500" }) => (
   <div className={`flex flex-col justify-center items-center gap-2.5 pr-2 pl-2 rounded-lg h-12 shadow-sm ${bgColor}`}>
     <div className="flex flex-row justify-between items-center gap-9 w-full h-5">
@@ -182,7 +183,9 @@ export default function MainTaskDashboardContent() {
   const [activeTab, setActiveTab] = useState("taskManagement");
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
+  const [daysFilter, setDaysFilter] = useState("All");
   const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
+  const [isDaysDropdownOpen, setIsDaysDropdownOpen] = useState(false);
 
   const statusMap = {
     "All": "All Status",
@@ -195,33 +198,54 @@ export default function MainTaskDashboardContent() {
     "OVERDUE": "Overdue"
   };
 
-  const statusOptions = Object.entries(statusMap).map(([key, value]) => ({ key, value }));
+  const daysMap = {
+    "All": "All Days",
+    "1": "1 Day Ago",
+    "3": "3 Days Ago",
+    "7": "7 Days Ago",
+    "10": "10 Days Ago",
+    "14": "14 Days Ago",
+    "21": "21 Days Ago",
+    "30": "30 Days Ago",
+    "60": "60 Days Ago",
+    "90": "90 Days Ago"
+  };
 
-  // Fetch all tasks with increased page size to get more tasks
+  const statusOptions = Object.entries(statusMap).map(([key, value]) => ({ key, value }));
+  const daysOptions = Object.entries(daysMap).map(([key, value]) => ({ key, value }));
+
   const {
     data: tasksData,
     refetch,
   } = useGetTasksQuery({
     search: searchTerm || undefined,
     status: statusFilter !== "All" && statusFilter !== "OVERDUE" ? statusFilter : undefined,
-    page_size: 100, // Increased page size to get more tasks
+    page_size: 100,
   });
 
-  // Fetch analytics
   const { data: analyticsData } = useGetTaskAnalyticsQuery({});
-
   const [createTask] = useCreateTaskMutation();
 
   const tasks = tasksData?.results || [];
-  // Use the total count from API response instead of just the current page results
   const totalTasksCount = tasksData?.count || tasks.length;
 
-  // Filter tasks based on overdue filter
-  const filteredTasks = statusFilter === "OVERDUE" 
+  let filteredTasks = statusFilter === "OVERDUE" 
     ? tasks.filter(task => task.is_overdue && task.status !== "COMPLETED")
     : tasks;
 
-  // Group tasks by status - show ALL tasks, not limited
+  if (daysFilter !== "All") {
+    const today = new Date();
+    const filterDays = parseInt(daysFilter);
+    const pastDate = new Date(today);
+    pastDate.setDate(today.getDate() - filterDays);
+
+    filteredTasks = filteredTasks.filter(task => {
+      if (!task.created_at) return false;
+      const taskCreatedDate = new Date(task.created_at);
+      return taskCreatedDate >= pastDate && taskCreatedDate <= today;
+    });
+  }
+
   const groupedTasks = {
     todo: filteredTasks.filter((t) => t.status === "TO_DO"),
     inProgress: filteredTasks.filter((t) => t.status === "IN_PROGRESS"),
@@ -231,13 +255,13 @@ export default function MainTaskDashboardContent() {
     cancelled: filteredTasks.filter((t) => t.status === "CANCELLED"),
   };
 
-  // Calculate counts for analytics using the total count
   const completedCount = groupedTasks.completed.length;
   const inProgressCount = groupedTasks.inProgress.length;
   const overdueCount = tasks.filter((t) => t.is_overdue && t.status !== "COMPLETED").length;
 
   const handleCreateTask = async (formData) => {
     try {
+      console.log("=== HANDLE CREATE TASK ===");
       console.log("Form data received:", formData);
 
       const formatDate = (date) => {
@@ -246,63 +270,85 @@ export default function MainTaskDashboardContent() {
         return dateObj.toISOString().split("T")[0];
       };
 
-      // Create FormData object for file upload
       const formDataObj = new FormData();
       
-      // Append all task data
-      formDataObj.append("title", formData.title || "");
-      formDataObj.append("description", formData.description || "");
+      if (!formData.title || formData.title.trim().length === 0) {
+        toast.error("Task title is required");
+        return;
+      }
+      
+      if (!formData.description || formData.description.trim().length === 0) {
+        toast.error("Task description is required");
+        return;
+      }
+
+      formDataObj.append("title", formData.title.trim());
+      formDataObj.append("description", formData.description.trim());
       formDataObj.append("status", formData.status || "TO_DO");
       formDataObj.append("priority", formData.priority || "MEDIUM");
-      if (formData.assignee) formDataObj.append("assignee", formData.assignee);
-      if (formData.department) formDataObj.append("department", formData.department);
       
-      const startDate = formatDate(formData.start_date || formData.startDate);
-      const dueDate = formatDate(formData.due_date || formData.dueDate);
+      if (formData.assignees && formData.assignees.length > 0) {
+        formData.assignees.forEach(assigneeId => {
+          formDataObj.append("assignees", assigneeId.toString());
+        });
+      } else {
+        toast.error("At least one assignee is required");
+        return;
+      }
+      
+      if (formData.department) formDataObj.append("department", formData.department.toString());
+      
+      const startDate = formatDate(formData.start_date);
+      const dueDate = formatDate(formData.due_date);
       
       if (startDate) formDataObj.append("start_date", startDate);
       if (dueDate) formDataObj.append("due_date", dueDate);
       
       formDataObj.append("progress_percentage", 
-        parseInt(formData.progress_percentage || formData.progressPercentage) || 0
+        parseInt(formData.progress_percentage) || 0
       );
       
-      if (formData.estimated_hours || formData.estimatedHours) {
+      if (formData.estimated_hours) {
         formDataObj.append("estimated_hours", 
-          parseFloat(formData.estimated_hours || formData.estimatedHours)
+          parseFloat(formData.estimated_hours).toString()
         );
       }
       
-      formDataObj.append("is_urgent", Boolean(formData.is_urgent || formData.isUrgent));
-      formDataObj.append("requires_approval", Boolean(
-        formData.requires_approval || formData.requiresApproval
-      ));
+      formDataObj.append("is_urgent", formData.is_urgent ? "true" : "false");
+      formDataObj.append("requires_approval", formData.requires_approval ? "true" : "false");
       
-      if (formData.parent_task || formData.parentTask) {
-        formDataObj.append("parent_task", formData.parent_task || formData.parentTask);
+      if (formData.parent_task) {
+        formDataObj.append("parent_task", formData.parent_task.toString());
       }
 
-      // Append files
       if (formData.files && formData.files.length > 0) {
         formData.files.forEach((file) => {
           formDataObj.append("files", file);
         });
       }
 
-      // Use the FormData object for the API call
+      console.log("Sending task creation request...");
       const result = await createTask(formDataObj).unwrap();
       console.log("Task created successfully:", result);
 
-      // ✅ ADDED: Success toast notification
       toast.success("Task created successfully!");
-
       setIsLogTaskModalOpen(false);
       refetch();
     } catch (error) {
       console.error("Failed to create task:", error);
+      console.error("Error details:", error?.data);
       
-      // ✅ ADDED: Error toast notification
-      toast.error("Failed to create task");
+      if (error?.data?.title) {
+        toast.error(`Title error: ${error.data.title[0]}`);
+      } else if (error?.data?.description) {
+        toast.error(`Description error: ${error.data.description[0]}`);
+      } else if (error?.data?.assignees) {
+        toast.error(`Assignee error: ${error.data.assignees[0]}`);
+      } else if (error?.data?.detail) {
+        toast.error(error.data.detail);
+      } else {
+        toast.error("Failed to create task");
+      }
     }
   };
 
@@ -316,9 +362,13 @@ export default function MainTaskDashboardContent() {
     setIsStatusDropdownOpen(false);
   };
 
+  const handleDaysFilterChange = (days) => {
+    setDaysFilter(days);
+    setIsDaysDropdownOpen(false);
+  };
+
   return (
     <div className="flex flex-col gap-6">
-      {/* Header */}
       <div className="flex flex-row justify-between items-center">
         <div className="flex flex-col">
           <div className="text-lg text-neutral-900 font-semibold">Task Management</div>
@@ -344,9 +394,8 @@ export default function MainTaskDashboardContent() {
         </div>
       </div>
 
-      {/* Search and Filters */}
       <div className="flex flex-row justify-between items-center gap-4 w-full">
-        <div className="flex flex-row items-center gap-2 p-2 rounded-lg border border-slate-100 h-10 shadow-md min-w-[800px] transition-transform duration-200 hover:-translate-y-1 bg-white flex-1">
+        <div className="flex flex-row items-center gap-2 p-2 rounded-lg border border-slate-100 h-10 shadow-md transition-transform duration-200 hover:-translate-y-1 bg-white flex-1">
           <div className="flex justify-center items-center h-5">
             <img width="16.5" height="16.5" src="/images/search.png" alt="Search icon" />
           </div>
@@ -357,6 +406,46 @@ export default function MainTaskDashboardContent() {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
+        </div>
+
+        <div className="relative">
+          <div 
+            className="flex flex-row justify-center items-center gap-2 p-2 rounded-lg border border-neutral-200 w-[150px] h-10 bg-white cursor-pointer hover:bg-gray-50 transition-colors"
+            onClick={() => setIsDaysDropdownOpen(!isDaysDropdownOpen)}
+          >
+            <div className="flex flex-row items-center gap-1">
+              <div className="flex justify-center items-center h-5">
+                <img width="16.3px" height="16.3px" src="/images/calendar1.png" alt="Days filter icon" />
+              </div>
+              <div className="text-xs text-neutral-900 font-semibold">
+                {daysMap[daysFilter] || "All Days"}
+              </div>
+            </div>
+            <div className="flex flex-col justify-center items-center w-4 h-4">
+              <img
+                width="9.5px"
+                height="5.1px"
+                src="/images/dropdown.png"
+                alt="Dropdown icon"
+              />
+            </div>
+          </div>
+
+          {isDaysDropdownOpen && (
+            <div className="absolute top-full left-0 mt-1 w-full rounded-md border border-neutral-200 bg-white shadow-lg z-10 max-h-60 overflow-y-auto">
+              {daysOptions.map(({ key, value }) => (
+                <div
+                  key={key}
+                  className={`px-3 py-2 text-xs cursor-pointer hover:bg-gray-100 ${
+                    daysFilter === key ? "bg-teal-100 text-teal-800" : "text-neutral-900"
+                  }`}
+                  onClick={() => handleDaysFilterChange(key)}
+                >
+                  {value}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="relative">
@@ -377,7 +466,6 @@ export default function MainTaskDashboardContent() {
             </div>
           </div>
 
-          {/* Status Dropdown Menu */}
           {isStatusDropdownOpen && (
             <div className="absolute top-full left-0 mt-1 w-full rounded-md border border-neutral-200 bg-white shadow-lg z-10">
               {statusOptions.map(({ key, value }) => (
@@ -396,7 +484,6 @@ export default function MainTaskDashboardContent() {
         </div>
       </div>
 
-      {/* Tabs */}
       <div className="flex rounded-lg border border-slate-100 h-10 bg-slate-50 overflow-hidden">
         <div
           className={`flex items-center justify-center h-10 w-1/2 cursor-pointer ${
@@ -429,9 +516,7 @@ export default function MainTaskDashboardContent() {
       </div>
 
       {activeTab === "taskManagement" ? (
-        /* Task Columns - Show ALL tasks */
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
-          {/* To Do Column */}
           <div className="flex flex-col gap-4">
             <ColumnHeader
               icon="/images/taskstatus.png"
@@ -451,7 +536,6 @@ export default function MainTaskDashboardContent() {
             </div>
           </div>
 
-          {/* In Progress Column */}
           <div className="flex flex-col gap-4">
             <ColumnHeader
               icon="/images/taskstatus.png"
@@ -471,7 +555,6 @@ export default function MainTaskDashboardContent() {
             </div>
           </div>
 
-          {/* Completed Column */}
           <div className="flex flex-col gap-4">
             <ColumnHeader
               icon="/images/taskstatus.png"
@@ -491,10 +574,8 @@ export default function MainTaskDashboardContent() {
             </div>
           </div>
 
-          {/* Additional columns for other statuses */}
           {(groupedTasks.underReview.length > 0 || groupedTasks.onHold.length > 0 || groupedTasks.cancelled.length > 0) && (
             <div className="md:col-span-2 lg:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Under Review Column */}
               {groupedTasks.underReview.length > 0 && (
                 <div className="flex flex-col gap-4">
                   <ColumnHeader
@@ -511,7 +592,6 @@ export default function MainTaskDashboardContent() {
                 </div>
               )}
 
-              {/* On Hold Column */}
               {groupedTasks.onHold.length > 0 && (
                 <div className="flex flex-col gap-4">
                   <ColumnHeader
@@ -528,7 +608,6 @@ export default function MainTaskDashboardContent() {
                 </div>
               )}
 
-              {/* Cancelled Column */}
               {groupedTasks.cancelled.length > 0 && (
                 <div className="flex flex-col gap-4">
                   <ColumnHeader
@@ -548,9 +627,7 @@ export default function MainTaskDashboardContent() {
           )}
         </div>
       ) : (
-        /* Task Analytics Content */
         <div className="flex flex-col justify-between items-center gap-6 w-full">
-          {/* Task Stats Cards */}
           <div className="flex flex-row justify-between items-center gap-3 w-full h-[123px]">
             <div className="flex flex-col justify-between p-4 rounded-xl w-64 h-[121px] shadow-lg bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl">
               <div className="flex justify-between items-center">
@@ -656,7 +733,6 @@ export default function MainTaskDashboardContent() {
             </div>
           </div>
 
-          {/* Task Performance Section */}
           <div className="flex flex-col justify-start items-start gap-6 h-[334px] w-full">
             <div className="flex flex-row justify-start items-center gap-4 py-4 h-14 w-full">
               <div className="text-lg text-neutral-900 font-medium">Task Analytics</div>
@@ -718,7 +794,6 @@ export default function MainTaskDashboardContent() {
         </div>
       )}
 
-      {/* Modals */}
       <LogTaskModal
         isOpen={isLogTaskModalOpen}
         onClose={() => setIsLogTaskModalOpen(false)}

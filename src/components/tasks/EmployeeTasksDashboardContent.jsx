@@ -31,6 +31,14 @@ const TaskCard = ({ task, onClick }) => {
     URGENT: "Urgent",
   };
 
+  // Priority flag images
+  const priorityFlags = {
+    LOW: "/images/lowflag.png",
+    MEDIUM: "/images/mediumflag.png",
+    HIGH: "/images/highflag.png",
+    URGENT: "/images/urgentflag.png",
+  };
+
   const statusColors = {
     TO_DO: "bg-blue-100 text-blue-800",
     IN_PROGRESS: "bg-yellow-100 text-yellow-800",
@@ -58,9 +66,15 @@ const TaskCard = ({ task, onClick }) => {
               Overdue
             </span>
           )}
-          <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[status] || "bg-gray-100 text-gray-800"}`}>
-            {status?.replace('_', ' ') || 'Unknown'}
-          </span>
+          {/* Priority Flag instead of status badge */}
+          <img 
+            src={priorityFlags[priority] || priorityFlags.MEDIUM} 
+            alt={`${priorityMap[priority] || priority} priority`}
+            width="20"
+            height="20"
+            className="object-contain"
+            title={`${priorityMap[priority] || priority} Priority`}
+          />
         </div>
       </div>
 
@@ -167,7 +181,9 @@ const EmployeeTasksDashboardContent = () => {
   const [activeTab, setActiveTab] = useState("taskManagement");
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
+  const [daysFilter, setDaysFilter] = useState("All");
   const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
+  const [isDaysDropdownOpen, setIsDaysDropdownOpen] = useState(false);
 
   // Define statusMap for filter options
   const statusMap = {
@@ -181,7 +197,22 @@ const EmployeeTasksDashboardContent = () => {
     "OVERDUE": "Overdue"
   };
 
+  // Define daysMap for filter options (based on created_at)
+  const daysMap = {
+    "All": "All Days",
+    "1": "1 Day Ago",
+    "3": "3 Days Ago",
+    "7": "7 Days Ago",
+    "10": "10 Days Ago",
+    "14": "14 Days Ago",
+    "21": "21 Days Ago",
+    "30": "30 Days Ago",
+    "60": "60 Days Ago",
+    "90": "90 Days Ago"
+  };
+
   const statusOptions = Object.entries(statusMap).map(([key, value]) => ({ key, value }));
+  const daysOptions = Object.entries(daysMap).map(([key, value]) => ({ key, value }));
 
   // Get logged-in user
   const currentUser = useSelector((state) => state.auth.user);
@@ -196,13 +227,12 @@ const EmployeeTasksDashboardContent = () => {
 
   // Employee only sees their own tasks with status filter and increased page size
   const { data: tasksData, isLoading, error, refetch } = useGetMyTasksQuery({
-  search: searchTerm || undefined,
-  status: statusFilter !== "All" && statusFilter !== "OVERDUE" ? statusFilter : undefined,
-  page_size: 100,
-}, {
-  // 🔥 Add polling or refetch options
-  refetchOnMountOrArgChange: true,
-});
+    search: searchTerm || undefined,
+    status: statusFilter !== "All" && statusFilter !== "OVERDUE" ? statusFilter : undefined,
+    page_size: 100,
+  }, {
+    refetchOnMountOrArgChange: true,
+  });
 
   const [createTask] = useCreateTaskMutation();
 
@@ -211,11 +241,25 @@ const EmployeeTasksDashboardContent = () => {
   const totalTasksCount = tasksData?.count || tasks.length;
 
   // Filter tasks based on overdue filter
-  const filteredTasks = statusFilter === "OVERDUE" 
+  let filteredTasks = statusFilter === "OVERDUE" 
     ? tasks.filter(task => task.is_overdue && task.status !== "COMPLETED")
     : tasks;
 
-  // Group tasks by status - show ALL tasks for employee
+  // Apply days filter based on created_at
+  if (daysFilter !== "All") {
+    const today = new Date();
+    const filterDays = parseInt(daysFilter);
+    const pastDate = new Date(today);
+    pastDate.setDate(today.getDate() - filterDays);
+
+    filteredTasks = filteredTasks.filter(task => {
+      if (!task.created_at) return false;
+      const taskCreatedDate = new Date(task.created_at);
+      return taskCreatedDate >= pastDate && taskCreatedDate <= today;
+    });
+  }
+
+  // Group tasks by status - show ALL filtered tasks for employee
   const groupedTasks = {
     todo: filteredTasks.filter((task) => task.status === "TO_DO"),
     inProgress: filteredTasks.filter((task) => task.status === "IN_PROGRESS"),
@@ -228,76 +272,83 @@ const EmployeeTasksDashboardContent = () => {
   const overdueCount = tasks.filter(t => t.is_overdue && t.status !== "COMPLETED").length;
 
   // Handle new task creation
-  // In EmployeeTasksDashboardContent.jsx - UPDATE the handleCreateTask function
+  const handleCreateTask = async (formData) => {
+    try {
+      const formatDate = (date) =>
+        date ? new Date(date).toISOString().split("T")[0] : null;
 
-const handleCreateTask = async (formData) => {
-  try {
-    const formatDate = (date) =>
-      date ? new Date(date).toISOString().split("T")[0] : null;
+      // Create FormData object for file upload
+      const formDataObj = new FormData();
+      
+      // Append all task data
+      formDataObj.append("title", formData.title || "");
+      formDataObj.append("description", formData.description || "");
+      formDataObj.append("status", formData.status || "TO_DO");
+      formDataObj.append("priority", formData.priority || "MEDIUM");
+      
+      // 🔥 FIX: Check if currentUser has a user property (employee object) or is the user object directly
+      const userId = currentUser?.user?.id || currentUser?.id;
+      
+      if (!userId) {
+        console.error("Cannot determine user ID from currentUser:", currentUser);
+        toast.error("Failed to create task: User ID not found");
+        return;
+      }
+      
+      // Use the extracted user ID
+      formDataObj.append("assignee", userId);
+      
+      if (formData.department) formDataObj.append("department", formData.department);
+      
+      const startDate = formatDate(formData.start_date || formData.startDate);
+      const dueDate = formatDate(formData.due_date || formData.dueDate);
+      
+      if (startDate) formDataObj.append("start_date", startDate);
+      if (dueDate) formDataObj.append("due_date", dueDate);
+      
+      formDataObj.append("progress_percentage", formData.progress_percentage || 0);
+      
+      if (formData.estimated_hours || formData.estimatedHours) {
+        formDataObj.append("estimated_hours", 
+          parseFloat(formData.estimated_hours || formData.estimatedHours)
+        );
+      }
+      
+      formDataObj.append("is_urgent", Boolean(formData.is_urgent || formData.isUrgent));
+      formDataObj.append("requires_approval", Boolean(
+        formData.requires_approval || formData.requiresApproval
+      ));
 
-    // Create FormData object for file upload
-    const formDataObj = new FormData();
-    
-    // Append all task data
-    formDataObj.append("title", formData.title || "");
-    formDataObj.append("description", formData.description || "");
-    formDataObj.append("status", formData.status || "TO_DO");
-    formDataObj.append("priority", formData.priority || "MEDIUM");
-    
-    // 🔥 FIX: Check if currentUser has a user property (employee object) or is the user object directly
-    const userId = currentUser?.user?.id || currentUser?.id;
-    
-    if (!userId) {
-      console.error("Cannot determine user ID from currentUser:", currentUser);
-      toast.error("Failed to create task: User ID not found");
-      return;
+      // Append files
+      if (formData.files && formData.files.length > 0) {
+        formData.files.forEach((file) => {
+          formDataObj.append("files", file);
+        });
+      }
+
+      // DEBUG: Log what we're sending
+      console.log("Creating task with user ID:", userId);
+      console.log("Full currentUser object:", currentUser);
+
+      // Use the FormData object for the API call
+      await createTask(formDataObj).unwrap();
+      toast.success("Task created successfully!");
+      setIsLogTaskModalOpen(false);
+      refetch();
+    } catch (err) {
+      console.error("Task creation failed:", err);
+      console.error("Error details:", err?.data);
+      
+      // Show specific error message if available
+      if (err?.data?.assignee) {
+        toast.error(`Assignee error: ${err.data.assignee[0]}`);
+      } else if (err?.data?.detail) {
+        toast.error(err.data.detail);
+      } else {
+        toast.error("Failed to create task");
+      }
     }
-    
-    // Use the extracted user ID
-    formDataObj.append("assignee", userId);
-    
-    if (formData.department) formDataObj.append("department", formData.department);
-    
-    const startDate = formatDate(formData.start_date || formData.startDate);
-    const dueDate = formatDate(formData.due_date || formData.dueDate);
-    
-    if (startDate) formDataObj.append("start_date", startDate);
-    if (dueDate) formDataObj.append("due_date", dueDate);
-    
-    formDataObj.append("progress_percentage", formData.progress_percentage || 0);
-    
-    if (formData.estimated_hours || formData.estimatedHours) {
-      formDataObj.append("estimated_hours", 
-        parseFloat(formData.estimated_hours || formData.estimatedHours)
-      );
-    }
-    
-    formDataObj.append("is_urgent", Boolean(formData.is_urgent || formData.isUrgent));
-    formDataObj.append("requires_approval", Boolean(
-      formData.requires_approval || formData.requiresApproval
-    ));
-
-    // Append files
-    if (formData.files && formData.files.length > 0) {
-      formData.files.forEach((file) => {
-        formDataObj.append("files", file);
-      });
-    }
-
-    // DEBUG: Log what we're sending
-    console.log("Creating task with user ID:", userId);
-    console.log("Full currentUser object:", currentUser);
-
-    // Use the FormData object for the API call
-    await createTask(formDataObj).unwrap();
-    toast.success("Task created successfully!");
-    setIsLogTaskModalOpen(false);
-    refetch();
-  } catch (err) {
-    console.error("Task creation failed:", err);
-    toast.error("Failed to create task");
-  }
-};
+  };
 
   const handleCardClick = (task) => {
     setSelectedTask(task);
@@ -307,6 +358,11 @@ const handleCreateTask = async (formData) => {
   const handleStatusFilterChange = (status) => {
     setStatusFilter(status);
     setIsStatusDropdownOpen(false);
+  };
+
+  const handleDaysFilterChange = (days) => {
+    setDaysFilter(days);
+    setIsDaysDropdownOpen(false);
   };
 
   if (isLoading) {
@@ -361,9 +417,10 @@ const handleCreateTask = async (formData) => {
         )}
       </div>
 
-      {/* Search and Filter */}
+      {/* Search and Filters */}
       <div className="flex flex-row justify-between items-center gap-4 w-full">
-        <div className="flex flex-row items-center gap-2 p-2 rounded-lg border border-slate-100 h-10 shadow-md min-w-[800px] transition-transform duration-200 hover:-translate-y-1 bg-white flex-1">
+        {/* Search Bar */}
+        <div className="flex flex-row items-center gap-2 p-2 rounded-lg border border-slate-100 h-10 shadow-md transition-transform duration-200 hover:-translate-y-1 bg-white flex-1">
           <div className="flex justify-center items-center h-5">
             <img
               width="16.5px"
@@ -381,6 +438,49 @@ const handleCreateTask = async (formData) => {
           />
         </div>
 
+        {/* Days Filter Dropdown */}
+        <div className="relative">
+          <div 
+            className="flex flex-row justify-center items-center gap-2 p-2 rounded-lg border border-neutral-200 w-[150px] h-10 bg-white cursor-pointer hover:bg-gray-50 transition-colors"
+            onClick={() => setIsDaysDropdownOpen(!isDaysDropdownOpen)}
+          >
+            <div className="flex flex-row items-center gap-1">
+              <div className="flex justify-center items-center h-5">
+                <img width="16.3px" height="16.3px" src="/images/calendar1.png" alt="Days filter icon" />
+              </div>
+              <div className="text-xs text-neutral-900 font-semibold">
+                {daysMap[daysFilter] || "All Days"}
+              </div>
+            </div>
+            <div className="flex flex-col justify-center items-center w-4 h-4">
+              <img
+                width="9.5px"
+                height="5.1px"
+                src="/images/dropdown.png"
+                alt="Dropdown icon"
+              />
+            </div>
+          </div>
+
+          {/* Days Dropdown Menu */}
+          {isDaysDropdownOpen && (
+            <div className="absolute top-full left-0 mt-1 w-full rounded-md border border-neutral-200 bg-white shadow-lg z-10 max-h-60 overflow-y-auto">
+              {daysOptions.map(({ key, value }) => (
+                <div
+                  key={key}
+                  className={`px-3 py-2 text-xs cursor-pointer hover:bg-gray-100 ${
+                    daysFilter === key ? "bg-teal-100 text-teal-800" : "text-neutral-900"
+                  }`}
+                  onClick={() => handleDaysFilterChange(key)}
+                >
+                  {value}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Status Filter Dropdown */}
         <div className="relative">
           <div 
             className="flex flex-row justify-center items-center gap-2 p-2 rounded-lg border border-neutral-200 w-[150px] h-10 bg-white cursor-pointer hover:bg-gray-50 transition-colors"
@@ -444,7 +544,7 @@ const handleCreateTask = async (formData) => {
       </div>
 
       {activeTab === 'taskManagement' ? (
-        /* Task Columns - Show ALL tasks with scrollable containers */
+        /* Task Columns - Show ALL filtered tasks with scrollable containers */
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
           {/* To Do Column */}
           <div className="flex flex-col gap-4">

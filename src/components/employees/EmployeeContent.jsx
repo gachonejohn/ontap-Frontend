@@ -42,6 +42,14 @@ const TaskCard = ({ task, onClick }) => {
     URGENT: "Urgent",
   };
 
+  // Priority flag images
+  const priorityFlags = {
+    LOW: "/images/lowflag.png",
+    MEDIUM: "/images/mediumflag.png",
+    HIGH: "/images/highflag.png",
+    URGENT: "/images/urgentflag.png",
+  };
+
   const statusColors = {
     TO_DO: "bg-blue-100 text-blue-800",
     IN_PROGRESS: "bg-yellow-100 text-yellow-800",
@@ -60,7 +68,7 @@ const TaskCard = ({ task, onClick }) => {
       className="flex flex-col gap-3 p-4 rounded-xl bg-slate-50/80 cursor-pointer hover:bg-slate-100/80 transition-colors border border-transparent hover:border-slate-200"
       onClick={() => onClick(detail)}
     >
-      {/* Title and Status */}
+      {/* Title and Priority Flag */}
       <div className="flex justify-between items-start gap-2">
         <div className="text-sm text-neutral-900 font-semibold flex-1">{title}</div>
         <div className="flex flex-col items-end gap-1">
@@ -69,9 +77,15 @@ const TaskCard = ({ task, onClick }) => {
               Overdue
             </span>
           )}
-          <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[status] || "bg-gray-100 text-gray-800"}`}>
-            {status?.replace('_', ' ') || 'Unknown'}
-          </span>
+          {/* Priority Flag */}
+          <img 
+            src={priorityFlags[priority] || priorityFlags.MEDIUM} 
+            alt={`${priorityMap[priority] || priority} priority`}
+            width="20"
+            height="20"
+            className="object-contain"
+            title={`${priorityMap[priority] || priority} Priority`}
+          />
         </div>
       </div>
 
@@ -271,85 +285,85 @@ const EmployeeDashboardContent = () => {
 
   // Handle new task creation
   const handleCreateTask = async (formData) => {
-  try {
-    const formatDate = (date) =>
-      date ? new Date(date).toISOString().split("T")[0] : null;
+    try {
+      const formatDate = (date) =>
+        date ? new Date(date).toISOString().split("T")[0] : null;
 
-    // 🔥 FIX: Extract user ID correctly - check if currentUser has nested user object
-    const userId = currentUser?.user?.id || currentUser?.id;
-    
-    if (!userId) {
-      console.error("Cannot determine user ID from currentUser:", currentUser);
-      toast.error("Failed to create task: User ID not found");
-      return;
-    }
+      // 🔥 FIX: Extract user ID correctly - check if currentUser has nested user object
+      const userId = currentUser?.user?.id || currentUser?.id;
+      
+      if (!userId) {
+        console.error("Cannot determine user ID from currentUser:", currentUser);
+        toast.error("Failed to create task: User ID not found");
+        return;
+      }
 
-    // Create FormData object for file upload
-    const formDataObj = new FormData();
-    
-    // Append all task data
-    formDataObj.append("title", formData.title || "");
-    formDataObj.append("description", formData.description || "");
-    formDataObj.append("status", formData.status || "TO_DO");
-    formDataObj.append("priority", formData.priority || "MEDIUM");
-    
-    // Use the extracted user ID
-    formDataObj.append("assignee", userId);
-    
-    if (formData.department) {
-      formDataObj.append("department", formData.department);
-    }
-    
-    const startDate = formatDate(formData.start_date || formData.startDate);
-    const dueDate = formatDate(formData.due_date || formData.dueDate);
-    
-    if (startDate) formDataObj.append("start_date", startDate);
-    if (dueDate) formDataObj.append("due_date", dueDate);
-    
-    formDataObj.append("progress_percentage", formData.progress_percentage || formData.progressPercentage || 0);
-    
-    if (formData.estimated_hours || formData.estimatedHours) {
-      formDataObj.append("estimated_hours", 
-        parseFloat(formData.estimated_hours || formData.estimatedHours)
-      );
-    }
-    
-    formDataObj.append("is_urgent", Boolean(formData.is_urgent || formData.isUrgent));
-    formDataObj.append("requires_approval", Boolean(
-      formData.requires_approval || formData.requiresApproval
-    ));
+      // Create FormData object for file upload
+      const formDataObj = new FormData();
+      
+      // Append all task data
+      formDataObj.append("title", formData.title || "");
+      formDataObj.append("description", formData.description || "");
+      formDataObj.append("status", formData.status || "TO_DO");
+      formDataObj.append("priority", formData.priority || "MEDIUM");
+      
+      // Use the extracted user ID
+      formDataObj.append("assignee", userId);
+      
+      if (formData.department) {
+        formDataObj.append("department", formData.department);
+      }
+      
+      const startDate = formatDate(formData.start_date || formData.startDate);
+      const dueDate = formatDate(formData.due_date || formData.dueDate);
+      
+      if (startDate) formDataObj.append("start_date", startDate);
+      if (dueDate) formDataObj.append("due_date", dueDate);
+      
+      formDataObj.append("progress_percentage", formData.progress_percentage || formData.progressPercentage || 0);
+      
+      if (formData.estimated_hours || formData.estimatedHours) {
+        formDataObj.append("estimated_hours", 
+          parseFloat(formData.estimated_hours || formData.estimatedHours)
+        );
+      }
+      
+      formDataObj.append("is_urgent", Boolean(formData.is_urgent || formData.isUrgent));
+      formDataObj.append("requires_approval", Boolean(
+        formData.requires_approval || formData.requiresApproval
+      ));
 
-    // Append files if any
-    if (formData.files && formData.files.length > 0) {
-      formData.files.forEach((file) => {
-        formDataObj.append("files", file);
-      });
-    }
+      // Append files if any
+      if (formData.files && formData.files.length > 0) {
+        formData.files.forEach((file) => {
+          formDataObj.append("files", file);
+        });
+      }
 
-    // DEBUG: Log what we're sending
-    console.log("Creating task with user ID:", userId);
-    console.log("Full currentUser object:", currentUser);
-    console.log("Form data received:", formData);
+      // DEBUG: Log what we're sending
+      console.log("Creating task with user ID:", userId);
+      console.log("Full currentUser object:", currentUser);
+      console.log("Form data received:", formData);
 
-    // Use the FormData object for the API call
-    await createTask(formDataObj).unwrap();
-    toast.success("Task created successfully!");
-    setIsLogTaskModalOpen(false);
-    refetchTasks();
-  } catch (err) {
-    console.error("Task creation failed:", err);
-    console.error("Error details:", err?.data);
-    
-    // Show specific error message if available
-    if (err?.data?.assignee) {
-      toast.error(`Assignee error: ${err.data.assignee[0]}`);
-    } else if (err?.data?.detail) {
-      toast.error(err.data.detail);
-    } else {
-      toast.error("Failed to create task");
+      // Use the FormData object for the API call
+      await createTask(formDataObj).unwrap();
+      toast.success("Task created successfully!");
+      setIsLogTaskModalOpen(false);
+      refetchTasks();
+    } catch (err) {
+      console.error("Task creation failed:", err);
+      console.error("Error details:", err?.data);
+      
+      // Show specific error message if available
+      if (err?.data?.assignee) {
+        toast.error(`Assignee error: ${err.data.assignee[0]}`);
+      } else if (err?.data?.detail) {
+        toast.error(err.data.detail);
+      } else {
+        toast.error("Failed to create task");
+      }
     }
-  }
-};
+  };
 
   const handleCardClick = (task) => {
     setSelectedTask(task);
@@ -692,16 +706,6 @@ const EmployeeDashboardContent = () => {
             <div className="flex items-center p-3 rounded bg-gray-50">
               <div className="flex flex-col">
                 <div className="text-sm text-neutral-900 font-medium">
-                  Company Holiday: Labor Day Schedule
-                </div>
-                <div className="text-[10px] text-gray-600 font-medium">
-                  Aug 26, 2025
-                </div>
-              </div>
-            </div>
-            <div className="flex items-center p-3 rounded bg-gray-50">
-              <div className="flex flex-col">
-                <div className="text-sm text-neutral-900 font-medium">
                   Office Relocation Update
                 </div>
                 <div className="text-[10px] text-gray-600 font-medium">
@@ -818,5 +822,6 @@ const EmployeeDashboardContent = () => {
     </div>
   );
 };
-
+  
 export default EmployeeDashboardContent;
+              
