@@ -15,12 +15,12 @@ const TaskHeader = ({
   onPriorityChange,
   isAssignee,
   canViewAll,
-  currentUser // Add currentUser prop to get the correct ID
+  currentUser,
+  onAddSubtask 
 }) => {
   const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
   const [isPriorityDropdownOpen, setIsPriorityDropdownOpen] = useState(false);
 
-  // Safe user ID extraction
   const userId = currentUser?.user?.id || currentUser?.id;
 
   const statusMap = {
@@ -52,7 +52,6 @@ const TaskHeader = ({
 
   const priorityOptions = getUpgradablePriorityOptions();
 
-  // Enhanced status change handler
   const handleStatusChange = (newStatus) => {
     if (!userId) {
       console.error('User ID not available for status change');
@@ -60,12 +59,11 @@ const TaskHeader = ({
     }
     
     if (onStatusChange) {
-      onStatusChange(newStatus, userId); // Pass userId to the parent
+      onStatusChange(newStatus, userId);
     }
     setIsStatusDropdownOpen(false);
   };
 
-  // Enhanced priority change handler
   const handlePriorityChange = (newPriority) => {
     if (!userId) {
       console.error('User ID not available for priority change');
@@ -73,17 +71,28 @@ const TaskHeader = ({
     }
     
     if (onPriorityChange) {
-      onPriorityChange(newPriority, userId); // Pass userId to the parent
+      onPriorityChange(newPriority, userId);
     }
     setIsPriorityDropdownOpen(false);
   };
 
   return (
     <>
-      {/* Header with Close Button, Edit Button and Delete Option */}
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-lg text-neutral-900 font-semibold">Task Details</h2>
         <div className="flex items-center gap-2">
+          {/* 🔥 NEW: Add Subtask Button - Shows when user has edit permission and not in edit mode */}
+          {hasAnyEditPermission && !isEditingMode && onAddSubtask && (
+            <button 
+              onClick={onAddSubtask}
+              className="flex items-center gap-1.5 px-3 py-1 text-xs text-white bg-teal-500 rounded-lg hover:bg-teal-600 transition-colors"
+              title="Add Subtask"
+            >
+              
+              Add Subtask
+            </button>
+          )}
+
           {hasAnyEditPermission && (
             <>
               {isEditingMode ? (
@@ -131,7 +140,6 @@ const TaskHeader = ({
         </div>
       </div>
 
-      {/* Task Title */}
       <div className="flex flex-col justify-start items-start gap-4 mb-3">
         {isEditingMode ? (
           <div className="w-full">
