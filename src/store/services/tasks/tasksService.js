@@ -1,45 +1,143 @@
 import { apiSlice } from "../../api/apiSlice";
 
-// Enhanced normalizeTask function with better field handling
-const normalizeTask = (task) => ({
-  ...task,
-  // Normalize date fields
-  dueDate: task.due_date || task.dueDate,
-  startDate: task.start_date || task.startDate,
+// Enhanced normalizeTask function with MULTI-ASSIGNEE support
+const normalizeTask = (task) => {
+  // DEBUG: Log the raw task to see what we're receiving
+  console.log('🔍 normalizeTask received:', {
+    id: task.id,
+    title: task.title,
+    assignees: task.assignees,
+    assignees_detail: task.assignees_detail,
+    assignee_name: task.assignee_name,
+    assignee: task.assignee,
+    assignee_detail: task.assignee_detail
+  });
   
-  // Normalize progress and numeric fields
-  progressPercentage: task.progress_percentage || task.progressPercentage || 0,
-  estimatedHours: task.estimated_hours || task.estimatedHours,
+  // Handle multiple assignees
+  let assigneeNames = "Unassigned";
   
-  // Normalize boolean fields
-  isUrgent: task.is_urgent || task.isUrgent || false,
-  requiresApproval: task.requires_approval || task.requiresApproval || false,
-  isOverdue: task.is_overdue || task.isOverdue || false,
+  // PRIORITY 1: Check assignees_detail (backend sends detailed user info here)
+  if (task.assignees_detail && Array.isArray(task.assignees_detail) && task.assignees_detail.length > 0) {
+    console.log('📋 Found assignees_detail:', task.assignees_detail);
+    
+    assigneeNames = task.assignees_detail
+      .map(assignee => {
+        if (typeof assignee === 'object' && assignee !== null) {
+          // Try different possible field structures
+          if (assignee.first_name && assignee.last_name) {
+            return `${assignee.first_name} ${assignee.last_name}`;
+          } else if (assignee.user?.first_name && assignee.user?.last_name) {
+            return `${assignee.user.first_name} ${assignee.user.last_name}`;
+          } else if (assignee.full_name) {
+            return assignee.full_name;
+          } else if (assignee.user?.full_name) {
+            return assignee.user.full_name;
+          }
+        }
+        return null;
+      })
+      .filter(Boolean)
+      .join(", ");
+    
+    console.log('✅ Extracted names from assignees_detail:', assigneeNames);
+    
+    // Fallback if no names were extracted
+    if (!assigneeNames) {
+      assigneeNames = "Unassigned";
+    }
+  } 
+  // PRIORITY 2: Check assignees array (in case it has objects instead of just IDs)
+  else if (task.assignees && Array.isArray(task.assignees) && task.assignees.length > 0) {
+    console.log('📋 Found assignees array:', task.assignees);
+    
+    // Check if assignees array contains objects (not just IDs)
+    const firstItem = task.assignees[0];
+    if (typeof firstItem === 'object' && firstItem !== null) {
+      assigneeNames = task.assignees
+        .map(assignee => {
+          if (assignee.first_name && assignee.last_name) {
+            return `${assignee.first_name} ${assignee.last_name}`;
+          } else if (assignee.user?.first_name && assignee.user?.last_name) {
+            return `${assignee.user.first_name} ${assignee.user.last_name}`;
+          } else if (assignee.full_name) {
+            return assignee.full_name;
+          }
+          return null;
+        })
+        .filter(Boolean)
+        .join(", ");
+      
+      console.log('✅ Extracted names from assignees:', assigneeNames);
+      
+      if (!assigneeNames) {
+        assigneeNames = "Unassigned";
+      }
+    } else {
+      console.log('⚠️ Assignees array contains IDs, not objects');
+    }
+    // If assignees is just an array of IDs, we can't extract names
+  } 
+  // PRIORITY 3: Single assignee fallbacks
+  else if (task.assignee_name) {
+    assigneeNames = task.assignee_name;
+    console.log('✅ Using assignee_name:', assigneeNames);
+  } else if (task.assignee?.full_name) {
+    assigneeNames = task.assignee.full_name;
+    console.log('✅ Using assignee.full_name:', assigneeNames);
+  } else if (task.assignee_detail?.full_name) {
+    assigneeNames = task.assignee_detail.full_name;
+    console.log('✅ Using assignee_detail.full_name:', assigneeNames);
+  } else if (task.assignee_detail?.first_name && task.assignee_detail?.last_name) {
+    assigneeNames = `${task.assignee_detail.first_name} ${task.assignee_detail.last_name}`;
+    console.log('✅ Using assignee_detail names:', assigneeNames);
+  }
   
-  // Normalize description with fallback
-  description: task.description || "No description available",
-  
-  // Normalize user-related fields with better fallbacks
-  assigneeName: task.assignee_name || task.assignee?.full_name || task.assigneeName || "Unassigned",
-  createdByName: task.created_by_name || task.created_by?.full_name || task.createdByName || "System",
-  
-  // Normalize department field
-  departmentName: task.department_name || task.department?.name || task.departmentName || "Not specified",
-  
-  // Ensure consistent status and priority
-  status: task.status || "TO_DO",
-  priority: task.priority || "MEDIUM",
-  
-  // Normalize counts with fallbacks
-  attachmentsCount: task.attachments_count || task.attachmentsCount || 0,
-  commentsCount: task.comments_count || task.commentsCount || 0,
-  subtasksCount: task.subtasks_count || task.subtasksCount || 0,
-  
-  // Preserve original IDs
-  assigneeId: task.assignee || task.assigneeId,
-  departmentId: task.department || task.departmentId,
-  createdById: task.created_by || task.createdById,
-});
+  console.log('🏁 Final assigneeNames:', assigneeNames);
+
+  return {
+    ...task,
+    // Normalize date fields
+    dueDate: task.due_date || task.dueDate,
+    startDate: task.start_date || task.startDate,
+    
+    // Normalize progress and numeric fields
+    progressPercentage: task.progress_percentage || task.progressPercentage || 0,
+    estimatedHours: task.estimated_hours || task.estimatedHours,
+    
+    // Normalize boolean fields
+    isUrgent: task.is_urgent || task.isUrgent || false,
+    requiresApproval: task.requires_approval || task.requiresApproval || false,
+    isOverdue: task.is_overdue || task.isOverdue || false,
+    
+    // Normalize description with fallback
+    description: task.description || "No description available",
+    
+    // FIXED: Handle both single and multiple assignees
+    assignee_name: assigneeNames,
+    assigneeName: assigneeNames,
+    
+    // Normalize created_by
+    createdByName: task.created_by_name || task.created_by?.full_name || task.createdByName || "System",
+    
+    // Normalize department field
+    departmentName: task.department_name || task.department?.name || task.departmentName || "Not specified",
+    
+    // Ensure consistent status and priority
+    status: task.status || "TO_DO",
+    priority: task.priority || "MEDIUM",
+    
+    // Normalize counts with fallbacks
+    attachmentsCount: task.attachments_count || task.attachmentsCount || 0,
+    commentsCount: task.comments_count || task.commentsCount || 0,
+    subtasksCount: task.subtasks_count || task.subtasksCount || 0,
+    
+    // Preserve original IDs and arrays
+    assignees: task.assignees || [],
+    assigneeId: task.assignee || task.assigneeId,
+    departmentId: task.department || task.departmentId,
+    createdById: task.created_by || task.createdById,
+  };
+};
 
 export const tasksApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -96,7 +194,7 @@ export const tasksApi = apiSlice.injectEndpoints({
         if (page_size) params.page_size = page_size;
         if (search) params.search = search;
         if (ordering) params.ordering = ordering;
-        if (timeframe) params.timeframe = timeframe; // e.g., "week", "month", "quarter"
+        if (timeframe) params.timeframe = timeframe;
         
         return { url: "tasks/api/tasks/analytics/", method: "GET", params };
       },
@@ -114,7 +212,7 @@ export const tasksApi = apiSlice.injectEndpoints({
 
     /**
      * ========================
-     * TASK COMMENTS - FIXED
+     * TASK COMMENTS
      * ========================
      */
 
@@ -143,7 +241,6 @@ export const tasksApi = apiSlice.injectEndpoints({
         body: {
           content: data.content,
           user: data.user,
-          // Remove is_internal since it's not required and causing issues
         },
       }),
       invalidatesTags: (result, error, { task_pk }) => [
@@ -182,52 +279,90 @@ export const tasksApi = apiSlice.injectEndpoints({
 
     /**
      * ========================
-     * TASK MUTATIONS (WRITE) - ENHANCED
+     * TASK MUTATIONS (WRITE) - FIXED FOR REQUIRED FIELDS
      * ========================
      */
 
     createTask: builder.mutation({
-      query: (formData) => ({ 
-        url: "tasks/api/tasks/", 
-        method: "POST", 
-        body: formData,
-        // Note: No Content-Type header needed - browser will set it automatically with boundary
-      }),
-      invalidatesTags: ["Tasks", "MyTasks", "TaskAnalytics"],
-    }),
+  query: (formData) => {
+    console.log('=== CREATE TASK SERVICE ===');
+    console.log('Received formData:', formData);
+    
+    // Remove validation - trust the component validation
+    const formDataObj = formData instanceof FormData ? formData : new FormData();
+    
+    if (!(formData instanceof FormData)) {
+      // Convert regular object to FormData without validation
+      formDataObj.append("title", formData.title?.trim() || "");
+      formDataObj.append("description", formData.description?.trim() || "");
+      formDataObj.append("status", formData.status || "TO_DO");
+      formDataObj.append("priority", formData.priority || "MEDIUM");
+      
+      if (formData.assignees && formData.assignees.length > 0) {
+        formData.assignees.forEach(assigneeId => {
+          formDataObj.append("assignees", assigneeId.toString());
+        });
+      }
+      
+      if (formData.department) formDataObj.append("department", formData.department.toString());
+      if (formData.start_date) formDataObj.append("start_date", formData.start_date);
+      if (formData.due_date) formDataObj.append("due_date", formData.due_date);
+      
+      formDataObj.append("progress_percentage", (formData.progress_percentage || 0).toString());
+      
+      if (formData.estimated_hours) {
+        formDataObj.append("estimated_hours", formData.estimated_hours.toString());
+      }
+      
+      formDataObj.append("is_urgent", formData.is_urgent ? "true" : "false");
+      formDataObj.append("requires_approval", formData.requires_approval ? "true" : "false");
+      
+      if (formData.files && formData.files.length > 0) {
+        formData.files.forEach(file => {
+          formDataObj.append("files", file);
+        });
+      }
+    }
+
+    console.log('FormData contents:');
+    for (let pair of formDataObj.entries()) {
+      console.log(pair[0] + ': ', pair[1]);
+    }
+    
+    return { 
+      url: "tasks/api/tasks/", 
+      method: "POST", 
+      body: formDataObj,
+    };
+  },
+  // IMPORTANT: Transform the response to normalize the created task
+  transformResponse: (response) => normalizeTask(response),
+  invalidatesTags: ["Tasks", "MyTasks", "TaskAnalytics"],
+}),
 
     updateTask: builder.mutation({
       query: ({ id, ...data }) => {
-        // Ensure required fields are always included with current values
         const updateData = {
-          title: data.title || data.currentTitle, // Use current title if not provided
-          description: data.description || data.currentDescription, // Use current description if not provided
+          title: data.title || data.currentTitle,
+          description: data.description || data.currentDescription,
           status: data.status,
           priority: data.priority,
-          assignee: data.assignee,
+          assignees: data.assignees || (data.assignee ? [data.assignee] : []),
           department: data.department,
           start_date: data.start_date || data.startDate,
           due_date: data.due_date || data.dueDate,
           progress_percentage: data.progress_percentage || data.progressPercentage,
           estimated_hours: data.estimated_hours || data.estimatedHours,
           parent_task: data.parent_task || data.parentTask,
-          is_urgent: data.is_urgent || data.isUrgent,
-          requires_approval: data.requires_approval || data.requiresApproval,
         };
-        
-        // Remove undefined values
-        Object.keys(updateData).forEach(key => {
-          if (updateData[key] === undefined) {
-            delete updateData[key];
-          }
-        });
         
         return { 
           url: `tasks/api/tasks/${id}/`, 
-          method: "PUT", 
-          body: updateData
+          method: "PATCH", 
+          body: updateData 
         };
       },
+      transformResponse: (response) => normalizeTask(response),
       invalidatesTags: (result, error, { id }) => [
         "Tasks",
         "MyTasks",
@@ -245,15 +380,12 @@ export const tasksApi = apiSlice.injectEndpoints({
     }),
 
     updateTaskStatus: builder.mutation({
-      query: ({ id, status, progress_percentage, comment }) => ({ 
-        url: `tasks/api/tasks/${id}/update_status/`, 
-        method: "PATCH", 
-        body: { 
-          status,
-          progress_percentage,
-          comment 
-        }
+      query: ({ id, status, reason }) => ({
+        url: `tasks/api/tasks/${id}/update_status/`,
+        method: "POST",
+        body: { status, reason },
       }),
+      transformResponse: (response) => normalizeTask(response),
       invalidatesTags: (result, error, { id }) => [
         "Tasks",
         "MyTasks",
@@ -281,7 +413,7 @@ export const tasksApi = apiSlice.injectEndpoints({
 
     /**
      * ========================
-     * TASK ATTACHMENTS - ENHANCED
+     * TASK ATTACHMENTS
      * ========================
      */
 
@@ -309,7 +441,6 @@ export const tasksApi = apiSlice.injectEndpoints({
       ],
     }),
 
-    // 🔹 NEW: update attachment (PUT or PATCH)
     updateTaskAttachment: builder.mutation({
       query: ({ task_pk, id, formData, partial = true }) => ({
         url: `tasks/api/tasks/${task_pk}/attachments/${id}/`,
@@ -335,27 +466,27 @@ export const tasksApi = apiSlice.injectEndpoints({
 
     /**
      * ========================
-     * NEW ENHANCED ENDPOINTS
+     * ENHANCED ENDPOINTS
      * ========================
      */
 
-    // Duplicate a task
     duplicateTask: builder.mutation({
       query: ({ id, data }) => ({
         url: `tasks/api/tasks/${id}/duplicate/`,
         method: "POST",
         body: data,
       }),
+      transformResponse: (response) => normalizeTask(response),
       invalidatesTags: ["Tasks", "MyTasks", "TaskAnalytics"],
     }),
 
-    // Assign task to another user
     assignTask: builder.mutation({
       query: ({ id, assignee_id, reason }) => ({
         url: `tasks/api/tasks/${id}/assign_task/`,
         method: "POST",
         body: { assignee: assignee_id, reason },
       }),
+      transformResponse: (response) => normalizeTask(response),
       invalidatesTags: (result, error, { id }) => [
         "Tasks",
         "MyTasks",
@@ -364,10 +495,9 @@ export const tasksApi = apiSlice.injectEndpoints({
       ],
     }),
 
-    // Get task status history
     getTaskStatusHistory: builder.query({
       query: (task_pk) => ({
-        url: `tasks/api/tasks/${task_pk}/`, // This will include status_history in the detail response
+        url: `tasks/api/tasks/${task_pk}/`,
         method: "GET",
       }),
       transformResponse: (response) => response.status_history || [],
@@ -376,7 +506,6 @@ export const tasksApi = apiSlice.injectEndpoints({
       ],
     }),
 
-    // Get tasks by department
     getTasksByDepartment: builder.query({
       query: ({ department_id, page, page_size, status } = {}) => {
         const params = { department: department_id };
@@ -397,7 +526,6 @@ export const tasksApi = apiSlice.injectEndpoints({
       providesTags: ["Tasks"],
     }),
 
-    // Search tasks with advanced filtering
     searchTasks: builder.query({
       query: ({ 
         search, 
@@ -442,7 +570,6 @@ export const tasksApi = apiSlice.injectEndpoints({
      * ========================
      */
 
-    // Start time tracking for a task
     startTimeTracking: builder.mutation({
       query: ({ task_pk, data }) => ({
         url: `tasks/api/tasks/${task_pk}/time_logs/`,
@@ -455,7 +582,6 @@ export const tasksApi = apiSlice.injectEndpoints({
       ],
     }),
 
-    // Stop time tracking for a task
     stopTimeTracking: builder.mutation({
       query: ({ task_pk, timeLogId, description }) => ({
         url: `tasks/api/tasks/${task_pk}/time_logs/${timeLogId}/`,
@@ -471,10 +597,9 @@ export const tasksApi = apiSlice.injectEndpoints({
       ],
     }),
 
-    // Get time logs for a task
     getTaskTimeLogs: builder.query({
       query: (task_pk) => ({
-        url: `tasks/api/tasks/${task_pk}/`, // This will include time_logs in the detail response
+        url: `tasks/api/tasks/${task_pk}/`,
         method: "GET",
       }),
       transformResponse: (response) => response.time_logs || [],
@@ -485,7 +610,7 @@ export const tasksApi = apiSlice.injectEndpoints({
   }),
 });
 
-// Export all hooks with CORRECTED parameter names
+// Export all hooks
 export const {
   // Core task queries
   useGetTasksQuery,
@@ -493,7 +618,7 @@ export const {
   useGetTaskAnalyticsQuery,
   useGetTaskDetailQuery,
   
-  // Comment hooks - FIXED parameter names
+  // Comment hooks
   useGetTaskCommentsQuery,
   useCreateTaskCommentMutation,
   useUpdateTaskCommentMutation,

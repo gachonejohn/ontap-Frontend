@@ -21,8 +21,7 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit }) => {
     description: "",
     status: "TO_DO",
     priority: "",
-    assignee: "", // Single assignee (user ID)
-    assignees: [], // Multiple assignees (array of user IDs)
+    assignees: [],
     department: "",
     start_date: "",
     due_date: "",
@@ -72,51 +71,64 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit }) => {
   }));
 
   const employeeOptions = employees.map((emp) => ({
-    value: emp.user?.id, // MUST be user ID
+    value: emp.user?.id,
     label: `${emp.user?.first_name} ${emp.user?.last_name}`,
   }));
 
   useEffect(() => {
-  if (isOpen) {
-    // 🔥 FIX: Extract user ID correctly
-    const userId = currentUser?.user?.id || currentUser?.id;
-    const initialAssignee = canViewAll ? "" : userId;
-    
-    setFormData({
-      title: "",
-      description: "",
-      status: "TO_DO",
-      priority: "",
-      assignee: initialAssignee,
-      assignees: canViewAll ? [] : [userId],
-      department: "",
-      start_date: "",
-      due_date: "",
-      progress_percentage: 0,
-      estimated_hours: "",
-      is_urgent: false,
-      requires_approval: false,
-      files: [],
-    });
-    setFormErrors({});
-    setIsSubmitting(false);
-  }
-}, [isOpen, canViewAll, currentUser]);
+    if (isOpen) {
+      const userId = currentUser?.user?.id || currentUser?.id;
+      const initialAssignees = canViewAll ? [] : [userId];
+      
+      setFormData({
+        title: "",
+        description: "",
+        status: "TO_DO",
+        priority: "",
+        assignees: initialAssignees,
+        department: "",
+        start_date: "",
+        due_date: "",
+        progress_percentage: 0,
+        estimated_hours: "",
+        is_urgent: false,
+        requires_approval: false,
+        files: [],
+      });
+      setFormErrors({});
+      setIsSubmitting(false);
+    }
+  }, [isOpen, canViewAll, currentUser]);
 
   const validateForm = () => {
     const errors = {};
 
-    if (!formData.title.trim()) errors.title = "Task title is required";
-    if (!formData.priority) errors.priority = "Priority is required";
-    if (!formData.description.trim())
+    if (!formData.title || formData.title.trim().length === 0) {
+      errors.title = "Task title is required";
+    }
+
+    if (!formData.priority) {
+      errors.priority = "Priority is required";
+    }
+
+    if (!formData.description || formData.description.trim().length === 0) {
       errors.description = "Description is required";
-    if (!formData.start_date) errors.start_date = "Start date is required";
-    if (!formData.due_date) errors.due_date = "Due date is required";
+    }
+
+    if (!formData.start_date) {
+      errors.start_date = "Start date is required";
+    }
+
+    if (!formData.due_date) {
+      errors.due_date = "Due date is required";
+    }
 
     if (formData.start_date && formData.due_date) {
       const startDate = new Date(formData.start_date);
       const dueDate = new Date(formData.due_date);
-      if (dueDate < startDate) errors.due_date = "Due date cannot be before start date";
+      if (dueDate < startDate) {
+        errors.due_date = "Due date cannot be before start date";
+      }
     }
 
     setFormErrors(errors);
@@ -140,7 +152,6 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit }) => {
     setFormData((prev) => ({
       ...prev,
       assignees: selectedValues,
-      assignee: selectedValues.length > 0 ? selectedValues[0] : "",
     }));
   };
 
@@ -161,45 +172,62 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit }) => {
   };
 
   const handleCreateTask = async (e) => {
-  e.preventDefault();
-  if (!validateForm()) return;
-  if (!onSubmit) return;
-
-  setIsSubmitting(true);
-
-  try {
-    // 🔥 FIX: Extract user ID correctly
-    const userId = currentUser?.user?.id || currentUser?.id;
+    e.preventDefault();
     
-    const payload = {
-      ...formData,
-      assignee: formData.assignee || formData.assignees?.[0] || userId,
-      assignees: formData.assignees?.length > 0 ? formData.assignees : [formData.assignee || userId],
-    };
+    console.log('=== FORM SUBMISSION START ===');
+    console.log('Form data before validation:', formData);
+    
+    if (!validateForm()) {
+      console.log('Form validation failed');
+      return;
+    }
+    
+    if (!onSubmit) {
+      console.log('No onSubmit function provided');
+      return;
+    }
 
-    // DEBUG LOGS
-    console.log("Current User:", currentUser);
-    console.log("Extracted User ID:", userId);
-    console.log("Form Data:", formData);
-    console.log("Payload being sent:", payload);
-    if (payload.assignee) console.log("Assignee ID:", payload.assignee);
-    if (payload.assignees) console.log("Assignees IDs:", payload.assignees);
+    setIsSubmitting(true);
 
-    await onSubmit(payload);
-  } catch (err) {
-    console.error("Error creating task:", err);
-  } finally {
-    setIsSubmitting(false);
-  }
-};
+    try {
+      const userId = currentUser?.user?.id || currentUser?.id;
+      
+      const payload = {
+        title: formData.title.trim(),
+        description: formData.description.trim(),
+        status: formData.status,
+        priority: formData.priority,
+        assignees: formData.assignees?.length > 0 ? formData.assignees : [userId],
+        department: formData.department,
+        start_date: formData.start_date,
+        due_date: formData.due_date,
+        progress_percentage: parseInt(formData.progress_percentage) || 0,
+        estimated_hours: formData.estimated_hours,
+        is_urgent: Boolean(formData.is_urgent),
+        requires_approval: Boolean(formData.requires_approval),
+        files: formData.files,
+      };
 
+      console.log('=== PAYLOAD BEING SENT ===');
+      console.log('Payload:', payload);
+      console.log('Title:', payload.title, '(length:', payload.title.length, ')');
+      console.log('Description:', payload.description, '(length:', payload.description.length, ')');
+      console.log('Assignees:', payload.assignees);
+      console.log('=== END PAYLOAD DEBUG ===');
+
+      await onSubmit(payload);
+    } catch (err) {
+      console.error("Error in handleCreateTask:", err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="flex flex-col rounded-2xl w-[560px] max-h-[90vh] bg-white p-6 overflow-y-auto">
-        {/* HEADER */}
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-lg text-neutral-900 font-semibold">Create New Task</h2>
           <button
@@ -213,9 +241,7 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit }) => {
           </button>
         </div>
 
-        {/* FORM */}
         <form onSubmit={handleCreateTask} className="flex flex-col gap-4 w-full">
-          {/* Task Title */}
           <div className="flex flex-col gap-2 w-full">
             <label className="text-sm text-neutral-900 font-medium">Task Title *</label>
             <input
@@ -231,7 +257,6 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit }) => {
             {formErrors.title && <p className="text-red-500 text-xs mt-1">{formErrors.title}</p>}
           </div>
 
-          {/* Status & Priority */}
           <div className="flex flex-row gap-4 w-full">
             <div className="flex flex-col gap-2 w-full">
               <label className="text-sm text-neutral-900 font-medium">Status</label>
@@ -265,7 +290,6 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit }) => {
             </div>
           </div>
 
-          {/* Description */}
           <div className="flex flex-col gap-2 w-full">
             <label className="text-sm text-neutral-900 font-medium">Description *</label>
             <textarea
@@ -281,7 +305,6 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit }) => {
             {formErrors.description && <p className="text-red-500 text-xs mt-1">{formErrors.description}</p>}
           </div>
 
-          {/* File Upload */}
           <div className="flex flex-col gap-2 w-full">
             <label className="text-sm text-neutral-900 font-medium">Attachments</label>
             <label className="flex flex-col justify-center items-center gap-2.5 py-4 rounded-md border-2 border-dashed border-zinc-300 w-full bg-zinc-300/0 cursor-pointer hover:bg-gray-50">
@@ -314,7 +337,6 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit }) => {
             )}
           </div>
 
-          {/* Assignees */}
           {canViewAll && employees.length > 0 && (
             <div className="flex flex-col gap-2 w-full">
               <label className="text-sm text-neutral-900 font-medium">Assignees</label>
@@ -347,7 +369,6 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit }) => {
             </div>
           )}
 
-          {/* Department */}
           {canViewAll && departments.length > 0 && (
             <div className="flex flex-col gap-2 w-full">
               <label className="text-sm text-neutral-900 font-medium">Department</label>
@@ -365,7 +386,6 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit }) => {
             </div>
           )}
 
-          {/* Dates */}
           <div className="flex flex-row gap-4 w-full">
             <div className="flex flex-col gap-2 w-full">
               <label className="text-sm text-neutral-900 font-medium">Start Date *</label>
@@ -379,7 +399,6 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit }) => {
             </div>
           </div>
 
-          {/* Submit */}
           <button type="submit" disabled={isSubmitting} className={`w-full py-3 rounded-lg text-white font-normal mt-4 transition-colors ${isSubmitting ? "bg-teal-400 cursor-not-allowed" : "bg-teal-500 hover:bg-teal-600"}`}>
             {isSubmitting ? (
               <div className="flex justify-center items-center gap-2">

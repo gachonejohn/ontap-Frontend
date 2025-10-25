@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import ActionsDropdown from '../../dashboards/hr/components/ActionsDropdown';
-import TaskCompletionChart from '../../dashboards/hr/components/TaskCompletionChart';
+import TaskCompletionChart from './charts/TaskCompletionChart';
 import TrainingProgressChart from '../../dashboards/hr/components/TrainingProgressChart';
 import { useAppSelector } from "../../store/hooks";
 import EmployeeDashboardContent from "../employees/EmployeeContent";
