@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from "react";
 import {
   useGetTasksQuery,
   useGetTaskAnalyticsQuery,
@@ -162,12 +162,22 @@ export default function MainTaskDashboardContent() {
   const [isLogTaskModalOpen, setIsLogTaskModalOpen] = useState(false);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
-  const [activeTab, setActiveTab] = useState('taskManagement');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('All');
-  const [daysFilter, setDaysFilter] = useState('All');
+  const [activeTab, setActiveTab] = useState("taskManagement");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("All");
+  const [daysFilter, setDaysFilter] = useState("All");
   const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
   const [isDaysDropdownOpen, setIsDaysDropdownOpen] = useState(false);
+
+  // Debounce search term
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500); // Wait 500ms after user stops typing
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
   const statusMap = {
     All: 'All Status',
@@ -196,9 +206,13 @@ export default function MainTaskDashboardContent() {
   const statusOptions = Object.entries(statusMap).map(([key, value]) => ({ key, value }));
   const daysOptions = Object.entries(daysMap).map(([key, value]) => ({ key, value }));
 
-  const { data: tasksData, refetch } = useGetTasksQuery({
-    search: searchTerm || undefined,
-    status: statusFilter !== 'All' && statusFilter !== 'OVERDUE' ? statusFilter : undefined,
+  const {
+    data: tasksData,
+    refetch,
+    isFetching,
+  } = useGetTasksQuery({
+    search: debouncedSearchTerm || undefined,
+    status: statusFilter !== "All" && statusFilter !== "OVERDUE" ? statusFilter : undefined,
     page_size: 100,
   });
 
@@ -208,32 +222,55 @@ export default function MainTaskDashboardContent() {
   const tasks = tasksData?.results || [];
   const totalTasksCount = tasksData?.count || tasks.length;
 
-  let filteredTasks =
-    statusFilter === 'OVERDUE'
-      ? tasks.filter((task) => task.is_overdue && task.status !== 'COMPLETED')
-      : tasks;
+  // Client-side filtering for additional filters
+  const filteredTasks = useMemo(() => {
+    let filtered = tasks;
 
-  if (daysFilter !== 'All') {
-    const today = new Date();
-    const filterDays = parseInt(daysFilter);
-    const pastDate = new Date(today);
-    pastDate.setDate(today.getDate() - filterDays);
+    // Apply overdue filter
+    if (statusFilter === "OVERDUE") {
+      filtered = filtered.filter(task => task.is_overdue && task.status !== "COMPLETED");
+    }
 
-    filteredTasks = filteredTasks.filter((task) => {
-      if (!task.created_at) return false;
-      const taskCreatedDate = new Date(task.created_at);
-      return taskCreatedDate >= pastDate && taskCreatedDate <= today;
-    });
-  }
+    // Apply days filter
+    if (daysFilter !== "All") {
+      const today = new Date();
+      const filterDays = parseInt(daysFilter);
+      const pastDate = new Date(today);
+      pastDate.setDate(today.getDate() - filterDays);
 
-  const groupedTasks = {
-    todo: filteredTasks.filter((t) => t.status === 'TO_DO'),
-    inProgress: filteredTasks.filter((t) => t.status === 'IN_PROGRESS'),
-    completed: filteredTasks.filter((t) => t.status === 'COMPLETED'),
-    underReview: filteredTasks.filter((t) => t.status === 'UNDER_REVIEW'),
-    onHold: filteredTasks.filter((t) => t.status === 'ON_HOLD'),
-    cancelled: filteredTasks.filter((t) => t.status === 'CANCELLED'),
-  };
+      filtered = filtered.filter(task => {
+        if (!task.created_at) return false;
+        const taskCreatedDate = new Date(task.created_at);
+        return taskCreatedDate >= pastDate && taskCreatedDate <= today;
+      });
+    }
+
+    // Client-side search filtering (title and assignee only - descriptions not available in main list)
+    if (searchTerm && searchTerm.trim() !== "") {
+      const searchLower = searchTerm.toLowerCase().trim();
+      
+      filtered = filtered.filter(task => {
+        // Search in title
+        const titleMatch = task.title?.toLowerCase().includes(searchLower);
+        
+        // Search in assignee name
+        const assigneeMatch = task.assignee_name?.toLowerCase().includes(searchLower);
+        
+        return titleMatch || assigneeMatch;
+      });
+    }
+
+    return filtered;
+  }, [tasks, statusFilter, daysFilter, searchTerm]);
+
+  const groupedTasks = useMemo(() => ({
+    todo: filteredTasks.filter((t) => t.status === "TO_DO"),
+    inProgress: filteredTasks.filter((t) => t.status === "IN_PROGRESS"),
+    completed: filteredTasks.filter((t) => t.status === "COMPLETED"),
+    underReview: filteredTasks.filter((t) => t.status === "UNDER_REVIEW"),
+    onHold: filteredTasks.filter((t) => t.status === "ON_HOLD"),
+    cancelled: filteredTasks.filter((t) => t.status === "CANCELLED"),
+  }), [filteredTasks]);
 
   const completedCount = groupedTasks.completed.length;
   const inProgressCount = groupedTasks.inProgress.length;

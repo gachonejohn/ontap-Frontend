@@ -354,6 +354,7 @@ export const tasksApi = apiSlice.injectEndpoints({
     }),
 
     updateTask: builder.mutation({
+<<<<<<< HEAD
       query: ({ id, ...data }) => {
         const updateData = {
           title: data.title || data.currentTitle,
@@ -383,6 +384,45 @@ export const tasksApi = apiSlice.injectEndpoints({
         { type: 'TaskDetail', id },
       ],
     }),
+=======
+  query: ({ id, ...data }) => {
+    const updateData = {
+      title: data.title || data.currentTitle,
+      description: data.description || data.currentDescription,
+      status: data.status,
+      priority: data.priority,
+      assignees: data.assignees || (data.assignee ? [data.assignee] : []),
+      department: data.department,
+      start_date: data.start_date || data.startDate,
+      due_date: data.due_date || data.dueDate,
+      progress_percentage: data.progress_percentage || data.progressPercentage,
+      estimated_hours: data.estimated_hours || data.estimatedHours,
+      parent_task: data.parent_task || data.parentTask,
+      is_urgent: data.is_urgent || data.isUrgent,
+      requires_approval: data.requires_approval || data.requiresApproval,
+    };
+    
+    // Remove undefined values
+    Object.keys(updateData).forEach(key => {
+      if (updateData[key] === undefined) {
+        delete updateData[key];
+      }
+    });
+    
+    return { 
+      url: `tasks/api/tasks/${id}/update_status/`, 
+      method: "PATCH", 
+      body: updateData
+    };
+  },
+  invalidatesTags: (result, error, { id }) => [
+    "Tasks",
+    "MyTasks",
+    "TaskAnalytics",
+    { type: "TaskDetail", id },
+  ],
+}),
+>>>>>>> main
 
     deleteTask: builder.mutation({
       query: (id) => ({
@@ -393,6 +433,7 @@ export const tasksApi = apiSlice.injectEndpoints({
     }),
 
     updateTaskStatus: builder.mutation({
+<<<<<<< HEAD
       query: ({ id, status, reason }) => ({
         url: `tasks/api/tasks/${id}/update_status/`,
         method: 'POST',
@@ -406,6 +447,24 @@ export const tasksApi = apiSlice.injectEndpoints({
         { type: 'TaskDetail', id },
       ],
     }),
+=======
+  query: ({ id, status, progress_percentage, comment }) => ({ 
+    url: `tasks/api/tasks/${id}/update_status/`, 
+    method: "PATCH", 
+    body: { 
+      status,
+      progress_percentage: progress_percentage || 0,
+      comment: comment || ""
+    }
+  }),
+  invalidatesTags: (result, error, { id }) => [
+    "Tasks",
+    "MyTasks",
+    "TaskAnalytics",
+    { type: "TaskDetail", id },
+  ],
+}),
+>>>>>>> main
 
     bulkUpdateTasks: builder.mutation({
       query: (data) => ({
