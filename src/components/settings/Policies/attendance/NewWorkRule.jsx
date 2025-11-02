@@ -1,21 +1,20 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { FiPlus } from "react-icons/fi";
-import { IoCloseOutline } from "react-icons/io5";
-import Select from "react-select";
-import { toast } from "react-toastify";
-import SubmitSpinner from "../../../common/spinners/submitSpinner";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { FiPlus } from 'react-icons/fi';
+import { IoCloseOutline } from 'react-icons/io5';
+import Select from 'react-select';
+import { toast } from 'react-toastify';
+import SubmitSpinner from '../../../common/spinners/submitSpinner';
 
-import CreateUpdateButton from "@components/common/Buttons/CreateUpdateButton";
-import { attendancePolicyOptions } from "@constants/constants";
-import { CreateAttendancePolicySchema } from "@schemas/companies/policies/attendancePolicySchema";
-import { useCreateAttendancePolicyMutation } from "@store/services/policies/policyService";
+import CreateUpdateButton from '@components/common/Buttons/CreateUpdateButton';
+import { attendancePolicyOptions } from '@constants/constants';
+import { CreateAttendancePolicySchema } from '@schemas/companies/policies/attendancePolicySchema';
+import { useCreateAttendancePolicyMutation } from '@store/services/policies/policyService';
 export const CreateAttendacePolicy = ({ refetchData }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const [createAttendacePolicy, { isLoading: isCreating }] =
-    useCreateAttendancePolicyMutation();
+  const [createAttendacePolicy, { isLoading: isCreating }] = useCreateAttendancePolicyMutation();
 
   const {
     register,
@@ -36,15 +35,15 @@ export const CreateAttendacePolicy = ({ refetchData }) => {
       };
 
       await createAttendacePolicy(payload).unwrap();
-      toast.success("Attendance Policy created successfully!");
+      toast.success('Attendance Policy created successfully!');
       handleCloseModal();
       refetchData();
     } catch (error) {
-      console.error("Error:", error);
+      console.error('Error:', error);
       if (error && error.data && error.data.error) {
         toast.error(error.data.error);
       } else {
-        toast.error("An error occurred. Please try again.");
+        toast.error('An error occurred. Please try again.');
       }
     } finally {
       refetchData();
@@ -58,7 +57,7 @@ export const CreateAttendacePolicy = ({ refetchData }) => {
   };
   const handleRuleTypeChange = (selected) => {
     if (selected) {
-      setValue("rule_type", selected.value);
+      setValue('rule_type', selected.value);
     }
   };
   return (
@@ -95,22 +94,15 @@ export const CreateAttendacePolicy = ({ refetchData }) => {
                 <p className="text-sm md:text-lg lg:text-lg font-semibold">
                   Add New Attendance Policy
                 </p>
-                <IoCloseOutline
-                  size={20}
-                  className="cursor-pointer"
-                  onClick={handleCloseModal}
-                />
+                <IoCloseOutline size={20} className="cursor-pointer" onClick={handleCloseModal} />
               </div>
 
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 p-4">
                 {/* Name */}
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium mb-2">
-                    Rule Type
-                  </label>
+                  <label className="block text-sm font-medium mb-2">Rule Type</label>
                   <Select
                     options={attendancePolicyOptions}
-                    
                     menuPortalTarget={document.body}
                     menuPlacement="auto"
                     styles={{
@@ -120,75 +112,61 @@ export const CreateAttendacePolicy = ({ refetchData }) => {
                       }),
                       control: (base) => ({
                         ...base,
-                        minHeight: "40px",
-                        borderColor: "#d1d5db",
-                        boxShadow: "none",
-                        "&:hover": {
-                          borderColor: "#9ca3af",
+                        minHeight: '40px',
+                        borderColor: '#d1d5db',
+                        boxShadow: 'none',
+                        '&:hover': {
+                          borderColor: '#9ca3af',
                         },
-                        "&:focus-within": {
-                          borderColor: "#9ca3af",
-                          boxShadow: "none",
+                        '&:focus-within': {
+                          borderColor: '#9ca3af',
+                          boxShadow: 'none',
                         },
-                        backgroundColor: "#F8FAFC",
+                        backgroundColor: '#F8FAFC',
                       }),
                     }}
                     onChange={handleRuleTypeChange}
                   />
                   {errors.rule_type && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {errors.rule_type.message}
-                    </p>
+                    <p className="text-red-500 text-sm mt-1">{errors.rule_type.message}</p>
                   )}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Rule Time
-                  </label>
+                  <label className="block text-sm font-medium mb-2">Rule Time</label>
                   <input
                     type="time"
-                    {...register("rule_time")}
+                    {...register('rule_time')}
                     className="w-full py-2 px-4 rounded-md border border-gray-400 focus:outline-none focus:border-[#1E9FF2] focus:bg-white placeholder:text-sm cursor-text"
                   />
                   {errors.rule_time && (
-                    <p className="text-red-500 text-sm">
-                      {errors.rule_time.message}
-                    </p>
+                    <p className="text-red-500 text-sm">{errors.rule_time.message}</p>
                   )}
                 </div>
 
                 {/* Grace Minutes */}
                 <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Grace Minutes
-                  </label>
+                  <label className="block text-sm font-medium mb-2">Grace Minutes</label>
                   <input
                     type="number"
                     min="0"
                     placeholder="Enter grace period in minutes"
-                    {...register("grace_minutes", { valueAsNumber: true })}
+                    {...register('grace_minutes', { valueAsNumber: true })}
                     className="w-full py-2 px-4 rounded-md border border-gray-400 focus:outline-none focus:border-primary focus:bg-white placeholder:text-sm"
                   />
                   {errors.grace_minutes && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {errors.grace_minutes.message}
-                    </p>
+                    <p className="text-red-500 text-sm mt-1">{errors.grace_minutes.message}</p>
                   )}
                 </div>
                 {/* Description */}
                 <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Description
-                  </label>
+                  <label className="block text-sm font-medium mb-2">Description</label>
                   <textarea
                     placeholder="Description here..."
-                    {...register("description")}
+                    {...register('description')}
                     className="w-full py-2 px-4 rounded-md border border-gray-400 focus:outline-none focus:border-[#1E9FF2] focus:bg-white placeholder:text-sm"
                   />
                   {errors.description && (
-                    <p className="text-red-500 text-sm">
-                      {errors.description.message}
-                    </p>
+                    <p className="text-red-500 text-sm">{errors.description.message}</p>
                   )}
                 </div>
                 <div className="flex items-center space-x-2 mb-4">
@@ -196,12 +174,9 @@ export const CreateAttendacePolicy = ({ refetchData }) => {
                     type="checkbox"
                     id="is_default"
                     className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                    {...register("is_default")}
+                    {...register('is_default')}
                   />
-                  <label
-                    htmlFor="is_default"
-                    className="ml-2 text-sm font-medium text-gray-700"
-                  >
+                  <label htmlFor="is_default" className="ml-2 text-sm font-medium text-gray-700">
                     Set as Default
                   </label>
                 </div>
@@ -225,7 +200,7 @@ export const CreateAttendacePolicy = ({ refetchData }) => {
                         <span>Submitting...</span>
                       </span>
                     ) : (
-                      "Submit"
+                      'Submit'
                     )}
                   </button>
                 </div>

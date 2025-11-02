@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 
 export default function Announcements() {
   const [showNewEmployeeModal, setShowNewEmployeeModal] = useState(false);
@@ -6,52 +6,56 @@ export default function Announcements() {
   const announcements = [
     {
       id: 1,
-      title: "General Tech Meeting",
-      priority: "Medium",
-      category: "General",
-      content: "We're excited to welcome five new team members in January! Please greet them warmly ...",
-      author: "Management Team",
-      publishedDate: "2025-08-29",
+      title: 'General Tech Meeting',
+      priority: 'Medium',
+      category: 'General',
+      content:
+        "We're excited to welcome five new team members in January! Please greet them warmly ...",
+      author: 'Management Team',
+      publishedDate: '2025-08-29',
       readCount: 142,
       totalEmployees: 156,
-      readPercentage: 91
+      readPercentage: 91,
     },
     {
       id: 2,
-      title: "Security System Maintenance",
-      priority: "High",
-      category: "General",
-      content: "We're excited to welcome five new team members in January! Please greet them warmly during ...",
-      author: "Facilities Team",
-      publishedDate: "2025-08-29",
+      title: 'Security System Maintenance',
+      priority: 'High',
+      category: 'General',
+      content:
+        "We're excited to welcome five new team members in January! Please greet them warmly during ...",
+      author: 'Facilities Team',
+      publishedDate: '2025-08-29',
       readCount: 142,
       totalEmployees: 156,
-      readPercentage: 91
+      readPercentage: 91,
     },
     {
       id: 3,
-      title: "General Tech Meeting",
-      priority: "Medium",
-      category: "General",
-      content: "We're excited to welcome five new team members in January! Please greet them warmly ...",
-      author: "Management Team",
-      publishedDate: "2025-08-29",
+      title: 'General Tech Meeting',
+      priority: 'Medium',
+      category: 'General',
+      content:
+        "We're excited to welcome five new team members in January! Please greet them warmly ...",
+      author: 'Management Team',
+      publishedDate: '2025-08-29',
       readCount: 142,
       totalEmployees: 156,
-      readPercentage: 91
+      readPercentage: 91,
     },
     {
       id: 4,
-      title: "Security System Maintenance",
-      priority: "High",
-      category: "General",
-      content: "We're excited to welcome five new team members in January! Please greet them warmly during ...",
-      author: "Facilities Team",
-      publishedDate: "2025-08-29",
+      title: 'Security System Maintenance',
+      priority: 'High',
+      category: 'General',
+      content:
+        "We're excited to welcome five new team members in January! Please greet them warmly during ...",
+      author: 'Facilities Team',
+      publishedDate: '2025-08-29',
       readCount: 142,
       totalEmployees: 156,
-      readPercentage: 91
-    }
+      readPercentage: 91,
+    },
   ];
 
   return (
@@ -143,12 +147,7 @@ export default function Announcements() {
       <div className="flex flex-col lg:flex-row justify-between items-center gap-4">
         <div className="flex items-center gap-2 p-2 rounded-lg border border-slate-100 h-10 shadow-md bg-white flex-1">
           <div className="flex justify-center items-center h-5">
-            <img
-              width="16.5px"
-              height="16.5px"
-              src="/images/search.png"
-              alt="Search icon"
-            />
+            <img width="16.5px" height="16.5px" src="/images/search.png" alt="Search icon" />
           </div>
           <input
             type="text"
@@ -159,16 +158,9 @@ export default function Announcements() {
 
         <div className="flex flex-row justify-center items-center gap-2">
           <div className="flex flex-row justify-center items-center gap-2 p-2 rounded-lg border border-neutral-200 w-[100px] h-10 bg-white cursor-pointer hover:bg-gray-50 transition-colors">
-            <div className="text-xs text-neutral-900 font-semibold">
-              Filter
-            </div>
+            <div className="text-xs text-neutral-900 font-semibold">Filter</div>
             <div className="flex flex-col justify-center items-center w-4 h-4">
-              <img
-                width="9.5px"
-                height="5.1px"
-                src="/images/dropdown.png"
-                alt="Dropdown icon"
-              />
+              <img width="9.5px" height="5.1px" src="/images/dropdown.png" alt="Dropdown icon" />
             </div>
           </div>
         </div>
@@ -188,24 +180,25 @@ export default function Announcements() {
       {/* Announcements List */}
       <div className="flex flex-col gap-4">
         {announcements.map((announcement) => (
-          <div key={announcement.id} className="flex flex-col gap-4 p-4 rounded-xl shadow-sm bg-white">
+          <div
+            key={announcement.id}
+            className="flex flex-col gap-4 p-4 rounded-xl shadow-sm bg-white"
+          >
             <div className="flex justify-between items-start">
               {/* Title + Labels */}
               <div className="flex items-center gap-2">
-                <div className="text-sm text-neutral-900 font-semibold">
-                  {announcement.title}
-                </div>
+                <div className="text-sm text-neutral-900 font-semibold">{announcement.title}</div>
                 <div className="flex gap-2">
-                  <div className={`px-2 py-1 rounded-md ${
-                    announcement.priority === "High" 
-                      ? "bg-red-100" 
-                      : "bg-yellow-100"
-                  }`}>
-                    <div className={`text-[10px] font-medium ${
-                      announcement.priority === "High" 
-                        ? "text-amber-700" 
-                        : "text-yellow-800"
-                    }`}>
+                  <div
+                    className={`px-2 py-1 rounded-md ${
+                      announcement.priority === 'High' ? 'bg-red-100' : 'bg-yellow-100'
+                    }`}
+                  >
+                    <div
+                      className={`text-[10px] font-medium ${
+                        announcement.priority === 'High' ? 'text-amber-700' : 'text-yellow-800'
+                      }`}
+                    >
                       {announcement.priority}
                     </div>
                   </div>
@@ -221,17 +214,20 @@ export default function Announcements() {
                 <div className="text-xs text-gray-800 font-medium">Read More</div>
               </div>
             </div>
-            
+
             <div className="text-xs text-gray-600 font-normal line-clamp-2">
               {announcement.content}
             </div>
-            
+
             <div className="flex items-center gap-6 text-xs text-gray-600 font-medium">
               <div>By: {announcement.author}</div>
               <div>Published: {announcement.publishedDate}</div>
               <div className="flex items-center gap-1">
                 <img width="14px" height="14px" src="/images/readcount.png" alt="Read Count icon" />
-                <span>{announcement.readCount}/{announcement.totalEmployees} read ({announcement.readPercentage}%)</span>
+                <span>
+                  {announcement.readCount}/{announcement.totalEmployees} read (
+                  {announcement.readPercentage}%)
+                </span>
               </div>
             </div>
           </div>
@@ -247,13 +243,11 @@ export default function Announcements() {
               onClick={() => setShowNewEmployeeModal(false)}
               className="absolute top-4 right-4 text-gray-500 hover:text-black text-xl font-bold"
             >
-              × 
+              ×
             </button>
 
             {/* Modal Header */}
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">
-              Create New Announcement
-            </h2>
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Create New Announcement</h2>
 
             {/* Form Content */}
             <div className="space-y-4">
@@ -281,9 +275,7 @@ export default function Announcements() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Priority
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
                   <select className="w-full border border-gray-300 rounded-lg p-3 text-sm">
                     <option>Select priority</option>
                     <option>Low</option>
@@ -292,9 +284,7 @@ export default function Announcements() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Category
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
                   <select className="w-full border border-gray-300 rounded-lg p-3 text-sm">
                     <option>Select category</option>
                     <option>General</option>

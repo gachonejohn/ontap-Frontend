@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
-import { useDebouncedCallback } from "use-debounce";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from 'react';
+import { useDebouncedCallback } from 'use-debounce';
+import { useNavigate } from 'react-router-dom';
 
 export function useFilters({
   initialFilters = {},
@@ -16,7 +16,7 @@ export function useFilters({
   // Sync URL params with filters and page
   useEffect(() => {
     const params = new URLSearchParams();
-    params.set("page", currentPage.toString());
+    params.set('page', currentPage.toString());
     Object.entries(filters).forEach(([key, value]) => {
       if (value) params.set(key, value);
     });

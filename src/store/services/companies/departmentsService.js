@@ -1,5 +1,5 @@
 // src/store/services/companies/departmentsService.js
-import { apiSlice } from "../../api/apiSlice";
+import { apiSlice } from '../../api/apiSlice';
 
 export const departmentsApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -11,49 +11,49 @@ export const departmentsApi = apiSlice.injectEndpoints({
 
         return {
           url: `companies/departments/`,
-          method: "GET",
+          method: 'GET',
           params: queryParams,
         };
       },
-      providesTags: ["Departments"],
+      providesTags: ['Departments'],
     }),
 
     // Get single department detail
     getDepartmentDetail: builder.query({
       query: (id) => ({
         url: `companies/departments/${id}/`,
-        method: "GET",
+        method: 'GET',
       }),
-      providesTags: ["Departments"],
+      providesTags: ['Departments'],
     }),
 
     // Create new department
     createDepartment: builder.mutation({
       query: (data) => ({
         url: `companies/departments/create/`,
-        method: "POST",
+        method: 'POST',
         body: data,
       }),
-      invalidatesTags: ["Departments"],
+      invalidatesTags: ['Departments'],
     }),
 
     // Update department
     updateDepartment: builder.mutation({
       query: ({ id, ...data }) => ({
         url: `companies/departments/${id}/`,
-        method: "PATCH",
+        method: 'PATCH',
         body: data,
       }),
-      invalidatesTags: ["Departments"],
+      invalidatesTags: ['Departments'],
     }),
 
     // Delete department
     deleteDepartment: builder.mutation({
       query: (id) => ({
         url: `companies/departments/${id}/`,
-        method: "DELETE",
+        method: 'DELETE',
       }),
-      invalidatesTags: ["Departments"],
+      invalidatesTags: ['Departments'],
     }),
   }),
 });

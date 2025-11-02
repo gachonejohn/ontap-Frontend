@@ -6,13 +6,8 @@
  * @param {string} fallbackMessage - Message to return if nothing found
  * @returns {string} - The message you can show in toast/alert/etc.
  */
-export function getApiErrorMessage(error, fallbackMessage = "An unexpected error occurred.") {
-  if (
-    error &&
-    typeof error === "object" &&
-    "data" in error &&
-    error.data
-  ) {
+export function getApiErrorMessage(error, fallbackMessage = 'An unexpected error occurred.') {
+  if (error && typeof error === 'object' && 'data' in error && error.data) {
     return error.data.error || fallbackMessage;
   }
   return fallbackMessage;

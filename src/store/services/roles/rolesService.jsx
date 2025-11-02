@@ -1,4 +1,4 @@
-import { apiSlice } from "../../api/apiSlice";
+import { apiSlice } from '../../api/apiSlice';
 
 export const rolesApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -10,59 +10,55 @@ export const rolesApi = apiSlice.injectEndpoints({
         if (employee_no) queryParams.employee_no = employee_no;
         return {
           url: `users/roles/`,
-          method: "GET",
+          method: 'GET',
           params: queryParams,
         };
       },
     }),
     getRolesPermissions: builder.query({
       query: (id) => {
-      
-      return {
+        return {
           url: `users/roles/${id}/permissions/`,
-          method: "GET",
+          method: 'GET',
         };
       },
     }),
 
-
     createRole: builder.mutation({
       query: (data) => ({
         url: `users/roles/create/`,
-        method: "POST",
+        method: 'POST',
         body: data,
       }),
     }),
     updateRole: builder.mutation({
-      query: ({id, data}) => ({
+      query: ({ id, data }) => ({
         url: `users/roles/${id}/`,
-        method: "PATCH",
+        method: 'PATCH',
         body: data,
       }),
     }),
- createUpdateRolePermission: builder.mutation({
+    createUpdateRolePermission: builder.mutation({
       query: ({ id, data }) => ({
         url: `users/${id}/permissions/create-update/`,
-        method: "PATCH",
+        method: 'PATCH',
         body: data,
       }),
     }),
     deleteRole: builder.mutation({
       query: (id) => ({
         url: `users/roles/${id}/`,
-        method: "DELETE",
+        method: 'DELETE',
       }),
     }),
   }),
 });
 
 export const {
-
-useGetRolesQuery,
-useCreateRoleMutation,
-useCreateUpdateRolePermissionMutation,
-useDeleteRoleMutation,
-useGetRolesPermissionsQuery,
-useUpdateRoleMutation,
-
+  useGetRolesQuery,
+  useCreateRoleMutation,
+  useCreateUpdateRolePermissionMutation,
+  useDeleteRoleMutation,
+  useGetRolesPermissionsQuery,
+  useUpdateRoleMutation,
 } = rolesApi;

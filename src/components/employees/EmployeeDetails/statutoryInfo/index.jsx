@@ -1,27 +1,24 @@
-import ButtonDropdown from "@components/common/ActionsPopover";
-import ActionModal from "@components/common/Modals/ActionModal";
-import NoDataFound from "@components/common/NoData";
-import {
-  useDeleteStatutoryInfoMutation
-} from "@store/services/employees/employeesService";
-import { YearMonthCustomDate } from "@utils/dates";
-import { getApiErrorMessage } from "@utils/errorHandler";
-import { useState } from "react";
-import { FiDownload, FiTrash2 } from "react-icons/fi";
-import { toast } from "react-toastify";
+import ButtonDropdown from '@components/common/ActionsPopover';
+import ActionModal from '@components/common/Modals/ActionModal';
+import NoDataFound from '@components/common/NoData';
+import { useDeleteStatutoryInfoMutation } from '@store/services/employees/employeesService';
+import { YearMonthCustomDate } from '@utils/dates';
+import { getApiErrorMessage } from '@utils/errorHandler';
+import { useState } from 'react';
+import { FiDownload, FiTrash2 } from 'react-icons/fi';
+import { toast } from 'react-toastify';
 
-import DataTable from "@components/common/DataTable";
-import { EditStatutoryInfo } from "./EditStatutoryInfo";
-import { NewStatutoryInfo } from "./NewStatutoryInfo";
+import DataTable from '@components/common/DataTable';
+import { EditStatutoryInfo } from './EditStatutoryInfo';
+import { NewStatutoryInfo } from './NewStatutoryInfo';
 export const StatutoryInfo = ({ data: employeeData, refetch }) => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const [selectedItem, setSelectedItem] = useState(null);
-  const [deleteStatutoryInfo, { isLoading: isDeleting }] =
-    useDeleteStatutoryInfoMutation();
+  const [deleteStatutoryInfo, { isLoading: isDeleting }] = useDeleteStatutoryInfoMutation();
   const openDeleteModal = (id) => {
     setSelectedItem(id);
-    console.log("id", id);
+    console.log('id', id);
     setIsDeleteModalOpen(true);
   };
 
@@ -29,19 +26,19 @@ export const StatutoryInfo = ({ data: employeeData, refetch }) => {
     setIsDeleteModalOpen(false);
   };
   const handleDelete = async () => {
-    console.log("selectedItem before delete:", selectedItem);
+    console.log('selectedItem before delete:', selectedItem);
     if (!selectedItem) {
-      toast.error("No item selected to delete");
+      toast.error('No item selected to delete');
       return;
     }
 
     try {
       await deleteStatutoryInfo(selectedItem).unwrap();
-      toast.success("Statutory Info Deleted successfully!");
+      toast.success('Statutory Info Deleted successfully!');
       closeDeleteModal();
       refetch();
     } catch (error) {
-      const message = getApiErrorMessage(error, "Error deleting info.");
+      const message = getApiErrorMessage(error, 'Error deleting info.');
       toast.error(message);
     } finally {
       closeDeleteModal();
@@ -52,62 +49,53 @@ export const StatutoryInfo = ({ data: employeeData, refetch }) => {
 
   const columns = [
     {
-      header: "Type",
-      accessor: "document_type",
-      cell: (item) => <span>{item?.document_type?.name ?? ""}</span>,
+      header: 'Type',
+      accessor: 'document_type',
+      cell: (item) => <span>{item?.document_type?.name ?? ''}</span>,
     },
     {
-      header: "Identifier",
-      accessor: "identifier",
+      header: 'Identifier',
+      accessor: 'identifier',
+      cell: (item) => <span className="text-xs font-medium">{item?.identifier ?? ''}</span>,
+    },
+    {
+      header: 'Issue Date',
+      accessor: 'issue_date',
       cell: (item) => (
-        <span className="text-xs font-medium">{item?.identifier ?? ""}</span>
+        <span className="text-xs font-medium">{YearMonthCustomDate(item?.issue_date ?? '')}</span>
       ),
     },
     {
-      header: "Issue Date",
-      accessor: "issue_date",
+      header: 'Expiry Date',
+      accessor: 'expiry_date',
+      cell: (item) => (
+        <span className="text-xs font-medium">{YearMonthCustomDate(item?.expiry_date ?? '')}</span>
+      ),
+    },
+    {
+      header: 'Added by',
+      accessor: 'created_by',
       cell: (item) => (
         <span className="text-xs font-medium">
-          {YearMonthCustomDate(item?.issue_date ?? "")}
+          {item?.created_by?.first_name ?? ''} {item?.created_by?.last_name ?? ''}
         </span>
       ),
     },
     {
-      header: "Expiry Date",
-      accessor: "expiry_date",
+      header: 'Added On',
+      accessor: 'created_at',
       cell: (item) => (
-        <span className="text-xs font-medium">
-          {YearMonthCustomDate(item?.expiry_date ?? "")}
-        </span>
-      ),
-    },
-    {
-      header: "Added by",
-      accessor: "created_by",
-      cell: (item) => (
-        <span className="text-xs font-medium">
-          {item?.created_by?.first_name ?? ""}{" "}
-          {item?.created_by?.last_name ?? ""}
-        </span>
-      ),
-    },
-    {
-      header: "Added On",
-      accessor: "created_at",
-      cell: (item) => (
-        <span className="text-xs font-medium">
-          {YearMonthCustomDate(item?.created_at ?? "")}
-        </span>
+        <span className="text-xs font-medium">{YearMonthCustomDate(item?.created_at ?? '')}</span>
       ),
     },
 
     {
-      header: "Actions",
-      accessor: "actions",
+      header: 'Actions',
+      accessor: 'actions',
       cell: (item) => (
         <ButtonDropdown>
           {/* View */}
-         <EditStatutoryInfo refetchData={refetch} data={item} />
+          <EditStatutoryInfo refetchData={refetch} data={item} />
 
           {/* Download */}
           {item.file ? (
@@ -129,10 +117,7 @@ export const StatutoryInfo = ({ data: employeeData, refetch }) => {
           )}
 
           {/* Delete */}
-          <button
-            onClick={() => openDeleteModal(item.id)}
-            className="flex items-center space-x-2"
-          >
+          <button onClick={() => openDeleteModal(item.id)} className="flex items-center space-x-2">
             <FiTrash2 className="text-lg" />
             <span className="text-red-600">Delete</span>
           </button>
@@ -140,13 +125,11 @@ export const StatutoryInfo = ({ data: employeeData, refetch }) => {
       ),
     },
   ];
-  console.log("employeeData.statutory_info", employeeData.statutory_info);
+  console.log('employeeData.statutory_info', employeeData.statutory_info);
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-6">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-900">
-          Statutory Information
-        </h3>
+        <h3 className="text-lg font-semibold text-gray-900">Statutory Information</h3>
         <div>
           <NewStatutoryInfo refetchData={refetch} data={employeeData} />
         </div>

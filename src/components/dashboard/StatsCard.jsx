@@ -8,7 +8,9 @@ export default function StatCard({ title, value, change, icon: Icon, iconBg, ico
           <div className="mt-1 text-xs text-gray-600 font-normal">{change}</div>
         </div>
 
-        <div className={`flex items-center justify-center p-1 rounded-2xl h-8 w-8 ${iconBg} shadow-sm`}>
+        <div
+          className={`flex items-center justify-center p-1 rounded-2xl h-8 w-8 ${iconBg} shadow-sm`}
+        >
           {Icon && <Icon className={`h-6 w-6 ${iconColor}`} />} {/* bigger icon */}
         </div>
       </div>

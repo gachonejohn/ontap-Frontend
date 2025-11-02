@@ -13,7 +13,6 @@ export default function LeaveContent() {
   const isLeaveRoute = location.pathname.includes('/leaves');
   const isAttendanceRoute = location.pathname.includes('/attendance');
 
-  // Get permissions
   const leavePermissions = user?.role?.permissions?.find(
     (p) => p.feature_code === "leave"
   );
@@ -22,12 +21,10 @@ export default function LeaveContent() {
     (p) => p.feature_code === "attendance"
   );
 
-  // Use appropriate permissions based on route
   const permissions = isLeaveRoute ? leavePermissions : attendancePermissions;
   const canViewAll = permissions?.can_view_all;
   const canView = permissions?.can_view;
 
-  // Check route access
   const hasRouteAccess = (isLeaveRoute && leavePermissions?.can_view) || 
                         (isAttendanceRoute && attendancePermissions?.can_view);
 
@@ -39,7 +36,6 @@ export default function LeaveContent() {
     );
   }
 
-  // Render appropriate components based on route and permissions
   if (canViewAll) {
     return (
       <div className="flex flex-col gap-6">

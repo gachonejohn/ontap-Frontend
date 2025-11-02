@@ -1,7 +1,7 @@
-import React, { useState } from "react";
-import LogTaskModal from "./LogTaskModal.js";
-import TaskModal from "./TaskModal.js";
-import ViewProfileModal from "./ViewProfileModal.js";
+import React, { useState } from 'react';
+import LogTaskModal from './LogTaskModal.js';
+import TaskModal from './TaskModal.js';
+import ViewProfileModal from './ViewProfileModal.js';
 
 const Task = () => {
   const [isLogTaskModalOpen, setIsLogTaskModalOpen] = useState(false);
@@ -10,7 +10,7 @@ const Task = () => {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
   const handleLogTaskSubmit = (formData) => {
-    console.log("New Task Submitted:", formData);
+    console.log('New Task Submitted:', formData);
     // You can add your API call or state update here
   };
 
@@ -19,16 +19,17 @@ const Task = () => {
     todo: [
       {
         id: 1,
-        title: "Complete Q3 Performance Review",
-        description: "Fill out the quarterly performance form and submit to HR",
-        status: "To do",
-        priority: "High",
-        assignee: "Mildred",
-        team: "HR",
-        startDate: "Sep 02,2025",
-        dueDate: "Sep 09,2025",
-        attachments: [{ name: "Training_outl_docx", size: "2.5 MB" }],
-        comments: "Great explanation of leadership overview! The examples really helped me understand the concept better."
+        title: 'Complete Q3 Performance Review',
+        description: 'Fill out the quarterly performance form and submit to HR',
+        status: 'To do',
+        priority: 'High',
+        assignee: 'Mildred',
+        team: 'HR',
+        startDate: 'Sep 02,2025',
+        dueDate: 'Sep 09,2025',
+        attachments: [{ name: 'Training_outl_docx', size: '2.5 MB' }],
+        comments:
+          'Great explanation of leadership overview! The examples really helped me understand the concept better.',
       },
       // ... other tasks
     ],
@@ -37,7 +38,7 @@ const Task = () => {
     ],
     completed: [
       // ... tasks
-    ]
+    ],
   };
 
   return (
@@ -45,9 +46,7 @@ const Task = () => {
       {/* Task Header */}
       <div className="flex flex-row justify-between items-center">
         <div className="flex flex-col">
-          <div className="text-lg text-neutral-900 font-semibold">
-            My Tasks
-          </div>
+          <div className="text-lg text-neutral-900 font-semibold">My Tasks</div>
           <div className="text-sm text-gray-600 font-normal">
             Manage and track your assigned tasks
           </div>
@@ -58,16 +57,9 @@ const Task = () => {
         >
           <div className="flex flex-row items-center gap-2">
             <div className="flex justify-center items-center w-5 h-5">
-              <img
-                width="15.3px"
-                height="15.3px"
-                src="/images/addtask.png"
-                alt="Add Task icon"
-              />
+              <img width="15.3px" height="15.3px" src="/images/addtask.png" alt="Add Task icon" />
             </div>
-            <div className="text-sm text-white font-medium">
-              New Task
-            </div>
+            <div className="text-sm text-white font-medium">New Task</div>
           </div>
         </div>
       </div>
@@ -77,12 +69,7 @@ const Task = () => {
         {/* Search Input */}
         <div className="flex flex-row items-center gap-2 p-2 rounded-lg border border-slate-100 h-10 shadow-md min-w-[800px] transition-transform duration-200 hover:-translate-y-1 bg-white flex-1">
           <div className="flex justify-center items-center h-5">
-            <img
-              width="16.5px"
-              height="16.5px"
-              src="/images/search.png"
-              alt="Search icon"
-            />
+            <img width="16.5px" height="16.5px" src="/images/search.png" alt="Search icon" />
           </div>
           <input
             type="text"
@@ -99,24 +86,12 @@ const Task = () => {
         <div className="flex flex-row justify-center items-center gap-2 p-2 rounded-lg border border-neutral-200 w-[115px] h-11 bg-white cursor-pointer hover:bg-gray-50 transition-colors">
           <div className="flex flex-row items-center gap-1">
             <div className="flex justify-center items-center h-5">
-              <img
-                width="16.3px"
-                height="16.3px"
-                src="/images/filter.png"
-                alt="Filter icon"
-              />
+              <img width="16.3px" height="16.3px" src="/images/filter.png" alt="Filter icon" />
             </div>
-            <div className="text-xs text-neutral-900 font-semibold">
-              All Task
-            </div>
+            <div className="text-xs text-neutral-900 font-semibold">All Task</div>
           </div>
           <div className="flex flex-col justify-center items-center w-4 h-4">
-            <img
-              width="9.5px"
-              height="5.1px"
-              src="/images/dropdown.png"
-              alt="Dropdown icon"
-            />
+            <img width="9.5px" height="5.1px" src="/images/dropdown.png" alt="Dropdown icon" />
           </div>
         </div>
       </div>
@@ -177,24 +152,22 @@ const Task = () => {
               onClick={() => {
                 // You would set the appropriate task data here
                 setSelectedTask({
-                  title: "Design Review for Ontap",
-                  description: "Fill out the quarterly performance form and submit to HR",
-                  status: "To do",
-                  priority: "High",
-                  assignee: "Thaddeus",
-                  team: "Design",
-                  startDate: "Sep 02,2025",
-                  dueDate: "Sep 09,2025",
+                  title: 'Design Review for Ontap',
+                  description: 'Fill out the quarterly performance form and submit to HR',
+                  status: 'To do',
+                  priority: 'High',
+                  assignee: 'Thaddeus',
+                  team: 'Design',
+                  startDate: 'Sep 02,2025',
+                  dueDate: 'Sep 09,2025',
                   attachments: [],
-                  comments: "No comments yet."
+                  comments: 'No comments yet.',
                 });
                 setIsTaskModalOpen(true);
               }}
             >
               <div className="flex justify-between items-start">
-                <div className="text-sm text-neutral-900 font-medium">
-                  Design Review for Ontap
-                </div>
+                <div className="text-sm text-neutral-900 font-medium">Design Review for Ontap</div>
                 <img width="16.5" height="16.3" src="/images/greenflag.png" alt="Green flag" />
               </div>
               <div className="text-xs text-neutral-900 font-normal">
@@ -220,9 +193,7 @@ const Task = () => {
             {/* Task 3 */}
             <div className="flex flex-col gap-3 p-4 rounded-xl bg-slate-50/80 cursor-pointer hover:bg-slate-100/80 transition-colors">
               <div className="flex justify-between items-start">
-                <div className="text-sm text-neutral-900 font-medium">
-                  Design Review for Ontap
-                </div>
+                <div className="text-sm text-neutral-900 font-medium">Design Review for Ontap</div>
                 <img width="16.5" height="16.3" src="/images/greenflag.png" alt="Green flag" />
               </div>
               <div className="text-xs text-neutral-900 font-normal">
@@ -292,9 +263,7 @@ const Task = () => {
             {/* Task 2 */}
             <div className="flex flex-col gap-3 p-4 rounded-xl bg-slate-50/80 cursor-pointer hover:bg-slate-100/80 transition-colors">
               <div className="flex justify-between items-start">
-                <div className="text-sm text-neutral-900 font-medium">
-                  Design Review for Ontap
-                </div>
+                <div className="text-sm text-neutral-900 font-medium">Design Review for Ontap</div>
                 <img width="16.5" height="16.3" src="/images/greenflag.png" alt="Green flag" />
               </div>
               <div className="text-xs text-neutral-900 font-normal">

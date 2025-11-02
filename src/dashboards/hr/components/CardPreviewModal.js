@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 const CardPreviewModal = ({ isOpen, onClose, card }) => {
   if (!isOpen) return null;
@@ -96,31 +96,40 @@ const CardPreviewModal = ({ isOpen, onClose, card }) => {
               </a>
             </div>
 
-          {/* Stats: Scans, Connections, Status */}
-          <div className="border border-gray-300 rounded-lg p-6 mt-4" style={{backgroundColor:'#f9fafb'}}>
-<div className="flex justify-between w-full mt-3 px-2">
-  {/* Total Scans */}
-  <div className="flex flex-col items-center justify-center w-[110px]">
-    <div className="text-sm font-semibold text-black">245</div>
-    <div className="text-xs font-medium" style={{ color: 'grey' }}>Total Scans</div>
-  </div>
+            {/* Stats: Scans, Connections, Status */}
+            <div
+              className="border border-gray-300 rounded-lg p-6 mt-4"
+              style={{ backgroundColor: '#f9fafb' }}
+            >
+              <div className="flex justify-between w-full mt-3 px-2">
+                {/* Total Scans */}
+                <div className="flex flex-col items-center justify-center w-[110px]">
+                  <div className="text-sm font-semibold text-black">245</div>
+                  <div className="text-xs font-medium" style={{ color: 'grey' }}>
+                    Total Scans
+                  </div>
+                </div>
 
-  {/* Connections */}
-  <div className="flex flex-col items-center justify-center w-[110px]">
-    <div className="text-sm font-semibold text-black">18</div>
-    <div className="text-xs font-medium" style={{ color: 'grey' }}>Connections</div>
-  </div>
+                {/* Connections */}
+                <div className="flex flex-col items-center justify-center w-[110px]">
+                  <div className="text-sm font-semibold text-black">18</div>
+                  <div className="text-xs font-medium" style={{ color: 'grey' }}>
+                    Connections
+                  </div>
+                </div>
 
-  {/* Status */}
-  <div className="flex flex-col items-center justify-center w-[110px]">
-    <div className="text-sm font-semibold" style={{ color: '#17ae9e' }}>Active</div>
-    <div className="text-xs font-medium" style={{ color: 'grey' }}>Status</div>
-  </div>
-</div>
-</div>
-</div>
-
-
+                {/* Status */}
+                <div className="flex flex-col items-center justify-center w-[110px]">
+                  <div className="text-sm font-semibold" style={{ color: '#17ae9e' }}>
+                    Active
+                  </div>
+                  <div className="text-xs font-medium" style={{ color: 'grey' }}>
+                    Status
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
 
           {/* Action Buttons */}
           <div className="flex flex-row justify-between items-center gap-3 w-full">

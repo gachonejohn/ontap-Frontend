@@ -1,26 +1,22 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { FiEdit } from "react-icons/fi";
-import { IoCloseOutline } from "react-icons/io5";
-import Select from "react-select";
-import { toast } from "react-toastify";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { FiEdit } from 'react-icons/fi';
+import { IoCloseOutline } from 'react-icons/io5';
+import Select from 'react-select';
+import { toast } from 'react-toastify';
 
-import SubmitCancelButtons from "@components/common/Buttons/ActionButton";
-import CreateUpdateButton from "@components/common/Buttons/CreateUpdateButton";
-import { assignRoleSchema } from "@schemas/roleSchema";
-import { useUpdateEmployeeRoleMutation } from "@store/services/employees/employeesService";
-import { useGetRolesQuery } from "@store/services/roles/rolesService";
-import { getApiErrorMessage } from "@utils/errorHandler";
+import SubmitCancelButtons from '@components/common/Buttons/ActionButton';
+import CreateUpdateButton from '@components/common/Buttons/CreateUpdateButton';
+import { assignRoleSchema } from '@schemas/roleSchema';
+import { useUpdateEmployeeRoleMutation } from '@store/services/employees/employeesService';
+import { useGetRolesQuery } from '@store/services/roles/rolesService';
+import { getApiErrorMessage } from '@utils/errorHandler';
 export const EditEmployeeRole = ({ refetchData, data }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const [updateEmployeeRole, { isLoading: isCreating }] =
-    useUpdateEmployeeRoleMutation();
- const { data: rolesData } = useGetRolesQuery(
-    {},
-    { refetchOnMountOrArgChange: true }
-  );
+  const [updateEmployeeRole, { isLoading: isCreating }] = useUpdateEmployeeRoleMutation();
+  const { data: rolesData } = useGetRolesQuery({}, { refetchOnMountOrArgChange: true });
   const {
     register,
     handleSubmit,
@@ -30,8 +26,8 @@ export const EditEmployeeRole = ({ refetchData, data }) => {
   } = useForm({
     resolver: zodResolver(assignRoleSchema),
     defaultValues: {
-    role: data?.role?.id ?? undefined,
-    is_primary: data?.is_primary ?? false,
+      role: data?.role?.id ?? undefined,
+      is_primary: data?.is_primary ?? false,
     },
   });
 
@@ -41,14 +37,11 @@ export const EditEmployeeRole = ({ refetchData, data }) => {
         id: data.id,
         data: formData,
       }).unwrap();
-      toast.success("Employee Access role updated successfully!");
+      toast.success('Employee Access role updated successfully!');
       handleCloseModal();
       refetchData();
     } catch (error) {
-      const message = getApiErrorMessage(
-        error,
-        "Error updating employee access role."
-      );
+      const message = getApiErrorMessage(error, 'Error updating employee access role.');
       toast.error(message);
     } finally {
       refetchData();
@@ -60,10 +53,10 @@ export const EditEmployeeRole = ({ refetchData, data }) => {
     reset();
     setIsOpen(false);
   };
- const handleRoleChange = (selected) => {
+  const handleRoleChange = (selected) => {
     if (selected) {
       const item_id = Number(selected.value);
-      setValue("role", item_id);
+      setValue('role', item_id);
     }
   };
   return (
@@ -108,28 +101,22 @@ export const EditEmployeeRole = ({ refetchData, data }) => {
                 <p className="text-sm md:text-lg lg:text-lg font-semibold">
                   Edit Employee Access Role
                 </p>
-                <IoCloseOutline
-                  size={20}
-                  className="cursor-pointer"
-                  onClick={handleCloseModal}
-                />
+                <IoCloseOutline size={20} className="cursor-pointer" onClick={handleCloseModal} />
               </div>
 
-               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 p-4">
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 p-4">
                 {/* Name */}
-                
+
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium mb-2">
-                    Role
-                  </label>
+                  <label className="block text-sm font-medium mb-2">Role</label>
                   <Select
                     options={rolesData?.map((item) => ({
                       value: item.id,
                       label: `${item.name}`,
                     }))}
                     defaultValue={{
-                        value: data?.role?.id,
-                        label: data?.role?.name,
+                      value: data?.role?.id,
+                      label: data?.role?.name,
                     }}
                     menuPortalTarget={document.body}
                     menuPlacement="auto"
@@ -140,39 +127,34 @@ export const EditEmployeeRole = ({ refetchData, data }) => {
                       }),
                       control: (base) => ({
                         ...base,
-                        minHeight: "40px",
-                        borderColor: "#d1d5db",
-                        boxShadow: "none",
-                        "&:hover": {
-                          borderColor: "#9ca3af",
+                        minHeight: '40px',
+                        borderColor: '#d1d5db',
+                        boxShadow: 'none',
+                        '&:hover': {
+                          borderColor: '#9ca3af',
                         },
-                        "&:focus-within": {
-                          borderColor: "#9ca3af",
-                          boxShadow: "none",
+                        '&:focus-within': {
+                          borderColor: '#9ca3af',
+                          boxShadow: 'none',
                         },
-                        backgroundColor: "#F8FAFC",
+                        backgroundColor: '#F8FAFC',
                       }),
                     }}
                     onChange={handleRoleChange}
                   />
                   {errors.role && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {errors.role.message}
-                    </p>
+                    <p className="text-red-500 text-sm mt-1">{errors.role.message}</p>
                   )}
                 </div>
-                
+
                 <div className="flex items-center space-x-2 mb-4">
                   <input
                     type="checkbox"
                     id="is_primary"
                     className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                    {...register("is_primary")}
+                    {...register('is_primary')}
                   />
-                  <label
-                    htmlFor="is_primary"
-                    className="ml-2 text-sm font-medium text-gray-700"
-                  >
+                  <label htmlFor="is_primary" className="ml-2 text-sm font-medium text-gray-700">
                     Set as Primary Role
                   </label>
                 </div>

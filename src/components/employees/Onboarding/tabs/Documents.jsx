@@ -1,14 +1,14 @@
-import Select from "react-select";
-import { FiFileText } from "react-icons/fi";
-import { GoTrash } from "react-icons/go";
+import Select from 'react-select';
+import { FiFileText } from 'react-icons/fi';
+import { GoTrash } from 'react-icons/go';
 
 const DOCUMENT_TYPE_OPTIONS = [
-  { value: "National Id", label: "National ID" },
-  { value: "Passport", label: "Passport" },
-  { value: "Medical Certificate", label: "Medical Certificate" },
-  { value: "Contract", label: "Employment Contract" },
-  { value: "Academic  Certificate", label: "Academic  Certificate" },
-  { value: "Other", label: "Other" },
+  { value: 'National Id', label: 'National ID' },
+  { value: 'Passport', label: 'Passport' },
+  { value: 'Medical Certificate', label: 'Medical Certificate' },
+  { value: 'Contract', label: 'Employment Contract' },
+  { value: 'Academic  Certificate', label: 'Academic  Certificate' },
+  { value: 'Other', label: 'Other' },
 ];
 
 const DocumentsTab = ({ documents, setDocuments }) => {
@@ -16,10 +16,10 @@ const DocumentsTab = ({ documents, setDocuments }) => {
     setDocuments([
       ...documents,
       {
-        document_type: "",
+        document_type: '',
         file: null,
-        description: "",
-        expiry_date: "",
+        description: '',
+        expiry_date: '',
       },
     ]);
   };
@@ -58,35 +58,31 @@ const DocumentsTab = ({ documents, setDocuments }) => {
           <div className="grid grid-cols-1 gap-4">
             {/* Document Type (React-Select) */}
             <div>
-              <label className="block text-[12px] font-medium mb-1">
-                Document Type*
-              </label>
+              <label className="block text-[12px] font-medium mb-1">Document Type*</label>
               <Select
                 options={DOCUMENT_TYPE_OPTIONS}
                 value={
                   document.document_type
-                    ? DOCUMENT_TYPE_OPTIONS.find(
-                        (opt) => opt.value === document.document_type
-                      )
+                    ? DOCUMENT_TYPE_OPTIONS.find((opt) => opt.value === document.document_type)
                     : null
                 }
                 onChange={(selected) =>
-                  updateDocument(index, "document_type", selected?.value || "")
+                  updateDocument(index, 'document_type', selected?.value || '')
                 }
                 placeholder="Select type"
                 menuPortalTarget={document.body}
-          menuPlacement="auto"
-          styles={{
-            menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-            control: (base) => ({
-              ...base,
-              minHeight: "36px",
-              borderColor: "#d1d5db",
-              boxShadow: "none",
-              "&:hover": { borderColor: "#9ca3af" },
-              backgroundColor: "#F3F4F6",
-            }),
-          }}
+                menuPlacement="auto"
+                styles={{
+                  menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                  control: (base) => ({
+                    ...base,
+                    minHeight: '36px',
+                    borderColor: '#d1d5db',
+                    boxShadow: 'none',
+                    '&:hover': { borderColor: '#9ca3af' },
+                    backgroundColor: '#F3F4F6',
+                  }),
+                }}
               />
             </div>
 
@@ -95,24 +91,18 @@ const DocumentsTab = ({ documents, setDocuments }) => {
               <label className="block text-[12px] font-medium mb-1">File</label>
               <input
                 type="file"
-                onChange={(e) =>
-                  updateDocument(index, "file", e.target.files[0])
-                }
+                onChange={(e) => updateDocument(index, 'file', e.target.files[0])}
                 className="w-full py-2 px-3 text-[12px] rounded-md border bg-white focus:outline-none focus:border-primary-500"
               />
             </div>
 
             {/* Expiry Date */}
             <div>
-              <label className="block text-[12px] font-medium mb-1">
-                Expiry Date
-              </label>
+              <label className="block text-[12px] font-medium mb-1">Expiry Date</label>
               <input
                 type="date"
                 value={document.expiry_date}
-                onChange={(e) =>
-                  updateDocument(index, "expiry_date", e.target.value)
-                }
+                onChange={(e) => updateDocument(index, 'expiry_date', e.target.value)}
                 className="w-full py-2 px-3 rounded-md text-[12px] border bg-white focus:outline-none focus:border-primary-500"
               />
             </div>

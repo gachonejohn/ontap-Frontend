@@ -1,13 +1,10 @@
 module.exports = {
-  extends: [
-    'react-app',
-    'react-app/jest'
-  ],
+  extends: ['react-app', 'react-app/jest'],
   settings: {
     'import/resolver': {
       node: {
         paths: ['src'],
-        extensions: ['.js', '.jsx', '.json']
+        extensions: ['.js', '.jsx', '.json'],
       },
       alias: {
         map: [
@@ -19,10 +16,10 @@ module.exports = {
           ['@hooks', './src/hooks'],
           ['@utils', './src/utils'],
           ['@pages', './src/pages'],
-          ['@constants', './src/constants']
+          ['@constants', './src/constants'],
         ],
-        extensions: ['.js', '.jsx', '.json']
-      }
-    }
-  }
+        extensions: ['.js', '.jsx', '.json'],
+      },
+    },
+  },
 };

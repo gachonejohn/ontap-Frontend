@@ -14,6 +14,13 @@ const menuItems = [
     whiteIcon: "/images/whitedashboard.png",
   },
   {
+    code: "onboard",
+    id: "onboarding",
+    label: "Staff Onboarding",
+    icon: "/images/myprofile2.png",
+    whiteIcon: "/images/whiteprofile.png",
+  },
+  {
     code: "attendance",
     id: "attendance",
     label: "Attendance",
@@ -91,7 +98,7 @@ const menuItems = [
     whiteIcon: "/images/payslips.png",
   },
   {
-    code: "my_profile", 
+    code: "my_profile",
     id: "profile",
     label: "My Profile",
     icon: "/images/myprofile2.png",
@@ -204,7 +211,6 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
                   navigate(
                     `/dashboard/${item.id === "dashboard" ? "" : item.id}`
                   );
-                  // setSidebarOpen(false);
                 }
               }}
             >

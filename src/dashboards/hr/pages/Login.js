@@ -15,13 +15,11 @@ const Login = ({ onLogin }) => {
     e.preventDefault();
 
     const validUser = demoUsers.find(
-      (user) =>
-        user.email.toLowerCase() === email.toLowerCase() &&
-        user.password === password
+      (user) => user.email.toLowerCase() === email.toLowerCase() && user.password === password
     );
 
     if (validUser) {
-      onLogin(); 
+      onLogin();
     } else {
       alert('Invalid email or password');
     }

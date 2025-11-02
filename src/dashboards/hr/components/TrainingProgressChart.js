@@ -1,11 +1,6 @@
 import React from 'react';
 import { Doughnut } from 'react-chartjs-2';
-import {
-  Chart as ChartJS,
-  ArcElement,
-  Tooltip,
-  Legend,
-} from 'chart.js';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -32,16 +27,16 @@ const TrainingProgressChart = ({ data, onSegmentClick }) => {
       if (elements.length > 0 && onSegmentClick) {
         const index = elements[0].index;
         const segment = data[index];
-        onSegmentClick(segment); 
+        onSegmentClick(segment);
       }
     },
   };
 
   return (
     <div className="w-40 h-40">
-    <div className="flex justify-center items-center h-full">
-      <Doughnut data={chartData} options={options} />
-    </div>
+      <div className="flex justify-center items-center h-full">
+        <Doughnut data={chartData} options={options} />
+      </div>
     </div>
   );
 };

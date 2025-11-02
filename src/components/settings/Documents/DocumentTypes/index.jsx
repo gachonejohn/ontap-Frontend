@@ -1,28 +1,28 @@
-import { useMemo, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useMemo, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
-import ActionModal from "@components/common/Modals/ActionModal";
-import { toast } from "react-toastify";
+import ActionModal from '@components/common/Modals/ActionModal';
+import { toast } from 'react-toastify';
 
-import { PAGE_SIZE } from "@constants/constants";
-import { useFilters } from "@hooks/useFIlters";
-import { LuArchiveX } from "react-icons/lu";
+import { PAGE_SIZE } from '@constants/constants';
+import { useFilters } from '@hooks/useFIlters';
+import { LuArchiveX } from 'react-icons/lu';
 
-import DataTable from "@components/common/DataTable";
-import Pagination from "@components/common/pagination";
-import ContentSpinner from "@components/common/spinners/dataLoadingSpinner";
+import DataTable from '@components/common/DataTable';
+import Pagination from '@components/common/pagination';
+import ContentSpinner from '@components/common/spinners/dataLoadingSpinner';
 
-import ButtonDropdown from "@components/common/ActionsPopover";
+import ButtonDropdown from '@components/common/ActionsPopover';
 import {
-    useDeleteDocumentTypeMutation,
-    useGetDocumentTypesQuery
-} from "@store/services/companies/documentsService";
+  useDeleteDocumentTypeMutation,
+  useGetDocumentTypesQuery,
+} from '@store/services/companies/documentsService';
 
-import NoDataFound from "@components/common/NoData";
-import { YearMonthCustomDate } from "@utils/dates";
-import { getApiErrorMessage } from "@utils/errorHandler";
-import { EditDocumentType } from "./EditDocumentType";
-import { NewDocumentType } from "./NewDocumentType";
+import NoDataFound from '@components/common/NoData';
+import { YearMonthCustomDate } from '@utils/dates';
+import { getApiErrorMessage } from '@utils/errorHandler';
+import { EditDocumentType } from './EditDocumentType';
+import { NewDocumentType } from './NewDocumentType';
 
 const DocumentTypes = () => {
   const [searchParams] = useSearchParams();
@@ -31,14 +31,14 @@ const DocumentTypes = () => {
   const [selectedRole, setSelectedRole] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  const currentPageParam = parseInt(searchParams.get("page") || "1", 10);
+  const currentPageParam = parseInt(searchParams.get('page') || '1', 10);
 
   const { filters, currentPage, handlePageChange } = useFilters({
     initialFilters: {},
     initialPage: currentPageParam,
     navigate,
     debounceTime: 100,
-    debouncedFields: [""],
+    debouncedFields: [''],
   });
 
   const queryParams = useMemo(
@@ -58,10 +58,9 @@ const DocumentTypes = () => {
   } = useGetDocumentTypesQuery(queryParams, {
     refetchOnMountOrArgChange: true,
   });
-  console.log("documentTypesData",documentTypesData)
+  console.log('documentTypesData', documentTypesData);
 
-  const [deleteDocumentType, { isLoading: deleting }] =
-    useDeleteDocumentTypeMutation();
+  const [deleteDocumentType, { isLoading: deleting }] = useDeleteDocumentTypeMutation();
 
   const openDeleteModal = (id) => {
     setSelectedRole(id);
@@ -76,14 +75,11 @@ const DocumentTypes = () => {
   const handleDelete = async () => {
     try {
       await deleteDocumentType(selectedRole).unwrap();
-      toast.success("Document Type deleted successfully!");
+      toast.success('Document Type deleted successfully!');
       closeDeleteModal();
       refetch();
     } catch (error) {
-      const message = getApiErrorMessage(
-        error,
-        "Error deleting document type."
-      );
+      const message = getApiErrorMessage(error, 'Error deleting document type.');
       toast.error(message);
     }
   };
@@ -91,22 +87,18 @@ const DocumentTypes = () => {
 
   const columns = [
     {
-      header: "Name",
-      accessor: "name",
+      header: 'Name',
+      accessor: 'name',
       cell: (item) => <span>{item.name}</span>,
     },
     {
-      header: "Category",
-      accessor: "category",
-      cell: (item) => (
-        <span className="text-xs font-medium">
-          {item?.category?.name ?? ""}
-        </span>
-      ),
+      header: 'Category',
+      accessor: 'category',
+      cell: (item) => <span className="text-xs font-medium">{item?.category?.name ?? ''}</span>,
     },
     {
-      header: "Require Acknowledgement",
-      accessor: "requires_acknowledgment",
+      header: 'Require Acknowledgement',
+      accessor: 'requires_acknowledgment',
       cell: (item) => {
         const isTrue = item.requires_acknowledgment === true;
         return (
@@ -114,36 +106,32 @@ const DocumentTypes = () => {
             className={`text-xs font-medium px-2 py-1 rounded border 
           ${
             isTrue
-              ? "bg-green-100 border-green-500 text-green-500"
-              : "bg-red-100 border-red-500 text-red-500"
+              ? 'bg-green-100 border-green-500 text-green-500'
+              : 'bg-red-100 border-red-500 text-red-500'
           }`}
           >
-            {isTrue ? "Yes" : "No"}
+            {isTrue ? 'Yes' : 'No'}
           </span>
         );
       },
     },
 
     {
-      header: "Description",
-      accessor: "description",
-      cell: (item) => (
-        <span className="text-xs font-medium">{item.description}</span>
-      ),
+      header: 'Description',
+      accessor: 'description',
+      cell: (item) => <span className="text-xs font-medium">{item.description}</span>,
     },
 
     {
-      header: "Date Created",
-      accessor: "created_at",
+      header: 'Date Created',
+      accessor: 'created_at',
       cell: (item) => (
-        <span className="text-xs font-medium">
-          {YearMonthCustomDate(item.created_at)}
-        </span>
+        <span className="text-xs font-medium">{YearMonthCustomDate(item.created_at)}</span>
       ),
     },
     {
-      header: "Actions",
-      accessor: "id",
+      header: 'Actions',
+      accessor: 'id',
       cell: (item) => (
         <>
           <ButtonDropdown>
@@ -165,7 +153,6 @@ const DocumentTypes = () => {
   return (
     <div className="bg-white w-full  font-nunito">
       <div className="p-3 flex flex-col md:flex-row md:items-center gap-4 justify-end">
-     
         <div>
           <NewDocumentType refetchData={refetch} />
         </div>
@@ -177,9 +164,9 @@ const DocumentTypes = () => {
         </div>
       ) : error ? (
         <div className="bg-red-50 p-4 rounded-md text-red-800 text-center">
-          {"status" in error && error.data?.error
+          {'status' in error && error.data?.error
             ? error.data.error
-            : "An error occurred while fetching roles."}
+            : 'An error occurred while fetching roles.'}
         </div>
       ) : documentTypesData && documentTypesData.results.length > 0 ? (
         <DataTable

@@ -20,9 +20,7 @@ import { formatClockTime } from "../../utils/dates";
 import ActionModal from "../common/Modals/ActionModal";
 import ContentSpinner from "@components/common/spinners/dataLoadingSpinner";
 
-// Component for individual task card
 const TaskCard = ({ task, onClick }) => {
-  // Fetch full details including description
   const { data: taskDetail } = useGetTaskDetailQuery(task.id);
   const detail = taskDetail || task;
 
@@ -43,7 +41,6 @@ const TaskCard = ({ task, onClick }) => {
     URGENT: "Urgent",
   };
 
-  // Priority flag images
   const priorityFlags = {
     LOW: "/images/lowflag.png",
     MEDIUM: "/images/mediumflag.png",
@@ -60,7 +57,6 @@ const TaskCard = ({ task, onClick }) => {
     ON_HOLD: "bg-gray-100 text-gray-800",
   };
 
-  // Check if task is overdue and not completed
   const showOverdueBadge = isOverdue && status !== "COMPLETED";
 
   return (
@@ -199,13 +195,10 @@ const EmployeeDashboardContent = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
 
-  // Get logged-in user
   const currentUser = useSelector((state) => state.auth.user);
 
-  // Fetch profile info for organization and status
   const { data: profileData, isLoading: profileLoading } = useGetProfileInfoQuery();
 
-  // Get task permissions
   const taskPermissions = useSelector((state) => {
     const permissions = state.auth.user?.role?.permissions;
     return permissions?.find(
@@ -245,14 +238,12 @@ const EmployeeDashboardContent = () => {
     completed: tasks.filter((task) => task.status === "COMPLETED").slice(0, 2), // Limit to 2 latest for display
   };
 
-  // Get total counts for display (using actual counts from all tasks)
   const totalCounts = {
     todo: tasks.filter((task) => task.status === "TO_DO").length,
     inProgress: tasks.filter((task) => task.status === "IN_PROGRESS").length,
     completed: tasks.filter((task) => task.status === "COMPLETED").length,
   };
 
-  // Extract organization and status from profile data
   const organizationName = profileData?.organization?.name || "OnTap Technologies";
   const employeeStatus = profileData?.employee_profile?.status || "ACTIVE";
   const employeeRole = profileData?.employee_profile?.user?.role?.name || 
@@ -293,7 +284,6 @@ const EmployeeDashboardContent = () => {
     console.log("Leave application submitted:", formData);
   };
 
-  // Handle new task creation
   const handleCreateTask = async (formData) => {
     try {
       const formatDate = (date) =>
@@ -372,7 +362,6 @@ const EmployeeDashboardContent = () => {
     setIsTaskModalOpen(true);
   };
 
-  // Clock in/out functions
   const openClockInModal = () => {
     setModalType("clockIn");
     setIsModalOpen(true);

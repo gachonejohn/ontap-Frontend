@@ -9,8 +9,7 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit, preselectedParentTask = null 
   const taskPermissions = useSelector((state) => {
     const permissions = state.auth.user?.role?.permissions;
     return permissions?.find(
-      (p) =>
-        p.feature_code === "task" || p.feature_code === "task_management"
+      (p) => p.feature_code === 'task' || p.feature_code === 'task_management'
     );
   });
 
@@ -26,11 +25,11 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit, preselectedParentTask = null 
     assignee: "",
     teamMembers: [],
     assignees: [],
-    department: "",
-    start_date: "",
-    due_date: "",
+    department: '',
+    start_date: '',
+    due_date: '',
     progress_percentage: 0,
-    estimated_hours: "",
+    estimated_hours: '',
     is_urgent: false,
     requires_approval: false,
     files: [],
@@ -155,19 +154,19 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit, preselectedParentTask = null 
   }, [parentTaskSearchQuery, isOpen]);
 
   const statusMap = {
-    TO_DO: "To Do",
-    IN_PROGRESS: "In Progress",
-    UNDER_REVIEW: "Under Review",
-    COMPLETED: "Completed",
-    CANCELLED: "Cancelled",
-    ON_HOLD: "On Hold",
+    TO_DO: 'To Do',
+    IN_PROGRESS: 'In Progress',
+    UNDER_REVIEW: 'Under Review',
+    COMPLETED: 'Completed',
+    CANCELLED: 'Cancelled',
+    ON_HOLD: 'On Hold',
   };
 
   const priorityMap = {
-    LOW: "Low",
-    MEDIUM: "Medium",
-    HIGH: "High",
-    URGENT: "Urgent",
+    LOW: 'Low',
+    MEDIUM: 'Medium',
+    HIGH: 'High',
+    URGENT: 'Urgent',
   };
 
   const statusOptions = Object.entries(statusMap).map(([key, value]) => ({
@@ -246,7 +245,7 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit, preselectedParentTask = null 
     if (isOpen) {
       const userId = currentUser?.user?.id || currentUser?.id;
       const initialAssignees = canViewAll ? [] : [userId];
-      
+
       setFormData({
         title: "",
         description: "",
@@ -256,11 +255,11 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit, preselectedParentTask = null 
         assignee: canViewAll ? "" : userId,
         teamMembers: [],
         assignees: initialAssignees,
-        department: "",
-        start_date: "",
-        due_date: "",
+        department: '',
+        start_date: '',
+        due_date: '',
         progress_percentage: 0,
-        estimated_hours: "",
+        estimated_hours: '',
         is_urgent: false,
         requires_approval: false,
         files: [],
@@ -279,30 +278,30 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit, preselectedParentTask = null 
     const errors = {};
 
     if (!formData.title || formData.title.trim().length === 0) {
-      errors.title = "Task title is required";
+      errors.title = 'Task title is required';
     }
 
     if (!formData.priority) {
-      errors.priority = "Priority is required";
+      errors.priority = 'Priority is required';
     }
 
     if (!formData.description || formData.description.trim().length === 0) {
-      errors.description = "Description is required";
+      errors.description = 'Description is required';
     }
 
     if (!formData.start_date) {
-      errors.start_date = "Start date is required";
+      errors.start_date = 'Start date is required';
     }
 
     if (!formData.due_date) {
-      errors.due_date = "Due date is required";
+      errors.due_date = 'Due date is required';
     }
 
     if (formData.start_date && formData.due_date) {
       const startDate = new Date(formData.start_date);
       const dueDate = new Date(formData.due_date);
       if (dueDate < startDate) {
-        errors.due_date = "Due date cannot be before start date";
+        errors.due_date = 'Due date cannot be before start date';
       }
     }
 
@@ -314,11 +313,11 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit, preselectedParentTask = null 
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: type === 'checkbox' ? checked : value,
     }));
 
     if (formErrors[name]) {
-      setFormErrors((prev) => ({ ...prev, [name]: "" }));
+      setFormErrors((prev) => ({ ...prev, [name]: '' }));
     }
   };
 
@@ -367,7 +366,7 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit, preselectedParentTask = null 
   };
 
   const handleDepartmentChange = (selected) => {
-    setFormData((prev) => ({ ...prev, department: selected?.value || "" }));
+    setFormData((prev) => ({ ...prev, department: selected?.value || '' }));
   };
 
   const handleParentTaskSelect = (task) => {
@@ -466,15 +465,15 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit, preselectedParentTask = null 
 
   const handleCreateTask = async (e) => {
     e.preventDefault();
-    
+
     console.log('=== FORM SUBMISSION START ===');
     console.log('Form data before validation:', formData);
-    
+
     if (!validateForm()) {
       console.log('Form validation failed');
       return;
     }
-    
+
     if (!onSubmit) {
       console.log('No onSubmit function provided');
       return;
@@ -570,8 +569,20 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit, preselectedParentTask = null 
             className="flex justify-center items-center w-7 h-7 hover:bg-gray-100 rounded-full"
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M12 4L4 12" stroke="#4B5563" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M4 4L12 12" stroke="#4B5563" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path
+                d="M12 4L4 12"
+                stroke="#4B5563"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M4 4L12 12"
+                stroke="#4B5563"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           </button>
         </div>

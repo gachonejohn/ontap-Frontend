@@ -1,11 +1,6 @@
-import SubmitSpinner from "../spinners/submitSpinner";
+import SubmitSpinner from '../spinners/submitSpinner';
 
-
-const SubmitCancelButtons = ({
-  onCancel,
-  isSubmitting,
-  isProcessing,
-}) => {
+const SubmitCancelButtons = ({ onCancel, isSubmitting, isProcessing }) => {
   return (
     <div className="sticky bottom-0 bg-white z-40 flex  gap-4 md:justify-between items-center py-3">
       <button

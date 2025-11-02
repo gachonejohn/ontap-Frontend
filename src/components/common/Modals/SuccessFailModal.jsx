@@ -1,4 +1,4 @@
-import { MdClose, MdOutlineCheck, MdOutlineClose } from "react-icons/md";
+import { MdClose, MdOutlineCheck, MdOutlineClose } from 'react-icons/md';
 
 const SuccessFailModal = ({ message, onClose, isError = false }) => {
   return (
@@ -28,7 +28,7 @@ const SuccessFailModal = ({ message, onClose, isError = false }) => {
             <div className="flex flex-col items-center text-center">
               <div
                 className={`mb-4 flex h-16 w-16 items-center justify-center rounded-full ${
-                  isError ? "bg-red-100" : "bg-green-100"
+                  isError ? 'bg-red-100' : 'bg-green-100'
                 }`}
               >
                 {isError ? (
@@ -39,26 +39,20 @@ const SuccessFailModal = ({ message, onClose, isError = false }) => {
               </div>
 
               <h3
-                className={`mb-2 text-xl font-bold ${
-                  isError ? "text-red-600" : "text-green-600"
-                }`}
+                className={`mb-2 text-xl font-bold ${isError ? 'text-red-600' : 'text-green-600'}`}
               >
-                {isError ? "Error" : "Success"}
+                {isError ? 'Error' : 'Success'}
               </h3>
 
-              <p className="mb-6 text-gray-700 break-words whitespace-normal">
-                {message}
-              </p>
+              <p className="mb-6 text-gray-700 break-words whitespace-normal">{message}</p>
 
               <button
                 onClick={onClose}
                 className={`inline-flex justify-center rounded-md border border-transparent px-6 py-2 text-base font-medium text-white shadow-sm focus:outline-none ${
-                  isError
-                    ? "bg-red-600 hover:bg-red-700"
-                    : "bg-green-600 hover:bg-green-700"
+                  isError ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'
                 }`}
               >
-                {isError ? "Close" : "Continue"}
+                {isError ? 'Close' : 'Continue'}
               </button>
             </div>
           </div>

@@ -1,20 +1,19 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { createDocumentCategorySchema } from "@schemas/companies/documentsSchema";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { FiEdit } from "react-icons/fi";
-import { IoCloseOutline } from "react-icons/io5";
-import { toast } from "react-toastify";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { createDocumentCategorySchema } from '@schemas/companies/documentsSchema';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { FiEdit } from 'react-icons/fi';
+import { IoCloseOutline } from 'react-icons/io5';
+import { toast } from 'react-toastify';
 
-import SubmitCancelButtons from "@components/common/Buttons/ActionButton";
-import CreateUpdateButton from "@components/common/Buttons/CreateUpdateButton";
-import { useUpdateDocumentCategoryMutation } from "@store/services/companies/documentsService";
-import { getApiErrorMessage } from "@utils/errorHandler";
+import SubmitCancelButtons from '@components/common/Buttons/ActionButton';
+import CreateUpdateButton from '@components/common/Buttons/CreateUpdateButton';
+import { useUpdateDocumentCategoryMutation } from '@store/services/companies/documentsService';
+import { getApiErrorMessage } from '@utils/errorHandler';
 export const EditDocumentCategory = ({ refetchData, data }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const [updateDocumentCategory, { isLoading: isCreating }] =
-    useUpdateDocumentCategoryMutation();
+  const [updateDocumentCategory, { isLoading: isCreating }] = useUpdateDocumentCategoryMutation();
 
   const {
     register,
@@ -24,8 +23,8 @@ export const EditDocumentCategory = ({ refetchData, data }) => {
   } = useForm({
     resolver: zodResolver(createDocumentCategorySchema),
     defaultValues: {
-      name: data?.name ?? "",
-      description: data?.description ?? "",
+      name: data?.name ?? '',
+      description: data?.description ?? '',
     },
   });
 
@@ -35,14 +34,11 @@ export const EditDocumentCategory = ({ refetchData, data }) => {
         id: data.id,
         data: formData,
       }).unwrap();
-      toast.success("Category updated successfully!");
+      toast.success('Category updated successfully!');
       handleCloseModal();
       refetchData();
     } catch (error) {
-      const message = getApiErrorMessage(
-        error,
-        "Error updating document category."
-      );
+      const message = getApiErrorMessage(error, 'Error updating document category.');
       toast.error(message);
     } finally {
       refetchData();
@@ -97,11 +93,7 @@ export const EditDocumentCategory = ({ refetchData, data }) => {
                 <p className="text-sm md:text-lg lg:text-lg font-semibold">
                   Edit Document Category
                 </p>
-                <IoCloseOutline
-                  size={20}
-                  className="cursor-pointer"
-                  onClick={handleCloseModal}
-                />
+                <IoCloseOutline size={20} className="cursor-pointer" onClick={handleCloseModal} />
               </div>
 
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 p-4">
@@ -113,30 +105,22 @@ export const EditDocumentCategory = ({ refetchData, data }) => {
                   <input
                     type="text"
                     placeholder="E.g Personal Identification"
-                    {...register("name")}
+                    {...register('name')}
                     className="w-full py-2 px-4 rounded-md border border-gray-400 focus:outline-none focus:border-[#1E9FF2] focus:bg-white placeholder:text-sm"
                   />
-                  {errors.name && (
-                    <p className="text-red-500 text-sm">
-                      {errors.name.message}
-                    </p>
-                  )}
+                  {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
                 </div>
 
                 {/* Description */}
                 <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Description
-                  </label>
+                  <label className="block text-sm font-medium mb-2">Description</label>
                   <textarea
                     placeholder="Description here..."
-                    {...register("description")}
+                    {...register('description')}
                     className="w-full py-2 px-4 rounded-md border border-gray-400 focus:outline-none focus:border-[#1E9FF2] focus:bg-white placeholder:text-sm"
                   />
                   {errors.description && (
-                    <p className="text-red-500 text-sm">
-                      {errors.description.message}
-                    </p>
+                    <p className="text-red-500 text-sm">{errors.description.message}</p>
                   )}
                 </div>
 

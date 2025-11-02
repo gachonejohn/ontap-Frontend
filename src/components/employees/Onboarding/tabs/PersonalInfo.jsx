@@ -1,4 +1,4 @@
-import Select from "react-select";
+import Select from 'react-select';
 const PersonalDetailsTab = ({
   register,
   errors,
@@ -8,15 +8,15 @@ const PersonalDetailsTab = ({
   positionsData,
 }) => {
   const handleRoleChange = (selected) => {
-    if (selected) setValue("role_id", Number(selected.value));
+    if (selected) setValue('role_id', Number(selected.value));
   };
 
   const handleDepartmentChange = (selected) => {
-    if (selected) setValue("department_id", Number(selected.value));
+    if (selected) setValue('department_id', Number(selected.value));
   };
 
   const handlePositionChange = (selected) => {
-    if (selected) setValue("position_id", Number(selected.value));
+    if (selected) setValue('position_id', Number(selected.value));
   };
 
   return (
@@ -29,13 +29,11 @@ const PersonalDetailsTab = ({
           <input
             type="text"
             placeholder="E.g. Peter"
-            {...register("first_name")}
+            {...register('first_name')}
             className="w-full py-2 px-4 rounded-md border bg-slate-50 focus:outline-none focus:border-primary focus:bg-white placeholder:text-[12px] "
           />
           {errors.first_name && (
-            <p className="text-red-500 text-[12px]  mt-1">
-              {errors.first_name.message}
-            </p>
+            <p className="text-red-500 text-[12px]  mt-1">{errors.first_name.message}</p>
           )}
         </div>
 
@@ -46,15 +44,13 @@ const PersonalDetailsTab = ({
           <input
             type="text"
             placeholder="E.g. Smith"
-            {...register("last_name")}
+            {...register('last_name')}
             className="w-full py-2
              px-4 rounded-md border bg-slate-50 focus:outline-none
               focus:border-primary focus:bg-white placeholder:text-[12px] "
           />
           {errors.last_name && (
-            <p className="text-red-500 text-[12px]  mt-1">
-              {errors.last_name.message}
-            </p>
+            <p className="text-red-500 text-[12px]  mt-1">{errors.last_name.message}</p>
           )}
         </div>
 
@@ -65,13 +61,11 @@ const PersonalDetailsTab = ({
           <input
             type="text"
             placeholder="+234...."
-            {...register("phone_number")}
+            {...register('phone_number')}
             className="w-full py-2 px-4 rounded-md border bg-slate-50 focus:outline-none focus:border-primary focus:bg-white placeholder:text-[12px] "
           />
           {errors.phone_number && (
-            <p className="text-red-500 text-[12px]  mt-1">
-              {errors.phone_number.message}
-            </p>
+            <p className="text-red-500 text-[12px]  mt-1">{errors.phone_number.message}</p>
           )}
         </div>
 
@@ -82,37 +76,27 @@ const PersonalDetailsTab = ({
           <input
             type="email"
             placeholder="Enter email"
-            {...register("email")}
+            {...register('email')}
             className="w-full py-2 px-4 rounded-md border bg-slate-50 focus:outline-none focus:border-primary focus:bg-white placeholder:text-[12px] "
           />
-          {errors.email && (
-            <p className="text-red-500 text-[12px]  mt-1">
-              {errors.email.message}
-            </p>
-          )}
+          {errors.email && <p className="text-red-500 text-[12px]  mt-1">{errors.email.message}</p>}
         </div>
 
         <div>
-          <label className="block text-[12px]  font-medium mb-2">
-            Employee Number
-          </label>
+          <label className="block text-[12px]  font-medium mb-2">Employee Number</label>
           <input
             type="text"
             placeholder="EMP-002"
-            {...register("employee_no")}
+            {...register('employee_no')}
             className="w-full py-2 px-4 rounded-md border bg-slate-50 focus:outline-none focus:border-primary focus:bg-white placeholder:text-[12px] "
           />
           {errors.employee_no && (
-            <p className="text-red-500 text-[12px]  mt-1">
-              {errors.employee_no.message}
-            </p>
+            <p className="text-red-500 text-[12px]  mt-1">{errors.employee_no.message}</p>
           )}
         </div>
 
         <div>
-          <label className="block text-[12px]  font-medium mb-2">
-            Department
-          </label>
+          <label className="block text-[12px]  font-medium mb-2">Department</label>
           <Select
             options={departmentsData?.results?.map((item) => ({
               value: item.id,
@@ -127,34 +111,30 @@ const PersonalDetailsTab = ({
               }),
               control: (base) => ({
                 ...base,
-                minHeight: "24px",
-                minWidth: "200px",
-                borderColor: "#d1d5db",
-                boxShadow: "none",
-                "&:hover": {
-                  borderColor: "#9ca3af",
+                minHeight: '24px',
+                minWidth: '200px',
+                borderColor: '#d1d5db',
+                boxShadow: 'none',
+                '&:hover': {
+                  borderColor: '#9ca3af',
                 },
-                "&:focus-within": {
-                  borderColor: "#9ca3af",
-                  boxShadow: "none",
+                '&:focus-within': {
+                  borderColor: '#9ca3af',
+                  boxShadow: 'none',
                 },
-                backgroundColor: "#F3F4F6",
+                backgroundColor: '#F3F4F6',
               }),
             }}
             onChange={handleDepartmentChange}
             placeholder="Select department"
           />
           {errors.department_id && (
-            <p className="text-red-500 text-[12px]  mt-1">
-              {errors.department_id.message}
-            </p>
+            <p className="text-red-500 text-[12px]  mt-1">{errors.department_id.message}</p>
           )}
         </div>
 
         <div>
-          <label className="block text-[12px]  font-medium mb-2">
-            Position
-          </label>
+          <label className="block text-[12px]  font-medium mb-2">Position</label>
           <Select
             options={positionsData?.results?.map((item) => ({
               value: item.id,
@@ -169,27 +149,25 @@ const PersonalDetailsTab = ({
               }),
               control: (base) => ({
                 ...base,
-                minHeight: "24px",
-                minWidth: "200px",
-                borderColor: "#d1d5db",
-                boxShadow: "none",
-                "&:hover": {
-                  borderColor: "#9ca3af",
+                minHeight: '24px',
+                minWidth: '200px',
+                borderColor: '#d1d5db',
+                boxShadow: 'none',
+                '&:hover': {
+                  borderColor: '#9ca3af',
                 },
-                "&:focus-within": {
-                  borderColor: "#9ca3af",
-                  boxShadow: "none",
+                '&:focus-within': {
+                  borderColor: '#9ca3af',
+                  boxShadow: 'none',
                 },
-                backgroundColor: "#F3F4F6",
+                backgroundColor: '#F3F4F6',
               }),
             }}
             onChange={handlePositionChange}
             placeholder="Select position"
           />
           {errors.position_id && (
-            <p className="text-red-500 text-[12px]  mt-1">
-              {errors.position_id.message}
-            </p>
+            <p className="text-red-500 text-[12px]  mt-1">{errors.position_id.message}</p>
           )}
         </div>
 
@@ -209,27 +187,25 @@ const PersonalDetailsTab = ({
               }),
               control: (base) => ({
                 ...base,
-                minHeight: "24px",
-                minWidth: "200px",
-                borderColor: "#d1d5db",
-                boxShadow: "none",
-                "&:hover": {
-                  borderColor: "#9ca3af",
+                minHeight: '24px',
+                minWidth: '200px',
+                borderColor: '#d1d5db',
+                boxShadow: 'none',
+                '&:hover': {
+                  borderColor: '#9ca3af',
                 },
-                "&:focus-within": {
-                  borderColor: "#9ca3af",
-                  boxShadow: "none",
+                '&:focus-within': {
+                  borderColor: '#9ca3af',
+                  boxShadow: 'none',
                 },
-                backgroundColor: "#F3F4F6",
+                backgroundColor: '#F3F4F6',
               }),
             }}
             onChange={handleRoleChange}
             placeholder="Select role"
           />
           {errors.role_id && (
-            <p className="text-red-500 text-[12px]  mt-1">
-              {errors.role_id.message}
-            </p>
+            <p className="text-red-500 text-[12px]  mt-1">{errors.role_id.message}</p>
           )}
         </div>
       </div>

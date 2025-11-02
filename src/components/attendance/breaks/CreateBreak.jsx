@@ -1,20 +1,20 @@
-import SubmitSpinner from "@components/common/spinners/submitSpinner";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { CreateBreakSchema } from "@schemas/companies/policies/breaksPolicySchema";
+import SubmitSpinner from '@components/common/spinners/submitSpinner';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { CreateBreakSchema } from '@schemas/companies/policies/breaksPolicySchema';
 import {
-    useCreateBreakMutation,
-    useGetBreakCategoriesQuery
-} from "@store/services/policies/policyService";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { IoCloseOutline } from "react-icons/io5";
-import Select from "react-select";
-import { toast } from "react-toastify";
+  useCreateBreakMutation,
+  useGetBreakCategoriesQuery,
+} from '@store/services/policies/policyService';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { IoCloseOutline } from 'react-icons/io5';
+import Select from 'react-select';
+import { toast } from 'react-toastify';
 
 export const CreateBreak = ({ refetchData }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [createBreak, { isLoading: isCreating }] = useCreateBreakMutation();
-  
+
   const { data: categoriesData } = useGetBreakCategoriesQuery(
     {},
     { refetchOnMountOrArgChange: true }
@@ -39,15 +39,15 @@ export const CreateBreak = ({ refetchData }) => {
       };
 
       await createBreak(payload).unwrap();
-      toast.success("Break started  successfully!");
+      toast.success('Break started  successfully!');
       handleCloseModal();
       refetchData();
     } catch (error) {
-      console.error("Error:", error);
+      console.error('Error:', error);
       if (error && error.data && error.data.error) {
         toast.error(error.data.error);
       } else {
-        toast.error("An error occurred. Please try again.");
+        toast.error('An error occurred. Please try again.');
       }
     } finally {
       refetchData();
@@ -63,10 +63,9 @@ export const CreateBreak = ({ refetchData }) => {
   const handleBreakTypeChange = (selected) => {
     if (selected) {
       const item_id = Number(selected.value);
-      setValue("break_type", item_id);
+      setValue('break_type', item_id);
     }
   };
-
 
   return (
     <>
@@ -97,22 +96,14 @@ export const CreateBreak = ({ refetchData }) => {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="sticky top-0 bg-white z-40 flex px-4 justify-between items-center py-4">
-                <p className="text-sm md:text-lg lg:text-lg font-semibold">
-                 Go for a Break
-                </p>
-                <IoCloseOutline
-                  size={20}
-                  className="cursor-pointer"
-                  onClick={handleCloseModal}
-                />
+                <p className="text-sm md:text-lg lg:text-lg font-semibold">Go for a Break</p>
+                <IoCloseOutline size={20} className="cursor-pointer" onClick={handleCloseModal} />
               </div>
 
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 p-4">
                 {/* Name */}
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium mb-2">
-                    Break Type
-                  </label>
+                  <label className="block text-sm font-medium mb-2">Break Type</label>
                   <Select
                     options={categoriesData?.map((item) => ({
                       value: item.id,
@@ -127,55 +118,45 @@ export const CreateBreak = ({ refetchData }) => {
                       }),
                       control: (base) => ({
                         ...base,
-                        minHeight: "40px",
-                        borderColor: "#d1d5db",
-                        boxShadow: "none",
-                        "&:hover": {
-                          borderColor: "#9ca3af",
+                        minHeight: '40px',
+                        borderColor: '#d1d5db',
+                        boxShadow: 'none',
+                        '&:hover': {
+                          borderColor: '#9ca3af',
                         },
-                        "&:focus-within": {
-                          borderColor: "#9ca3af",
-                          boxShadow: "none",
+                        '&:focus-within': {
+                          borderColor: '#9ca3af',
+                          boxShadow: 'none',
                         },
-                        backgroundColor: "#F8FAFC",
+                        backgroundColor: '#F8FAFC',
                       }),
                     }}
                     onChange={handleBreakTypeChange}
                   />
                   {errors.break_type && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {errors.break_type.message}
-                    </p>
+                    <p className="text-red-500 text-sm mt-1">{errors.break_type.message}</p>
                   )}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Break Start
-                  </label>
+                  <label className="block text-sm font-medium mb-2">Break Start</label>
                   <input
                     type="time"
-                    {...register("break_start")}
+                    {...register('break_start')}
                     className="w-full py-2 px-4 rounded-md border border-gray-400 focus:outline-none focus:border-[#1E9FF2] focus:bg-white placeholder:text-sm cursor-text"
                   />
                   {errors.break_start && (
-                    <p className="text-red-500 text-sm">
-                      {errors.break_start.message}
-                    </p>
+                    <p className="text-red-500 text-sm">{errors.break_start.message}</p>
                   )}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Break End
-                  </label>
+                  <label className="block text-sm font-medium mb-2">Break End</label>
                   <input
                     type="time"
-                    {...register("break_end")}
+                    {...register('break_end')}
                     className="w-full py-2 px-4 rounded-md border border-gray-400 focus:outline-none focus:border-[#1E9FF2] focus:bg-white placeholder:text-sm cursor-text"
                   />
                   {errors.break_end && (
-                    <p className="text-red-500 text-sm">
-                      {errors.break_end.message}
-                    </p>
+                    <p className="text-red-500 text-sm">{errors.break_end.message}</p>
                   )}
                 </div>
 
@@ -199,7 +180,7 @@ export const CreateBreak = ({ refetchData }) => {
                         <span>Submitting...</span>
                       </span>
                     ) : (
-                      "Submit"
+                      'Submit'
                     )}
                   </button>
                 </div>

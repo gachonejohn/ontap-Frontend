@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import ViewProfileModal from "./ViewProfileModal.js";
+import React, { useState } from 'react';
+import ViewProfileModal from './ViewProfileModal.js';
 
 const Profile = () => {
   const [activeTab, setActiveTab] = useState('personalInfo');
@@ -8,29 +8,29 @@ const Profile = () => {
 
   // State for editable data
   const [personalData, setPersonalData] = useState({
-    fullName: "Emefo Victor Ebubechukwu",
-    gender: "Male",
-    email: "victor.emefo@company.com",
-    phone: "+234 7099767789",
-    address: "123 Main St, San Francisco, CA 94102",
-    department: "Design Team",
-    position: "Head of design",
-    employeeId: "EMP0035",
-    startDate: "2023-08-13"
+    fullName: 'Emefo Victor Ebubechukwu',
+    gender: 'Male',
+    email: 'victor.emefo@company.com',
+    phone: '+234 7099767789',
+    address: '123 Main St, San Francisco, CA 94102',
+    department: 'Design Team',
+    position: 'Head of design',
+    employeeId: 'EMP0035',
+    startDate: '2023-08-13',
   });
 
   const [emergencyData, setEmergencyData] = useState({
-    fullName: "Sarah Watson Bush",
-    gender: "Female",
-    email: "victor.emefo@gmail.com",
-    phone: "+234 7099767789",
-    relationship: "Sister"
+    fullName: 'Sarah Watson Bush',
+    gender: 'Female',
+    email: 'victor.emefo@gmail.com',
+    phone: '+234 7099767789',
+    relationship: 'Sister',
   });
 
   const [preferencesData, setPreferencesData] = useState({
     emailNotifications: false,
     pushNotifications: false,
-    taskUpdates: false
+    taskUpdates: false,
   });
 
   const handleEditToggle = () => {
@@ -45,41 +45,41 @@ const Profile = () => {
   };
 
   const handlePersonalDataChange = (field, value) => {
-    setPersonalData(prev => ({
+    setPersonalData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
   const handleEmergencyDataChange = (field, value) => {
-    setEmergencyData(prev => ({
+    setEmergencyData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
   const handlePreferencesChange = (field) => {
-    setPreferencesData(prev => ({
+    setPreferencesData((prev) => ({
       ...prev,
-      [field]: !prev[field]
+      [field]: !prev[field],
     }));
   };
 
   const renderReadOnlyField = (label, value, fullWidth = false) => (
-    <div className={`flex flex-col justify-start items-start gap-2 ${fullWidth ? 'col-span-2' : ''}`}>
-      <div className="text-sm text-gray-600 font-medium">
-        {label}
-      </div>
+    <div
+      className={`flex flex-col justify-start items-start gap-2 ${fullWidth ? 'col-span-2' : ''}`}
+    >
+      <div className="text-sm text-gray-600 font-medium">{label}</div>
       <div className="flex justify-start items-center pl-4 rounded-lg w-full h-12 bg-gray-50">
-        <div className="text-sm text-gray-600 font-normal">
-          {value}
-        </div>
+        <div className="text-sm text-gray-600 font-normal">{value}</div>
       </div>
     </div>
   );
 
   const renderEditableField = (label, value, onChange, required = true, fullWidth = false) => (
-    <div className={`flex flex-col justify-start items-start gap-2 ${fullWidth ? 'col-span-2' : ''}`}>
+    <div
+      className={`flex flex-col justify-start items-start gap-2 ${fullWidth ? 'col-span-2' : ''}`}
+    >
       <div className="text-sm text-gray-600 font-medium">
         {label} {required && <span className="text-red-500">*</span>}
       </div>
@@ -92,9 +92,7 @@ const Profile = () => {
         />
       ) : (
         <div className="flex justify-start items-center pl-4 rounded-lg w-full h-12 bg-gray-50">
-          <div className="text-sm text-gray-600 font-normal">
-            {value}
-          </div>
+          <div className="text-sm text-gray-600 font-normal">{value}</div>
         </div>
       )}
     </div>
@@ -105,7 +103,9 @@ const Profile = () => {
       className={`flex items-center cursor-pointer transition-all duration-200 rounded-full w-10 h-5 ${isOn ? 'bg-teal-500' : 'bg-gray-300'} ${isEditing ? 'cursor-pointer' : 'cursor-default'}`}
       onClick={isEditing ? onChange : undefined}
     >
-      <div className={`rounded-full w-4 h-4 shadow bg-white transition-all duration-200 ${isOn ? 'ml-5' : 'ml-0.5'}`}></div>
+      <div
+        className={`rounded-full w-4 h-4 shadow bg-white transition-all duration-200 ${isOn ? 'ml-5' : 'ml-0.5'}`}
+      ></div>
     </div>
   );
 
@@ -114,9 +114,7 @@ const Profile = () => {
       {/* Profile Header */}
       <div className="flex flex-row justify-between items-center">
         <div className="flex flex-col justify-start items-start gap-1.5">
-          <div className="text-lg text-neutral-900 font-semibold">
-            My Profile
-          </div>
+          <div className="text-lg text-neutral-900 font-semibold">My Profile</div>
           <div className="text-sm text-gray-600 font-normal">
             Manage your personal information and preferences
           </div>
@@ -137,9 +135,7 @@ const Profile = () => {
                   alt="Edit Profile icon"
                 />
               </div>
-              <div className="text-sm text-white font-medium">
-                Edit Profile
-              </div>
+              <div className="text-sm text-white font-medium">Edit Profile</div>
             </div>
           </div>
         ) : (
@@ -149,15 +145,9 @@ const Profile = () => {
           >
             <div className="flex flex-row justify-start items-start gap-2 w-32">
               <div className="flex justify-center items-center w-5 h-5">
-                <img
-                  className="w-[20px] h-[19.4px]"
-                  src="/images/save.png"
-                  alt="Save Icon"
-                />
+                <img className="w-[20px] h-[19.4px]" src="/images/save.png" alt="Save Icon" />
               </div>
-              <div className="text-sm text-white font-medium whitespace-nowrap">
-                Save Changes
-              </div>
+              <div className="text-sm text-white font-medium whitespace-nowrap">Save Changes</div>
             </div>
           </div>
         )}
@@ -184,40 +174,22 @@ const Profile = () => {
                 </div>
               </div>
               <div className="flex flex-col justify-start items-center gap-1 text-center">
-                <div className="text-base text-neutral-900 font-semibold">
-                  Victor Emefo
-                </div>
-                <div className="text-sm text-gray-600 font-normal">
-                  Junior Product Designer
-                </div>
+                <div className="text-base text-neutral-900 font-semibold">Victor Emefo</div>
+                <div className="text-sm text-gray-600 font-normal">Junior Product Designer</div>
               </div>
             </div>
             <div className="flex flex-col justify-start items-start gap-3 w-full">
               <div className="flex flex-row justify-start items-center gap-2 w-full">
                 <div className="flex justify-center items-center w-5 h-5">
-                  <img
-                    width="19.3px"
-                    height="15.1px"
-                    src="/images/email.png"
-                    alt="Email icon"
-                  />
+                  <img width="19.3px" height="15.1px" src="/images/email.png" alt="Email icon" />
                 </div>
-                <div className="text-sm text-gray-600 font-normal">
-                  {personalData.email}
-                </div>
+                <div className="text-sm text-gray-600 font-normal">{personalData.email}</div>
               </div>
               <div className="flex flex-row justify-start items-center gap-2 w-full">
                 <div className="flex justify-center items-center w-5 h-5">
-                  <img
-                    width="17.9px"
-                    height="17.9px"
-                    src="/images/phonee.png"
-                    alt="Phone icon"
-                  />
+                  <img width="17.9px" height="17.9px" src="/images/phonee.png" alt="Phone icon" />
                 </div>
-                <div className="text-sm text-gray-600 font-normal">
-                  {personalData.phone}
-                </div>
+                <div className="text-sm text-gray-600 font-normal">{personalData.phone}</div>
               </div>
               <div className="flex flex-row justify-start items-center gap-2 w-full">
                 <div className="flex justify-center items-center w-5 h-5">
@@ -241,32 +213,44 @@ const Profile = () => {
           {/* Tabs */}
           <div className="flex flex-row justify-center items-center border-b border-slate-100 h-10 bg-slate-50">
             <div
-              className={`flex flex-row justify-center items-center h-10 min-w-[33%] cursor-pointer border-r border-slate-100 ${activeTab === 'personalInfo' ? 'bg-white' : 'hover:bg-gray-50 transition-colors'
-                }`}
+              className={`flex flex-row justify-center items-center h-10 min-w-[33%] cursor-pointer border-r border-slate-100 ${
+                activeTab === 'personalInfo' ? 'bg-white' : 'hover:bg-gray-50 transition-colors'
+              }`}
               onClick={() => setActiveTab('personalInfo')}
             >
-              <div className={`text-xs text-neutral-900 tracking-wide ${activeTab === 'personalInfo' ? 'font-semibold' : 'font-medium'
-                }`}>
+              <div
+                className={`text-xs text-neutral-900 tracking-wide ${
+                  activeTab === 'personalInfo' ? 'font-semibold' : 'font-medium'
+                }`}
+              >
                 Personal Info
               </div>
             </div>
             <div
-              className={`flex flex-row justify-center items-center h-10 min-w-[33%] cursor-pointer border-r border-slate-100 ${activeTab === 'emergencyInfo' ? 'bg-white' : 'hover:bg-gray-50 transition-colors'
-                }`}
+              className={`flex flex-row justify-center items-center h-10 min-w-[33%] cursor-pointer border-r border-slate-100 ${
+                activeTab === 'emergencyInfo' ? 'bg-white' : 'hover:bg-gray-50 transition-colors'
+              }`}
               onClick={() => setActiveTab('emergencyInfo')}
             >
-              <div className={`text-xs text-neutral-900 tracking-wide ${activeTab === 'emergencyInfo' ? 'font-semibold' : 'font-medium'
-                }`}>
+              <div
+                className={`text-xs text-neutral-900 tracking-wide ${
+                  activeTab === 'emergencyInfo' ? 'font-semibold' : 'font-medium'
+                }`}
+              >
                 Emergency Info
               </div>
             </div>
             <div
-              className={`flex flex-row justify-center items-center h-10 min-w-[34%] cursor-pointer ${activeTab === 'preferences' ? 'bg-white' : 'hover:bg-gray-50 transition-colors'
-                }`}
+              className={`flex flex-row justify-center items-center h-10 min-w-[34%] cursor-pointer ${
+                activeTab === 'preferences' ? 'bg-white' : 'hover:bg-gray-50 transition-colors'
+              }`}
               onClick={() => setActiveTab('preferences')}
             >
-              <div className={`text-xs text-neutral-900 tracking-wide ${activeTab === 'preferences' ? 'font-semibold' : 'font-medium'
-                }`}>
+              <div
+                className={`text-xs text-neutral-900 tracking-wide ${
+                  activeTab === 'preferences' ? 'font-semibold' : 'font-medium'
+                }`}
+              >
                 Preferences
               </div>
             </div>
@@ -284,21 +268,19 @@ const Profile = () => {
                     alt="Personal Info icon"
                   />
                 </div>
-                <div className="text-base text-neutral-900 font-medium">
-                  Personal Info
-                </div>
+                <div className="text-base text-neutral-900 font-medium">Personal Info</div>
               </div>
 
               <div className="grid grid-cols-2 gap-6 w-full">
-                {renderReadOnlyField("Full Name", personalData.fullName)}
-                {renderReadOnlyField("Gender", personalData.gender)}
-                {renderReadOnlyField("Email", personalData.email, true)}
-                {renderReadOnlyField("Phone Number", personalData.phone, true)}
-                {renderReadOnlyField("Address", personalData.address, true)}
-                {renderReadOnlyField("Department", personalData.department)}
-                {renderReadOnlyField("Position", personalData.position)}
-                {renderReadOnlyField("Employee ID", personalData.employeeId)}
-                {renderReadOnlyField("Start Date", personalData.startDate)}
+                {renderReadOnlyField('Full Name', personalData.fullName)}
+                {renderReadOnlyField('Gender', personalData.gender)}
+                {renderReadOnlyField('Email', personalData.email, true)}
+                {renderReadOnlyField('Phone Number', personalData.phone, true)}
+                {renderReadOnlyField('Address', personalData.address, true)}
+                {renderReadOnlyField('Department', personalData.department)}
+                {renderReadOnlyField('Position', personalData.position)}
+                {renderReadOnlyField('Employee ID', personalData.employeeId)}
+                {renderReadOnlyField('Start Date', personalData.startDate)}
               </div>
             </div>
           )}
@@ -314,17 +296,15 @@ const Profile = () => {
                     alt="Emergency Info icon"
                   />
                 </div>
-                <div className="text-base text-neutral-900 font-medium">
-                  Emergency Information
-                </div>
+                <div className="text-base text-neutral-900 font-medium">Emergency Information</div>
               </div>
 
               <div className="grid grid-cols-2 gap-6 w-full">
-                {renderReadOnlyField("Full Name", emergencyData.fullName)}
-                {renderReadOnlyField("Gender", emergencyData.gender)}
-                {renderReadOnlyField("Email", emergencyData.email, true)}
-                {renderReadOnlyField("Phone Number", emergencyData.phone, true)}
-                {renderReadOnlyField("Relationship", emergencyData.relationship, true)}
+                {renderReadOnlyField('Full Name', emergencyData.fullName)}
+                {renderReadOnlyField('Gender', emergencyData.gender)}
+                {renderReadOnlyField('Email', emergencyData.email, true)}
+                {renderReadOnlyField('Phone Number', emergencyData.phone, true)}
+                {renderReadOnlyField('Relationship', emergencyData.relationship, true)}
               </div>
             </div>
           )}
@@ -340,9 +320,7 @@ const Profile = () => {
                     alt="Security icon"
                   />
                 </div>
-                <div className="text-base text-neutral-900 font-medium">
-                  Security Settings
-                </div>
+                <div className="text-base text-neutral-900 font-medium">Security Settings</div>
               </div>
 
               <div className="flex flex-col justify-start items-start gap-5 w-full">
@@ -352,15 +330,13 @@ const Profile = () => {
                     <div className="text-sm text-neutral-900 font-medium">
                       Password <span className="text-red-500">*</span>
                     </div>
-                    <div className={`flex justify-start items-center pl-4 rounded-lg w-full h-12 ${isEditing ? 'border border-teal-500 bg-white cursor-pointer hover:bg-gray-50' : 'border border-gray-300'}`}>
-                      <div className="text-sm text-neutral-900 font-normal">
-                        Change password
-                      </div>
+                    <div
+                      className={`flex justify-start items-center pl-4 rounded-lg w-full h-12 ${isEditing ? 'border border-teal-500 bg-white cursor-pointer hover:bg-gray-50' : 'border border-gray-300'}`}
+                    >
+                      <div className="text-sm text-neutral-900 font-normal">Change password</div>
                     </div>
                   </div>
-                  <div className="text-sm text-gray-600 font-normal">
-                    Last changed 3 months ago
-                  </div>
+                  <div className="text-sm text-gray-600 font-normal">Last changed 3 months ago</div>
                 </div>
 
                 {/* Notification Preferences */}
@@ -380,7 +356,9 @@ const Profile = () => {
                         </div>
                       </div>
                       <div className="flex items-center h-6">
-                        {renderToggleSwitch(preferencesData.emailNotifications, () => handlePreferencesChange('emailNotifications'))}
+                        {renderToggleSwitch(preferencesData.emailNotifications, () =>
+                          handlePreferencesChange('emailNotifications')
+                        )}
                       </div>
                     </div>
 
@@ -395,22 +373,24 @@ const Profile = () => {
                         </div>
                       </div>
                       <div className="flex items-center h-6">
-                        {renderToggleSwitch(preferencesData.pushNotifications, () => handlePreferencesChange('pushNotifications'))}
+                        {renderToggleSwitch(preferencesData.pushNotifications, () =>
+                          handlePreferencesChange('pushNotifications')
+                        )}
                       </div>
                     </div>
 
                     {/* Task Updates */}
                     <div className="flex flex-row justify-between items-center w-full py-3">
                       <div className="flex flex-col justify-start items-start gap-0.5">
-                        <div className="text-sm text-neutral-900 font-medium">
-                          Task Updates
-                        </div>
+                        <div className="text-sm text-neutral-900 font-medium">Task Updates</div>
                         <div className="text-xs text-gray-600 font-normal">
                           Receive notifications for task updates
                         </div>
                       </div>
                       <div className="flex items-center h-6">
-                        {renderToggleSwitch(preferencesData.taskUpdates, () => handlePreferencesChange('taskUpdates'))}
+                        {renderToggleSwitch(preferencesData.taskUpdates, () =>
+                          handlePreferencesChange('taskUpdates')
+                        )}
                       </div>
                     </div>
                   </div>
@@ -418,9 +398,7 @@ const Profile = () => {
 
                 {/* Active Sessions */}
                 <div className="flex flex-col justify-start items-start gap-4 w-full">
-                  <div className="text-base text-neutral-900 font-medium">
-                    Active Sessions
-                  </div>
+                  <div className="text-base text-neutral-900 font-medium">Active Sessions</div>
                   <div className="flex flex-col justify-start items-start gap-3 w-full">
                     {/* Current Session */}
                     <div className="flex justify-center items-center rounded-lg w-full p-4 bg-gray-50">
@@ -434,9 +412,7 @@ const Profile = () => {
                           </div>
                         </div>
                         <div className="flex items-center px-3 py-1 rounded-lg bg-green-100">
-                          <div className="text-xs text-green-800 font-medium">
-                            Active
-                          </div>
+                          <div className="text-xs text-green-800 font-medium">Active</div>
                         </div>
                       </div>
                     </div>
@@ -445,17 +421,15 @@ const Profile = () => {
                     <div className="flex justify-center items-center rounded-lg w-full p-4 bg-gray-50">
                       <div className="flex flex-row justify-between items-center w-full">
                         <div className="flex flex-col justify-start items-start gap-0.5">
-                          <div className="text-sm text-neutral-900 font-medium">
-                            Mobile App
-                          </div>
+                          <div className="text-sm text-neutral-900 font-medium">Mobile App</div>
                           <div className="text-xs text-gray-600 font-normal">
                             iOS App • Last active 2 hours ago
                           </div>
                         </div>
-                        <div className={`flex items-center px-3 py-1 rounded-md shadow-sm bg-white ${isEditing ? 'hover:bg-red-50 cursor-pointer' : ''}`}>
-                          <div className="text-sm text-neutral-900 font-normal">
-                            Revoke
-                          </div>
+                        <div
+                          className={`flex items-center px-3 py-1 rounded-md shadow-sm bg-white ${isEditing ? 'hover:bg-red-50 cursor-pointer' : ''}`}
+                        >
+                          <div className="text-sm text-neutral-900 font-normal">Revoke</div>
                         </div>
                       </div>
                     </div>

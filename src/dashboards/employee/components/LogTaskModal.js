@@ -1,28 +1,28 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 
 const LogTaskModal = ({ isOpen, onClose, onSubmit }) => {
   const [formData, setFormData] = useState({
-    taskTitle: "",
-    status: "To Do",
-    priority: "",
-    description: "",
+    taskTitle: '',
+    status: 'To Do',
+    priority: '',
+    description: '',
     banner: null,
-    team: "",
-    assignee: "",
-    startDate: "",
-    dueDate: ""
+    team: '',
+    assignee: '',
+    startDate: '',
+    dueDate: '',
   });
 
-  const priorities = ["Low", "Medium", "High"];
-  const statuses = ["To Do", "In Progress", "Completed"];
+  const priorities = ['Low', 'Medium', 'High'];
+  const statuses = ['To Do', 'In Progress', 'Completed'];
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleBannerUpload = (e) => {
-    setFormData(prev => ({ ...prev, banner: e.target.files[0] }));
+    setFormData((prev) => ({ ...prev, banner: e.target.files[0] }));
   };
 
   const handleSubmit = (e) => {
@@ -37,17 +37,34 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       {/* Modal Container */}
       <div className="flex flex-col rounded-2xl w-[560px] max-h-[630px] bg-white p-6 overflow-y-auto">
-
         {/* HEADER */}
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-lg text-neutral-900 font-semibold">Create New Task</h2>
-          <button 
+          <button
             onClick={onClose}
             className="flex justify-center items-center w-7 h-7 hover:bg-gray-100 rounded-full"
           >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 4L4 12" stroke="#4B5563" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M4 4L12 12" stroke="#4B5563" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 4L4 12"
+                stroke="#4B5563"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M4 4L12 12"
+                stroke="#4B5563"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           </button>
         </div>
@@ -79,8 +96,10 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit }) => {
                 required
                 className="w-full p-3 rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
               >
-                {statuses.map(status => (
-                  <option key={status} value={status}>{status}</option>
+                {statuses.map((status) => (
+                  <option key={status} value={status}>
+                    {status}
+                  </option>
                 ))}
               </select>
             </div>
@@ -94,8 +113,10 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit }) => {
                 className="w-full p-3 rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
               >
                 <option value="">Select Priority</option>
-                {priorities.map(priority => (
-                  <option key={priority} value={priority}>{priority}</option>
+                {priorities.map((priority) => (
+                  <option key={priority} value={priority}>
+                    {priority}
+                  </option>
                 ))}
               </select>
             </div>
@@ -127,7 +148,13 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit }) => {
               <div className="flex flex-col items-center gap-2">
                 <img width="29" height="34" src="/images/upload.png" alt="Upload icon" />
                 <div className="font-inter text-xs text-gray-500/70">
-                  {formData.banner ? formData.banner.name : <>Upload or <span className="text-blue-600">browse</span></>}
+                  {formData.banner ? (
+                    formData.banner.name
+                  ) : (
+                    <>
+                      Upload or <span className="text-blue-600">browse</span>
+                    </>
+                  )}
                 </div>
               </div>
             </label>

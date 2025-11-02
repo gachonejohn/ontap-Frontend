@@ -1,8 +1,7 @@
-import { apiSlice } from "../../api/apiSlice";
+import { apiSlice } from '../../api/apiSlice';
 
 export const attendanceApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    
     getTodayAttendace: builder.query({
       query: ({ page, page_size, employee_no } = {}) => {
         const queryParams = {};
@@ -11,13 +10,13 @@ export const attendanceApi = apiSlice.injectEndpoints({
         if (employee_no) queryParams.employee_no = employee_no;
         return {
           url: `attendance/today/`,
-          method: "GET",
+          method: 'GET',
           params: queryParams,
         };
       },
     }),
     getAttendace: builder.query({
-      query: ({ page, page_size, search ,department, date, from_date, to_date, status} = {}) => {
+      query: ({ page, page_size, search, department, date, from_date, to_date, status } = {}) => {
         const queryParams = {};
         if (page) queryParams.page = page;
         if (page_size) queryParams.page_size = page_size;
@@ -29,13 +28,13 @@ export const attendanceApi = apiSlice.injectEndpoints({
         if (department) queryParams.department = department;
         return {
           url: `attendance/`,
-          method: "GET",
+          method: 'GET',
           params: queryParams,
         };
       },
     }),
     getAttendanceTrends: builder.query({
-      query: ({ page, page_size, search ,department, date, from_date, to_date, status} = {}) => {
+      query: ({ page, page_size, search, department, date, from_date, to_date, status } = {}) => {
         const queryParams = {};
         if (page) queryParams.page = page;
         if (page_size) queryParams.page_size = page_size;
@@ -47,7 +46,7 @@ export const attendanceApi = apiSlice.injectEndpoints({
         if (department) queryParams.department = department;
         return {
           url: `attendance/trends/`,
-          method: "GET",
+          method: 'GET',
           params: queryParams,
         };
       },
@@ -60,7 +59,7 @@ export const attendanceApi = apiSlice.injectEndpoints({
         if (employee_no) queryParams.employee_no = employee_no;
         return {
           url: `attendance/present-attendance/`,
-          method: "GET",
+          method: 'GET',
           params: queryParams,
         };
       },
@@ -68,26 +67,23 @@ export const attendanceApi = apiSlice.injectEndpoints({
     checkIn: builder.mutation({
       query: () => ({
         url: `attendance/attendance/clock-in/`,
-        method: "PATCH",
-     
+        method: 'PATCH',
       }),
     }),
     checkOut: builder.mutation({
       query: (id) => ({
         url: `attendance/attendance/${id}/clock-out/`,
-        method: "PATCH",
+        method: 'PATCH',
       }),
     }),
-
   }),
 });
 
 export const {
- useGetTodayAttendaceQuery,
-useCheckInMutation,
-useCheckOutMutation,
-useGetTodayClockInsQuery,
-useGetAttendaceQuery,
-useGetAttendanceTrendsQuery
-
+  useGetTodayAttendaceQuery,
+  useCheckInMutation,
+  useCheckOutMutation,
+  useGetTodayClockInsQuery,
+  useGetAttendaceQuery,
+  useGetAttendanceTrendsQuery,
 } = attendanceApi;

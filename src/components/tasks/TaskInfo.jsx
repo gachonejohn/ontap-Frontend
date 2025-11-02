@@ -9,7 +9,6 @@ import { getAssigneeName, getDepartmentName } from "./taskFunctions/taskHelpers"
 const TaskInfo = ({
   task,
   isEditingMode,
-  // ✅ SIMPLIFIED: Replace fieldPermissions with simple flags
   canEdit,
   canViewAll,
   isAssignee,
@@ -18,7 +17,6 @@ const TaskInfo = ({
   onFormDataUpdate,
   currentUser,
 }) => {
-  // Fetch employees and departments based on permissions
   const { data: employeesData } = useGetEmployeesQuery(
     {},
     { skip: !canViewAll }
@@ -31,7 +29,6 @@ const TaskInfo = ({
   );
   let departments = departmentsData || [];
 
-  // Fallback for limited permissions
   if (!canViewAll && currentUser) {
     employees = [
       {
@@ -59,33 +56,27 @@ const TaskInfo = ({
     URGENT: "Urgent",
   };
 
-  // Assign Task mutation
   const [assignTask, { isLoading: isAssigning }] = useAssignTaskMutation();
 
-  // Local state for reason modal
   const [isReasonPromptOpen, setIsReasonPromptOpen] = useState(false);
   const [pendingAssigneeId, setPendingAssigneeId] = useState(null);
   const [reasonText, setReasonText] = useState("");
 
-  // Local state for live countdown
   const [timeRemaining, setTimeRemaining] = useState("");
 
-  // ✅ SIMPLIFIED: Check permissions inline
   const canEditAssignee = isEditingMode && canEdit;
   const canEditDepartment = isEditingMode && canEdit && canViewAll;
   const canEditDueDate = isEditingMode && canEdit;
 
-  // Triggered when user selects a new assignee
   const handleAssigneeChange = (e) => {
     const newAssigneeId = e.target.value;
     onFormDataUpdate("assigneeValue", newAssigneeId);
 
-    if (!newAssigneeId) return; // Unassigned, skip modal
+    if (!newAssigneeId) return; 
     setPendingAssigneeId(newAssigneeId);
     setIsReasonPromptOpen(true);
   };
 
-  // Confirm and send assign_task request
   const confirmReassignment = async () => {
     if (!pendingAssigneeId) return;
     try {
@@ -105,7 +96,6 @@ const TaskInfo = ({
     }
   };
 
-  // Calculate live countdown
   useEffect(() => {
     if (!task?.due_date) return;
 
@@ -130,7 +120,7 @@ const TaskInfo = ({
       );
     };
 
-    updateCountdown(); // initial call
+    updateCountdown(); 
     const intervalId = setInterval(updateCountdown, 1000);
 
     return () => clearInterval(intervalId);
