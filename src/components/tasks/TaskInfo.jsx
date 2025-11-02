@@ -9,7 +9,11 @@ import { getAssigneeName, getDepartmentName } from "./taskFunctions/taskHelpers"
 const TaskInfo = ({
   task,
   isEditingMode,
-  fieldPermissions,
+  // ✅ SIMPLIFIED: Replace fieldPermissions with simple flags
+  canEdit,
+  canViewAll,
+  isAssignee,
+  isCreator,
   formData,
   onFormDataUpdate,
   currentUser,
@@ -17,18 +21,18 @@ const TaskInfo = ({
   // Fetch employees and departments based on permissions
   const { data: employeesData } = useGetEmployeesQuery(
     {},
-    { skip: !fieldPermissions.canViewAll }
+    { skip: !canViewAll }
   );
   let employees = employeesData?.results || [];
 
   const { data: departmentsData } = useGetDepartmentsQuery(
     {},
-    { skip: !fieldPermissions.canViewAll, refetchOnMountOrArgChange: true }
+    { skip: !canViewAll, refetchOnMountOrArgChange: true }
   );
   let departments = departmentsData || [];
 
   // Fallback for limited permissions
-  if (!fieldPermissions.canViewAll && currentUser) {
+  if (!canViewAll && currentUser) {
     employees = [
       {
         id: currentUser.employee_id || currentUser.id,
@@ -65,6 +69,11 @@ const TaskInfo = ({
 
   // Local state for live countdown
   const [timeRemaining, setTimeRemaining] = useState("");
+
+  // ✅ SIMPLIFIED: Check permissions inline
+  const canEditAssignee = isEditingMode && canEdit;
+  const canEditDepartment = isEditingMode && canEdit && canViewAll;
+  const canEditDueDate = isEditingMode && canEdit;
 
   // Triggered when user selects a new assignee
   const handleAssigneeChange = (e) => {
@@ -143,8 +152,8 @@ const TaskInfo = ({
           {/* Assignee */}
           <div className="flex flex-row justify-between items-center w-full">
             <div className="text-xs text-gray-600 font-medium">Assignee</div>
-            {isEditingMode && fieldPermissions.canEditAssignee ? (
-              fieldPermissions.canViewAll ? (
+            {canEditAssignee ? (
+              canViewAll ? (
                 <select
                   value={formData.assigneeValue}
                   onChange={handleAssigneeChange}
@@ -173,7 +182,7 @@ const TaskInfo = ({
           {/* Department */}
           <div className="flex flex-row justify-between items-center w-full">
             <div className="text-xs text-gray-600 font-medium">Department</div>
-            {isEditingMode && fieldPermissions.canEditDepartment ? (
+            {canEditDepartment ? (
               <Select
                 options={departments.map((d) => ({
                   value: d.id,
@@ -244,7 +253,7 @@ const TaskInfo = ({
           {/* Due Date with live countdown */}
           <div className="flex flex-row justify-between items-center w-full">
             <div className="text-xs text-gray-600 font-medium">Due Date</div>
-            {isEditingMode && fieldPermissions.canEditDueDate ? (
+            {canEditDueDate ? (
               <input
                 type="date"
                 value={formData.dueDateValue}

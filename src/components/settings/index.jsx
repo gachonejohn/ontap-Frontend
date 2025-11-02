@@ -25,6 +25,7 @@ import SettingsLayout from "./SettingsLayout";
 import AttendancePolicies from "./Policies/attendance";
 import BreakCategories from "./Policies/breaks/Categories";
 import BreakPolicies from "./Policies/breaks/rules";
+import LeavePolicies from "./Leave";
 import BreakTypeRuleAssignments from "./Policies/breaks/rulesAssignments";
 
 const Settings = () => {
@@ -122,7 +123,7 @@ const Settings = () => {
           label: "Leave Policies",
           description: "Configure leave rules and entitlements.",
           icon: <FiUsers className="text-sm" />,
-          content: <div>Leave policies content goes here</div>,
+          content: <LeavePolicies />,
         },
       ],
     },

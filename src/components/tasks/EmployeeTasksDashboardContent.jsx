@@ -1,17 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import {
   useGetMyTasksQuery,
   useCreateTaskMutation,
   useGetTaskDetailQuery,
 } from "../../store/services/tasks/tasksService";
+import { PAGE_SIZE } from "@constants/constants";
 import LogTaskModal from "./LogTaskModal";
 import TaskModal from "./TaskModal";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 
-// Component for individual task card
 const TaskCard = ({ task, onClick }) => {
-  // Fetch full details including description
   const { data: taskDetail } = useGetTaskDetailQuery(task.id);
   const detail = taskDetail || task;
 
@@ -31,7 +30,6 @@ const TaskCard = ({ task, onClick }) => {
     URGENT: "Urgent",
   };
 
-  // Priority flag images
   const priorityFlags = {
     LOW: "/images/lowflag.png",
     MEDIUM: "/images/mediumflag.png",
@@ -48,7 +46,6 @@ const TaskCard = ({ task, onClick }) => {
     ON_HOLD: "bg-gray-100 text-gray-800",
   };
 
-  // Check if task is overdue and not completed
   const showOverdueBadge = isOverdue && status !== "COMPLETED";
 
   return (
@@ -146,7 +143,6 @@ const TaskCard = ({ task, onClick }) => {
   );
 };
 
-// Blue rectangle component for column headers
 const ColumnHeader = ({ icon, title, count, bgColor = "bg-blue-500" }) => (
   <div className={`flex flex-col justify-center items-center gap-2.5 pr-2 pl-2 rounded-lg h-12 shadow-sm ${bgColor}`}>
     <div className="flex flex-row justify-between items-center gap-9 w-full h-5">
@@ -180,12 +176,34 @@ const EmployeeTasksDashboardContent = () => {
   const [selectedTask, setSelectedTask] = useState(null);
   const [activeTab, setActiveTab] = useState("taskManagement");
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [daysFilter, setDaysFilter] = useState("All");
   const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
   const [isDaysDropdownOpen, setIsDaysDropdownOpen] = useState(false);
 
-  // Define statusMap for filter options
+  const [currentPage, setCurrentPage] = useState(1);
+  const [allTasks, setAllTasks] = useState([]);
+  const [hasMore, setHasMore] = useState(true);
+  const observerTarget = useRef(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+      setCurrentPage(1);
+      setAllTasks([]);
+      setHasMore(true);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+    setAllTasks([]);
+    setHasMore(true);
+  }, [statusFilter, debouncedSearchTerm]);
+
   const statusMap = {
     "All": "All Task",
     "TO_DO": "To Do",
@@ -197,7 +215,6 @@ const EmployeeTasksDashboardContent = () => {
     "OVERDUE": "Overdue"
   };
 
-  // Define daysMap for filter options (based on created_at)
   const daysMap = {
     "All": "All Days",
     "1": "1 Day Ago",
@@ -214,10 +231,8 @@ const EmployeeTasksDashboardContent = () => {
   const statusOptions = Object.entries(statusMap).map(([key, value]) => ({ key, value }));
   const daysOptions = Object.entries(daysMap).map(([key, value]) => ({ key, value }));
 
-  // Get logged-in user
   const currentUser = useSelector((state) => state.auth.user);
 
-  // Get task permissions
   const taskPermissions = useSelector((state) => {
     const permissions = state.auth.user?.role?.permissions;
     return permissions?.find(p => p.feature_code === "task" || p.feature_code === "task_management");
@@ -225,68 +240,126 @@ const EmployeeTasksDashboardContent = () => {
 
   const canCreateTask = taskPermissions?.can_create;
 
-  // Employee only sees their own tasks with status filter and increased page size
-  const { data: tasksData, isLoading, error, refetch } = useGetMyTasksQuery({
-    search: searchTerm || undefined,
-    status: statusFilter !== "All" && statusFilter !== "OVERDUE" ? statusFilter : undefined,
-    page_size: 100,
-  }, {
-    refetchOnMountOrArgChange: true,
-  });
+  const queryParams = useMemo(
+    () => ({
+      page: currentPage,
+      page_size: PAGE_SIZE,
+      search: debouncedSearchTerm || undefined,
+      status: statusFilter !== "All" && statusFilter !== "OVERDUE" ? statusFilter : undefined,
+    }),
+    [currentPage, debouncedSearchTerm, statusFilter]
+  );
+
+  const {
+    data: tasksData,
+    refetch,
+    isFetching,
+  } = useGetMyTasksQuery(queryParams);
 
   const [createTask] = useCreateTaskMutation();
 
-  const tasks = tasksData?.results || [];
-  // Use the total count from API response instead of just the current page results
-  const totalTasksCount = tasksData?.count || tasks.length;
+  useEffect(() => {
+    if (tasksData?.results) {
+      if (currentPage === 1) {
+        setAllTasks(tasksData.results);
+      } else {
+        setAllTasks(prev => {
+          const newTasks = tasksData.results.filter(
+            newTask => !prev.some(existingTask => existingTask.id === newTask.id)
+          );
+          return [...prev, ...newTasks];
+        });
+      }
+      
+      setHasMore(tasksData.next !== null);
+    }
+  }, [tasksData, currentPage]);
 
-  // Filter tasks based on overdue filter
-  let filteredTasks = statusFilter === "OVERDUE" 
-    ? tasks.filter(task => task.is_overdue && task.status !== "COMPLETED")
-    : tasks;
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting && hasMore && !isFetching) {
+          setCurrentPage(prev => prev + 1);
+        }
+      },
+      { threshold: 0.1 }
+    );
 
-  // Apply days filter based on created_at
-  if (daysFilter !== "All") {
-    const today = new Date();
-    const filterDays = parseInt(daysFilter);
-    const pastDate = new Date(today);
-    pastDate.setDate(today.getDate() - filterDays);
+    const currentTarget = observerTarget.current;
+    if (currentTarget) {
+      observer.observe(currentTarget);
+    }
 
-    filteredTasks = filteredTasks.filter(task => {
-      if (!task.created_at) return false;
-      const taskCreatedDate = new Date(task.created_at);
-      return taskCreatedDate >= pastDate && taskCreatedDate <= today;
-    });
-  }
+    return () => {
+      if (currentTarget) {
+        observer.unobserve(currentTarget);
+      }
+    };
+  }, [hasMore, isFetching]);
 
-  // Group tasks by status - show ALL filtered tasks for employee
-  const groupedTasks = {
+  const totalTasksCount = tasksData?.count || allTasks.length;
+
+  const filteredTasks = useMemo(() => {
+    let filtered = allTasks;
+
+    if (statusFilter === "OVERDUE") {
+      filtered = filtered.filter(task => task.is_overdue && task.status !== "COMPLETED");
+    }
+
+    if (daysFilter !== "All") {
+      const today = new Date();
+      const filterDays = parseInt(daysFilter);
+      const pastDate = new Date(today);
+      pastDate.setDate(today.getDate() - filterDays);
+
+      filtered = filtered.filter(task => {
+        if (!task.created_at) return false;
+        const taskCreatedDate = new Date(task.created_at);
+        return taskCreatedDate >= pastDate && taskCreatedDate <= today;
+      });
+    }
+
+    return filtered;
+  }, [allTasks, statusFilter, daysFilter]);
+
+  const groupedTasks = useMemo(() => ({
     todo: filteredTasks.filter((task) => task.status === "TO_DO"),
     inProgress: filteredTasks.filter((task) => task.status === "IN_PROGRESS"),
     completed: filteredTasks.filter((task) => task.status === "COMPLETED"),
-  };
+  }), [filteredTasks]);
 
-  // Calculate counts for analytics using the total count
   const completedCount = groupedTasks.completed.length;
   const inProgressCount = groupedTasks.inProgress.length;
-  const overdueCount = tasks.filter(t => t.is_overdue && t.status !== "COMPLETED").length;
+  const overdueCount = allTasks.filter(t => t.is_overdue && t.status !== "COMPLETED").length;
 
-  // Handle new task creation
   const handleCreateTask = async (formData) => {
     try {
-      const formatDate = (date) =>
-        date ? new Date(date).toISOString().split("T")[0] : null;
+      console.log("=== HANDLE CREATE TASK ===");
+      console.log("Form data received:", formData);
 
-      // Create FormData object for file upload
+      const formatDate = (date) => {
+        if (!date) return null;
+        const dateObj = date instanceof Date ? date : new Date(date);
+        return dateObj.toISOString().split("T")[0];
+      };
+
       const formDataObj = new FormData();
       
-      // Append all task data
-      formDataObj.append("title", formData.title || "");
-      formDataObj.append("description", formData.description || "");
+      if (!formData.title || formData.title.trim().length === 0) {
+        toast.error("Task title is required");
+        return;
+      }
+      
+      if (!formData.description || formData.description.trim().length === 0) {
+        toast.error("Task description is required");
+        return;
+      }
+
+      formDataObj.append("title", formData.title.trim());
+      formDataObj.append("description", formData.description.trim());
       formDataObj.append("status", formData.status || "TO_DO");
       formDataObj.append("priority", formData.priority || "MEDIUM");
       
-      // 🔥 FIX: Check if currentUser has a user property (employee object) or is the user object directly
       const userId = currentUser?.user?.id || currentUser?.id;
       
       if (!userId) {
@@ -295,10 +368,9 @@ const EmployeeTasksDashboardContent = () => {
         return;
       }
       
-      // Use the extracted user ID
       formDataObj.append("assignee", userId);
       
-      if (formData.department) formDataObj.append("department", formData.department);
+      if (formData.department) formDataObj.append("department", formData.department.toString());
       
       const startDate = formatDate(formData.start_date || formData.startDate);
       const dueDate = formatDate(formData.due_date || formData.dueDate);
@@ -306,44 +378,55 @@ const EmployeeTasksDashboardContent = () => {
       if (startDate) formDataObj.append("start_date", startDate);
       if (dueDate) formDataObj.append("due_date", dueDate);
       
-      formDataObj.append("progress_percentage", formData.progress_percentage || 0);
+      formDataObj.append("progress_percentage", 
+        parseInt(formData.progress_percentage) || 0
+      );
       
       if (formData.estimated_hours || formData.estimatedHours) {
         formDataObj.append("estimated_hours", 
-          parseFloat(formData.estimated_hours || formData.estimatedHours)
+          parseFloat(formData.estimated_hours || formData.estimatedHours).toString()
         );
       }
       
-      formDataObj.append("is_urgent", Boolean(formData.is_urgent || formData.isUrgent));
-      formDataObj.append("requires_approval", Boolean(
-        formData.requires_approval || formData.requiresApproval
-      ));
+      formDataObj.append("is_urgent", formData.is_urgent ? "true" : "false");
+      formDataObj.append("requires_approval", formData.requires_approval ? "true" : "false");
 
-      // Append files
+      if (formData.parent_task) {
+        formDataObj.append("parent_task", formData.parent_task.toString());
+      }
+
       if (formData.files && formData.files.length > 0) {
         formData.files.forEach((file) => {
           formDataObj.append("files", file);
         });
       }
 
-      // DEBUG: Log what we're sending
       console.log("Creating task with user ID:", userId);
       console.log("Full currentUser object:", currentUser);
+      console.log("Sending task creation request...");
 
-      // Use the FormData object for the API call
-      await createTask(formDataObj).unwrap();
+      const result = await createTask(formDataObj).unwrap();
+      console.log("Task created successfully:", result);
+
       toast.success("Task created successfully!");
       setIsLogTaskModalOpen(false);
-      refetch();
-    } catch (err) {
-      console.error("Task creation failed:", err);
-      console.error("Error details:", err?.data);
       
-      // Show specific error message if available
-      if (err?.data?.assignee) {
-        toast.error(`Assignee error: ${err.data.assignee[0]}`);
-      } else if (err?.data?.detail) {
-        toast.error(err.data.detail);
+      setCurrentPage(1);
+      setAllTasks([]);
+      setHasMore(true);
+      refetch();
+    } catch (error) {
+      console.error("Failed to create task:", error);
+      console.error("Error details:", error?.data);
+      
+      if (error?.data?.title) {
+        toast.error(`Title error: ${error.data.title[0]}`);
+      } else if (error?.data?.description) {
+        toast.error(`Description error: ${error.data.description[0]}`);
+      } else if (error?.data?.assignee) {
+        toast.error(`Assignee error: ${error.data.assignee[0]}`);
+      } else if (error?.data?.detail) {
+        toast.error(error.data.detail);
       } else {
         toast.error("Failed to create task");
       }
@@ -364,24 +447,6 @@ const EmployeeTasksDashboardContent = () => {
     setDaysFilter(days);
     setIsDaysDropdownOpen(false);
   };
-
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center p-8">
-        <div className="text-gray-500">Loading your tasks...</div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex justify-center items-center p-8">
-        <div className="text-red-500">
-          Error loading tasks: {error?.data?.detail || "Unknown error"}
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -544,7 +609,6 @@ const EmployeeTasksDashboardContent = () => {
       </div>
 
       {activeTab === 'taskManagement' ? (
-        /* Task Columns - Show ALL filtered tasks with scrollable containers */
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
           {/* To Do Column */}
           <div className="flex flex-col gap-4">
@@ -558,9 +622,14 @@ const EmployeeTasksDashboardContent = () => {
               {groupedTasks.todo.map((task) => (
                 <TaskCard key={task.id} task={task} onClick={handleCardClick} />
               ))}
-              {groupedTasks.todo.length === 0 && (
+              {groupedTasks.todo.length === 0 && !isFetching && (
                 <div className="text-center text-gray-500 text-sm py-4">
                   No tasks to do
+                </div>
+              )}
+              {isFetching && groupedTasks.todo.length === 0 && (
+                <div className="text-center text-gray-500 text-sm py-4">
+                  Loading tasks...
                 </div>
               )}
             </div>
@@ -578,9 +647,14 @@ const EmployeeTasksDashboardContent = () => {
               {groupedTasks.inProgress.map((task) => (
                 <TaskCard key={task.id} task={task} onClick={handleCardClick} />
               ))}
-              {groupedTasks.inProgress.length === 0 && (
+              {groupedTasks.inProgress.length === 0 && !isFetching && (
                 <div className="text-center text-gray-500 text-sm py-4">
                   No tasks in progress
+                </div>
+              )}
+              {isFetching && groupedTasks.inProgress.length === 0 && (
+                <div className="text-center text-gray-500 text-sm py-4">
+                  Loading tasks...
                 </div>
               )}
             </div>
@@ -598,12 +672,27 @@ const EmployeeTasksDashboardContent = () => {
               {groupedTasks.completed.map((task) => (
                 <TaskCard key={task.id} task={task} onClick={handleCardClick} />
               ))}
-              {groupedTasks.completed.length === 0 && (
+              {groupedTasks.completed.length === 0 && !isFetching && (
                 <div className="text-center text-gray-500 text-sm py-4">
                   No completed tasks
                 </div>
               )}
+              {isFetching && groupedTasks.completed.length === 0 && (
+                <div className="text-center text-gray-500 text-sm py-4">
+                  Loading tasks...
+                </div>
+              )}
             </div>
+          </div>
+
+          {/* Infinite Scroll Observer Target */}
+          <div 
+            ref={observerTarget} 
+            className="md:col-span-2 lg:col-span-3 h-10 flex items-center justify-center"
+          >
+            {isFetching && hasMore && (
+              <div className="text-sm text-gray-500">Loading more tasks...</div>
+            )}
           </div>
         </div>
       ) : (
@@ -710,7 +799,7 @@ const EmployeeTasksDashboardContent = () => {
                 <div className="flex flex-col justify-start items-start gap-2 w-full">
                   <div className="text-base text-green-900 font-medium">Average Progress</div>
                   <div className="text-xs text-green-700 font-medium">
-                    Your average task progress is {tasks.length > 0 ? Math.round(tasks.reduce((sum, task) => sum + (task.progress_percentage || 0), 0) / tasks.length) : 0}%.
+                    Your average task progress is {allTasks.length > 0 ? Math.round(allTasks.reduce((sum, task) => sum + (task.progress_percentage || 0), 0) / allTasks.length) : 0}%.
                   </div>
                 </div>
               </div>
@@ -718,9 +807,9 @@ const EmployeeTasksDashboardContent = () => {
                 <div className="flex flex-col justify-start items-start gap-2 w-full">
                   <div className="text-base text-purple-900 font-medium">Priority Distribution</div>
                   <div className="text-xs text-purple-700 font-medium">
-                    High: {tasks.filter(t => t.priority === 'HIGH' || t.priority === 'URGENT').length} tasks, 
-                    Medium: {tasks.filter(t => t.priority === 'MEDIUM').length} tasks, 
-                    Low: {tasks.filter(t => t.priority === 'LOW').length} tasks.
+                    High: {allTasks.filter(t => t.priority === 'HIGH' || t.priority === 'URGENT').length} tasks, 
+                    Medium: {allTasks.filter(t => t.priority === 'MEDIUM').length} tasks, 
+                    Low: {allTasks.filter(t => t.priority === 'LOW').length} tasks.
                   </div>
                 </div>
               </div>
@@ -740,8 +829,14 @@ const EmployeeTasksDashboardContent = () => {
         isOpen={isTaskModalOpen}
         onClose={() => setIsTaskModalOpen(false)}
         task={selectedTask}
-        refetch={refetch}
+        refetch={() => {
+          setCurrentPage(1);
+          setAllTasks([]);
+          setHasMore(true);
+          refetch();
+        }}
         taskPermissions={taskPermissions}
+        onSubmit={handleCreateTask}  
       />
     </div>
   );

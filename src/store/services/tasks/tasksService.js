@@ -1,8 +1,8 @@
 import { apiSlice } from "../../api/apiSlice";
 
-// Enhanced normalizeTask function with MULTI-ASSIGNEE support
+
 const normalizeTask = (task) => {
-  // DEBUG: Log the raw task to see what we're receiving
+  
   console.log('🔍 normalizeTask received:', {
     id: task.id,
     title: task.title,
@@ -13,17 +13,14 @@ const normalizeTask = (task) => {
     assignee_detail: task.assignee_detail
   });
   
-  // Handle multiple assignees
   let assigneeNames = "Unassigned";
   
-  // PRIORITY 1: Check assignees_detail (backend sends detailed user info here)
   if (task.assignees_detail && Array.isArray(task.assignees_detail) && task.assignees_detail.length > 0) {
-    console.log('📋 Found assignees_detail:', task.assignees_detail);
+    console.log('Found assignees_detail:', task.assignees_detail);
     
     assigneeNames = task.assignees_detail
       .map(assignee => {
         if (typeof assignee === 'object' && assignee !== null) {
-          // Try different possible field structures
           if (assignee.first_name && assignee.last_name) {
             return `${assignee.first_name} ${assignee.last_name}`;
           } else if (assignee.user?.first_name && assignee.user?.last_name) {
@@ -41,16 +38,13 @@ const normalizeTask = (task) => {
     
     console.log('✅ Extracted names from assignees_detail:', assigneeNames);
     
-    // Fallback if no names were extracted
     if (!assigneeNames) {
       assigneeNames = "Unassigned";
     }
   } 
-  // PRIORITY 2: Check assignees array (in case it has objects instead of just IDs)
   else if (task.assignees && Array.isArray(task.assignees) && task.assignees.length > 0) {
     console.log('📋 Found assignees array:', task.assignees);
     
-    // Check if assignees array contains objects (not just IDs)
     const firstItem = task.assignees[0];
     if (typeof firstItem === 'object' && firstItem !== null) {
       assigneeNames = task.assignees
@@ -75,9 +69,7 @@ const normalizeTask = (task) => {
     } else {
       console.log('⚠️ Assignees array contains IDs, not objects');
     }
-    // If assignees is just an array of IDs, we can't extract names
   } 
-  // PRIORITY 3: Single assignee fallbacks
   else if (task.assignee_name) {
     assigneeNames = task.assignee_name;
     console.log('✅ Using assignee_name:', assigneeNames);
@@ -96,42 +88,32 @@ const normalizeTask = (task) => {
 
   return {
     ...task,
-    // Normalize date fields
     dueDate: task.due_date || task.dueDate,
     startDate: task.start_date || task.startDate,
     
-    // Normalize progress and numeric fields
     progressPercentage: task.progress_percentage || task.progressPercentage || 0,
     estimatedHours: task.estimated_hours || task.estimatedHours,
     
-    // Normalize boolean fields
     isUrgent: task.is_urgent || task.isUrgent || false,
     requiresApproval: task.requires_approval || task.requiresApproval || false,
     isOverdue: task.is_overdue || task.isOverdue || false,
     
-    // Normalize description with fallback
     description: task.description || "No description available",
     
-    // FIXED: Handle both single and multiple assignees
     assignee_name: assigneeNames,
     assigneeName: assigneeNames,
     
-    // Normalize created_by
     createdByName: task.created_by_name || task.created_by?.full_name || task.createdByName || "System",
     
-    // Normalize department field
     departmentName: task.department_name || task.department?.name || task.departmentName || "Not specified",
     
-    // Ensure consistent status and priority
     status: task.status || "TO_DO",
     priority: task.priority || "MEDIUM",
     
-    // Normalize counts with fallbacks
     attachmentsCount: task.attachments_count || task.attachmentsCount || 0,
     commentsCount: task.comments_count || task.commentsCount || 0,
     subtasksCount: task.subtasks_count || task.subtasksCount || 0,
     
-    // Preserve original IDs and arrays
     assignees: task.assignees || [],
     assigneeId: task.assignee || task.assigneeId,
     departmentId: task.department || task.departmentId,
@@ -148,10 +130,10 @@ export const tasksApi = apiSlice.injectEndpoints({
      */
 
     getTasks: builder.query({
-      query: ({ page, page_size, search, status, priority, ordering, assignee, department } = {}) => {
+      query: ({ page = 1, page_size = 10, search, status, priority, ordering, assignee, department } = {}) => {
         const params = {};
-        if (page) params.page = page;
-        if (page_size) params.page_size = page_size;
+        params.page = page;
+        params.page_size = page_size;
         if (search) params.search = search;
         if (status) params.status = status;
         if (priority) params.priority = priority;
@@ -169,10 +151,10 @@ export const tasksApi = apiSlice.injectEndpoints({
     }),
 
     getMyTasks: builder.query({
-      query: ({ page, page_size, search, status, priority, ordering } = {}) => {
+      query: ({ page = 1, page_size = 10, search, status, priority, ordering } = {}) => {
         const params = {};
-        if (page) params.page = page;
-        if (page_size) params.page_size = page_size;
+        params.page = page;
+        params.page_size = page_size;
         if (search) params.search = search;
         if (status) params.status = status;
         if (priority) params.priority = priority;
@@ -279,7 +261,7 @@ export const tasksApi = apiSlice.injectEndpoints({
 
     /**
      * ========================
-     * TASK MUTATIONS (WRITE) - FIXED FOR REQUIRED FIELDS
+     * TASK MUTATIONS (WRITE) 
      * ========================
      */
 
@@ -288,11 +270,9 @@ export const tasksApi = apiSlice.injectEndpoints({
     console.log('=== CREATE TASK SERVICE ===');
     console.log('Received formData:', formData);
     
-    // Remove validation - trust the component validation
     const formDataObj = formData instanceof FormData ? formData : new FormData();
     
     if (!(formData instanceof FormData)) {
-      // Convert regular object to FormData without validation
       formDataObj.append("title", formData.title?.trim() || "");
       formDataObj.append("description", formData.description?.trim() || "");
       formDataObj.append("status", formData.status || "TO_DO");
@@ -317,13 +297,18 @@ export const tasksApi = apiSlice.injectEndpoints({
       formDataObj.append("is_urgent", formData.is_urgent ? "true" : "false");
       formDataObj.append("requires_approval", formData.requires_approval ? "true" : "false");
       
+      if (formData.parent_task) {
+        formDataObj.append("parent_task", formData.parent_task.toString());
+        console.log('✅ Added parent_task to FormData:', formData.parent_task);
+      }
+      
       if (formData.files && formData.files.length > 0) {
         formData.files.forEach(file => {
           formDataObj.append("files", file);
         });
       }
     }
-
+    
     console.log('FormData contents:');
     for (let pair of formDataObj.entries()) {
       console.log(pair[0] + ': ', pair[1]);
@@ -335,7 +320,6 @@ export const tasksApi = apiSlice.injectEndpoints({
       body: formDataObj,
     };
   },
-  // IMPORTANT: Transform the response to normalize the created task
   transformResponse: (response) => normalizeTask(response),
   invalidatesTags: ["Tasks", "MyTasks", "TaskAnalytics"],
 }),
@@ -358,7 +342,6 @@ export const tasksApi = apiSlice.injectEndpoints({
       requires_approval: data.requires_approval || data.requiresApproval,
     };
     
-    // Remove undefined values
     Object.keys(updateData).forEach(key => {
       if (updateData[key] === undefined) {
         delete updateData[key];
@@ -518,10 +501,12 @@ export const tasksApi = apiSlice.injectEndpoints({
     }),
 
     getTasksByDepartment: builder.query({
-      query: ({ department_id, page, page_size, status } = {}) => {
-        const params = { department: department_id };
-        if (page) params.page = page;
-        if (page_size) params.page_size = page_size;
+      query: ({ department_id, page = 1, page_size = 10, status } = {}) => {
+        const params = { 
+          department: department_id,
+          page,
+          page_size
+        };
         if (status) params.status = status;
         
         return { 
@@ -547,10 +532,13 @@ export const tasksApi = apiSlice.injectEndpoints({
         overdue_only, 
         due_before, 
         due_after,
-        page,
-        page_size 
+        page = 1,
+        page_size = 10
       } = {}) => {
-        const params = {};
+        const params = {
+          page,
+          page_size
+        };
         if (search) params.search = search;
         if (status) params.status = status;
         if (priority) params.priority = priority;
@@ -559,8 +547,6 @@ export const tasksApi = apiSlice.injectEndpoints({
         if (overdue_only) params.overdue_only = overdue_only;
         if (due_before) params.due_before = due_before;
         if (due_after) params.due_after = due_after;
-        if (page) params.page = page;
-        if (page_size) params.page_size = page_size;
         
         return { 
           url: "tasks/api/tasks/", 

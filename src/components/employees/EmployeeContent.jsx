@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import DropdownAuthenticationModal from "../../dashboards/employee/components/DropdownAuthenticationModal";
@@ -15,6 +15,7 @@ import {
   useCheckInMutation,
   useCheckOutMutation,
 } from "../../store/services/attendance/attendanceService";
+import { useGetProfileInfoQuery } from "../../store/services/employees/employeesService";
 import { formatClockTime } from "../../utils/dates";
 import ActionModal from "../common/Modals/ActionModal";
 import ContentSpinner from "@components/common/spinners/dataLoadingSpinner";
@@ -157,7 +158,6 @@ const TaskCard = ({ task, onClick }) => {
   );
 };
 
-// Blue rectangle component for column headers
 const ColumnHeader = ({ icon, title, count, bgColor = "bg-blue-500" }) => (
   <div className={`flex flex-col justify-center items-center gap-2.5 pr-2 pl-2 rounded-lg h-12 shadow-sm ${bgColor}`}>
     <div className="flex flex-row justify-between items-center gap-9 w-full h-5">
@@ -202,6 +202,9 @@ const EmployeeDashboardContent = () => {
   // Get logged-in user
   const currentUser = useSelector((state) => state.auth.user);
 
+  // Fetch profile info for organization and status
+  const { data: profileData, isLoading: profileLoading } = useGetProfileInfoQuery();
+
   // Get task permissions
   const taskPermissions = useSelector((state) => {
     const permissions = state.auth.user?.role?.permissions;
@@ -212,17 +215,15 @@ const EmployeeDashboardContent = () => {
 
   const canCreateTask = taskPermissions?.can_create;
 
-  // Fetch tasks from backend with increased page size to get all tasks for counting
   const { 
     data: tasksData, 
     isLoading: tasksLoading, 
     error: tasksError, 
     refetch: refetchTasks 
   } = useGetMyTasksQuery({
-    page_size: 100, // Get all tasks to count properly
+    page_size: 100, 
   });
   
-  // Fetch attendance data from backend
   const {
     data: attendanceData,
     isLoading: attendanceLoading,
@@ -238,7 +239,6 @@ const EmployeeDashboardContent = () => {
   const clockIn = attendanceData?.clock_in;
   const clockOut = attendanceData?.clock_out;
 
-  // Group tasks by status - limit to 2 latest for display, but count all
   const groupedTasks = {
     todo: tasks.filter((task) => task.status === "TO_DO").slice(0, 2), // Limit to 2 latest for display
     inProgress: tasks.filter((task) => task.status === "IN_PROGRESS").slice(0, 2), // Limit to 2 latest for display
@@ -251,6 +251,16 @@ const EmployeeDashboardContent = () => {
     inProgress: tasks.filter((task) => task.status === "IN_PROGRESS").length,
     completed: tasks.filter((task) => task.status === "COMPLETED").length,
   };
+
+  // Extract organization and status from profile data
+  const organizationName = profileData?.organization?.name || "OnTap Technologies";
+  const employeeStatus = profileData?.employee_profile?.status || "ACTIVE";
+  const employeeRole = profileData?.employee_profile?.user?.role?.name || 
+                      profileData?.roles?.[0]?.name || 
+                      (currentUser?.role ? 
+                        (typeof currentUser.role === 'string' ? currentUser.role : 
+                        currentUser.role.name || currentUser.role.title) 
+                        : "Employee");
 
   const toggleAmountVisibility = () => {
     setIsAmountVisible((prev) => !prev);
@@ -289,7 +299,6 @@ const EmployeeDashboardContent = () => {
       const formatDate = (date) =>
         date ? new Date(date).toISOString().split("T")[0] : null;
 
-      // 🔥 FIX: Extract user ID correctly - check if currentUser has nested user object
       const userId = currentUser?.user?.id || currentUser?.id;
       
       if (!userId) {
@@ -298,16 +307,13 @@ const EmployeeDashboardContent = () => {
         return;
       }
 
-      // Create FormData object for file upload
       const formDataObj = new FormData();
       
-      // Append all task data
       formDataObj.append("title", formData.title || "");
       formDataObj.append("description", formData.description || "");
       formDataObj.append("status", formData.status || "TO_DO");
       formDataObj.append("priority", formData.priority || "MEDIUM");
       
-      // Use the extracted user ID
       formDataObj.append("assignee", userId);
       
       if (formData.department) {
@@ -333,19 +339,16 @@ const EmployeeDashboardContent = () => {
         formData.requires_approval || formData.requiresApproval
       ));
 
-      // Append files if any
       if (formData.files && formData.files.length > 0) {
         formData.files.forEach((file) => {
           formDataObj.append("files", file);
         });
       }
 
-      // DEBUG: Log what we're sending
       console.log("Creating task with user ID:", userId);
       console.log("Full currentUser object:", currentUser);
       console.log("Form data received:", formData);
 
-      // Use the FormData object for the API call
       await createTask(formDataObj).unwrap();
       toast.success("Task created successfully!");
       setIsLogTaskModalOpen(false);
@@ -354,7 +357,6 @@ const EmployeeDashboardContent = () => {
       console.error("Task creation failed:", err);
       console.error("Error details:", err?.data);
       
-      // Show specific error message if available
       if (err?.data?.assignee) {
         toast.error(`Assignee error: ${err.data.assignee[0]}`);
       } else if (err?.data?.detail) {
@@ -425,7 +427,7 @@ const EmployeeDashboardContent = () => {
     }
   };
 
-  if (tasksLoading || attendanceLoading) {
+  if (tasksLoading || attendanceLoading || profileLoading) {
     return (
      <ContentSpinner />
     );
@@ -433,44 +435,183 @@ const EmployeeDashboardContent = () => {
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Status Cards */}
+      {/* Action Buttons - Now at the top right */}
+      <div className="flex justify-end items-center gap-3 h-12">
+        {/* Clock In/Out Button */}
+        {!clockIn ? (
+          <div
+            onClick={openClockInModal}
+            className="flex justify-center items-center rounded-md w-44 h-12 bg-teal-500 hover:bg-teal-600 transition-colors cursor-pointer"
+          >
+            <div className="flex flex-row justify-start items-start gap-2 w-[83px]">
+              <div className="flex justify-start items-center pl-0.5 h-5">
+                <img
+                  width="16px"
+                  height="16.4px"
+                  src="/images/clockin.png"
+                  alt="Clock in icon"
+                />
+              </div>
+              <div className="font-inter text-sm min-w-[55px] whitespace-nowrap text-white text-opacity-100 leading-snug tracking-normal font-medium">
+                Clock In
+              </div>
+            </div>
+          </div>
+        ) : clockIn && !attendanceData?.clock_out ? (
+          <div
+            onClick={() => openClockOutModal(attendanceData.id)}
+            className="flex justify-center items-center rounded-md w-44 h-12 bg-red-500 hover:bg-red-600 transition-colors cursor-pointer"
+          >
+            <div className="flex flex-row justify-start items-start gap-2">
+              <div className="flex justify-start items-center pl-0.5 h-5">
+                <img
+                  width="16px"
+                  height="16.4px"
+                  src="/images/clockin.png"
+                  alt="Clock out icon"
+                />
+              </div>
+              <div className="font-inter text-sm min-w-[60px] whitespace-nowrap text-white text-opacity-100 leading-snug tracking-normal font-medium">
+                Clock Out
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div
+            onClick={openClockInModal}
+            className="flex justify-center items-center rounded-md w-44 h-12 bg-teal-500 hover:bg-teal-600 transition-colors cursor-pointer"
+          >
+            <div className="flex flex-row justify-start items-start gap-2 w-[83px]">
+              <div className="flex justify-start items-center pl-0.5 h-5">
+                <img
+                  width="16px"
+                  height="16.4px"
+                  src="/images/clockin.png"
+                  alt="Clock in icon"
+                />
+              </div>
+              <div className="font-inter text-sm min-w-[55px] whitespace-nowrap text-white text-opacity-100 leading-snug tracking-normal font-medium">
+                Clock In
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {/* Permission-based Log Task Button */}
+        {canCreateTask && (
+          <div
+            onClick={() => setIsLogTaskModalOpen(true)}
+            className="flex justify-center items-center rounded-md w-44 h-12 bg-orange-400 hover:bg-orange-500 transition-colors cursor-pointer"
+          >
+            <div className="flex flex-row justify-start items-start gap-1.5">
+              <img
+                width="20px"
+                height="20px"
+                src="/images/logtask.png"
+                alt="Log task icon"
+              />
+              <div className="font-inter text-sm min-w-[62px] whitespace-nowrap text-white text-opacity-100 leading-snug tracking-normal font-medium">
+                Log Task
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Status Cards - Now 4 cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
-        {/* Today's Status with Sticker */}
-        <div className="relative flex items-center p-4
-         rounded-xl min-h-[120px]  shadow-sm text-white 
-         transition-transform duration-200 hover:-translate-y-1 hover:shadow-md overflow-hidden">
-          {/* Sticker Image as Background */}
-          <img
-            src="/images/card1.png"
-            alt="Sticker background"
-            className="absolute inset-0 w-full h-full object-cover rounded-xl z-0"
-          />
+        {/* ID Card - Teal Version - FIRST */}
+        <div className="relative flex flex-col justify-start items-start p-4 rounded-xl min-h-[120px] shadow-sm
+         text-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-md overflow-hidden">
+          {/* Teal Background */}
+          <div className="absolute inset-0 w-full h-full bg-teal-500 rounded-xl z-0"></div>
 
           {/* Content */}
-          <div className="flex flex-col justify-center h-full w-full relative z-10">
-            {/* Status Text & Clock Icon */}
-            <div className="flex flex-row justify-between items-center w-full">
-              <div className="flex flex-col">
-                <div className="text-sm font-medium">Today's Status</div>
-                <div className="mt-2 text-lg font-semibold">
-                  {clockIn
-                    ? `Clocked In: ${formatClockTime(clockIn)}`
-                    : "Not clocked In"}
-                </div>
+          <div className="relative z-10 w-full h-full">
+            {/* Top Section: Company & QR Code */}
+            <div className="flex flex-row justify-between items-start w-full">
+              <div className="flex flex-col justify-start items-start gap-1">
+                <div className="text-xs font-bold">{organizationName}</div>
+                <div className="text-[10px] text-teal-100 font-medium">Employee ID</div>
               </div>
-              <div className="flex items-center justify-center p-1 rounded-2xl h-8 w-8 bg-white">
+              <div className="flex justify-center items-center rounded-md w-7 h-7 bg-white/40 hover:bg-white/60 transition-colors duration-200">
                 <img
-                  width="23"
-                  height="23"
-                  src="/images/clock.png"
-                  alt="Clock Icon"
+                  width="18px"
+                  height="18px"
+                  src="/images/qrcode.png"
+                  alt="QR Code icon"
                 />
+              </div>
+            </div>
+
+            {/* Profile Section */}
+<div className="flex flex-row justify-start items-center gap-2 mt-2">
+  <img
+    className="rounded-full border-2 border-emerald-300 overflow-hidden"
+    src={
+      profileData?.employee_profile?.user?.profile_picture 
+        ? `${process.env.REACT_APP_SERVER_URI}${profileData.employee_profile.user.profile_picture}`
+        : "/images/avatar.png"
+    }
+    alt="Profile"
+    width="35px"
+    height="35px"
+    onError={(e) => {
+      e.target.src = "/images/avatar.png";
+    }}
+  />
+  <div className="flex flex-col justify-start items-start gap-0.5">
+    <div className="text-xs font-bold">
+      {currentUser?.first_name} {currentUser?.last_name}
+    </div>
+    <div className="text-[10px] text-teal-100 font-medium">
+      {employeeRole}
+    </div>
+    <div className="text-[10px] text-teal-100 font-medium">
+      ID: {currentUser?.employee_no || "N/A"}
+    </div>
+  </div>
+</div>
+
+            {/* Status Badge */}
+            <div className="absolute bottom-3 right-3 flex justify-center items-center rounded-lg px-2 h-5 bg-white">
+              <div className={`text-[10px] font-medium ${
+                employeeStatus === "ACTIVE" ? "text-teal-500" : 
+                employeeStatus === "INACTIVE" ? "text-red-500" : 
+                "text-gray-500"
+              }`}>
+                {employeeStatus}
               </div>
             </div>
           </div>
         </div>
 
-        {/* Next Payday Card */}
+        {/* Performance Rating Card - SECOND */}
+        <div className="flex flex-col justify-center items-center rounded-lg min-h-[120px] shadow-sm bg-white
+         transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
+          <div className="flex flex-row justify-between items-start gap-2.5 pr-3 pl-3 w-full h-[60px]">
+            <div className="flex flex-col justify-start items-start gap-4 h-[60px]">
+              <div className="flex flex-col justify-start items-start gap-0.5 h-5">
+                <div className="font-inter text-sm whitespace-nowrap text-neutral-900 text-opacity-100 leading-snug tracking-normal font-medium">
+                  Performance Rating
+                </div>
+              </div>
+              <div className="font-inter text-lg whitespace-nowrap text-neutral-900 text-opacity-100 leading-tight font-semibold">
+                3.2/5.0
+              </div>
+            </div>
+            <div className="flex flex-row justify-center items-center gap-3 pt-1 pr-1 pb-1 pl-1 rounded-2xl h-9 bg-purple-100 overflow-hidden">
+              <img
+                width="22.5px"
+                height="22.5px"
+                src="/images/performancerating.png"
+                alt="Performance icon"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Next Payday Card - THIRD */}
         <div className="flex items-center p-4 rounded-xl min-h-[120px] shadow-sm border
          bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
           <div className="flex flex-col justify-between w-full h-full">
@@ -514,98 +655,39 @@ const EmployeeDashboardContent = () => {
           </div>
         </div>
 
-        {/* ID Card - Teal Version */}
-        <div className="relative flex flex-col justify-start items-start p-4 rounded-xl min-h-[120px] shadow-sm
-         text-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-md overflow-hidden">
-          {/* Teal Background */}
-          <div className="absolute inset-0 w-full h-full bg-teal-500 rounded-xl z-0"></div>
+        {/* Today's Status with Sticker - FOURTH/LAST */}
+        <div className="relative flex items-center p-4
+         rounded-xl min-h-[120px] shadow-sm text-white 
+         transition-transform duration-200 hover:-translate-y-1 hover:shadow-md overflow-hidden">
+          {/* Sticker Image as Background */}
+          <img
+            src="/images/card1.png"
+            alt="Sticker background"
+            className="absolute inset-0 w-full h-full object-cover rounded-xl z-0"
+          />
 
           {/* Content */}
-          <div className="relative z-10 w-full h-full">
-            {/* Top Section: Company & QR Code */}
-            <div className="flex flex-row justify-between items-start w-full">
-              <div className="flex flex-col justify-start items-start gap-1">
-                <div className="text-xs font-bold">OnTap Technologies</div>
-                <div className="text-[10px] text-teal-100 font-medium">Employee ID</div>
+          <div className="flex flex-col justify-center h-full w-full relative z-10">
+            {/* Status Text & Clock Icon */}
+            <div className="flex flex-row justify-between items-center w-full">
+              <div className="flex flex-col">
+                <div className="text-sm font-medium">Today's Status</div>
+                <div className="mt-2 text-lg font-semibold">
+                  {clockIn
+                    ? `Clocked In: ${formatClockTime(clockIn)}`
+                    : "Not clocked In"}
+                </div>
               </div>
-              <div className="flex justify-center items-center rounded-md w-7 h-7 bg-white/40 hover:bg-white/60 transition-colors duration-200">
+              <div className="flex items-center justify-center p-1 rounded-2xl h-8 w-8 bg-white">
                 <img
-                  width="18px"
-                  height="18px"
-                  src="/images/qrcode.png"
-                  alt="QR Code icon"
+                  width="23"
+                  height="23"
+                  src="/images/clock.png"
+                  alt="Clock Icon"
                 />
               </div>
             </div>
-
-            {/* Profile Section */}
-            <div className="flex flex-row justify-start items-center gap-2 mt-2">
-              <img
-                className="rounded-full border-2 border-emerald-300 overflow-hidden"
-                src="/images/avatar.png"
-                alt="Profile"
-                width="35px"
-                height="35px"
-              />
-              <div className="flex flex-col justify-start items-start gap-0.5">
-                <div className="text-xs font-bold">
-                  {currentUser?.first_name} {currentUser?.last_name}
-                </div>
-                <div className="text-[10px] text-teal-100 font-medium">
-                  {/* Safely handle role which might be an object */}
-                  {currentUser?.role ? (
-                    typeof currentUser.role === 'string' ? currentUser.role : 
-                    currentUser.role.name || currentUser.role.title || "Employee"
-                  ) : "Employee"}
-                </div>
-                <div className="text-[10px] text-teal-100 font-medium">
-                  ID: {currentUser?.employee_id || "N/A"}
-                </div>
-              </div>
-            </div>
-
-            {/* Status Badge */}
-            <div className="absolute bottom-3 right-3 flex justify-center items-center rounded-lg px-2 h-5 bg-white">
-              <div className="text-[10px] text-teal-500 font-medium">Active</div>
-            </div>
           </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex flex-col gap-2 justify-center h-[120px] w-full">
-          {/* Clock In/Out Button */}
-          {!clockIn ? (
-            <button
-              onClick={openClockInModal}
-              className="flex justify-center items-center rounded-md h-10 w-full max-w-[120px] bg-teal-500 text-white text-sm font-normal hover:bg-teal-600 transition-colors"
-            >
-              Clock In
-            </button>
-          ) : clockIn && !attendanceData?.clock_out ? (
-            <button
-              onClick={() => openClockOutModal(attendanceData.id)}
-              className="flex justify-center items-center rounded-md h-10 w-full max-w-[120px] bg-red-500 text-white text-sm font-normal hover:bg-red-600 transition-colors"
-            >
-              Clock Out
-            </button>
-          ) : (
-            <button
-              onClick={openClockInModal}
-              className="flex justify-center items-center rounded-md h-10 w-full max-w-[120px] bg-teal-500 text-white text-sm font-normal hover:bg-teal-600 transition-colors"
-            >
-              Clock In
-            </button>
-          )}
-          
-          {/* Permission-based Log Task Button */}
-          {canCreateTask && (
-            <button
-              onClick={() => setIsLogTaskModalOpen(true)}
-              className="flex justify-center items-center rounded-md h-10 w-full max-w-[120px] shadow-sm bg-white text-neutral-900 text-sm font-normal hover:bg-gray-100 transition-colors"
-            >
-              Log Task
-            </button>
-          )}
         </div>
       </div>
 
@@ -828,4 +910,3 @@ const EmployeeDashboardContent = () => {
 };
   
 export default EmployeeDashboardContent;
-              

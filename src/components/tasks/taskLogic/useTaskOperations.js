@@ -67,42 +67,32 @@ export const useTaskOperations = (task, refetch) => {
       toast.success("Progress updated successfully!");
     } catch (error) {
       console.error('Failed to update progress:', error);
-      toast.error("Failed to update progress");
+      toast.error(error?.data?.detail || "Failed to update progress");
     }
   };
 
-  // In useTaskOperations.js - Fix the handleStatusChange function
-const handleStatusChange = async (taskId, newStatus, userId) => {
-  try {
-    const effectiveUserId = userId || (currentUser?.user?.id || currentUser?.id);
-    
-    if (!effectiveUserId) {
-      throw new Error('User ID not available');
+  const handleStatusChange = async (taskId, newStatus, userId) => {
+    try {
+      const effectiveUserId = userId || (currentUser?.user?.id || currentUser?.id);
+      
+      if (!effectiveUserId) {
+        throw new Error('User ID not available');
+      }
+
+      const response = await updateTaskStatus({
+        id: taskId,
+        status: newStatus,
+        progress_percentage: task?.progress_percentage || task?.progressPercentage || 0,
+        comment: `Status changed to ${newStatus}`
+      }).unwrap();
+
+      return response;
+    } catch (error) {
+      console.error('Error updating task status:', error);
+      // Re-throw to let the calling component handle the error
+      throw error;
     }
-
-    console.log('=== STATUS CHANGE API CALL ===');
-    console.log('Task ID:', taskId);
-    console.log('New Status:', newStatus);
-    console.log('User ID:', effectiveUserId);
-
-    // 🔥 FIX: Use the correct endpoint structure
-    const response = await updateTaskStatus({
-      id: taskId, // This should be the task ID
-      status: newStatus,
-      progress_percentage: task?.progress_percentage || task?.progressPercentage || 0, // Include current progress
-      comment: `Status changed to ${newStatus}` // Optional comment
-    }).unwrap();
-
-    console.log('Status change successful:', response);
-    return response;
-  } catch (error) {
-    console.error('Error updating task status:', error);
-    console.error('Full error object:', error);
-    console.error('Error data:', error?.data);
-    console.error('Error status:', error?.status);
-    throw error;
-  }
-};
+  };
 
   const handlePriorityChange = async (newPriority) => {
     if (!task) return;
@@ -117,7 +107,8 @@ const handleStatusChange = async (taskId, newStatus, userId) => {
       toast.success("Priority updated successfully!");
     } catch (error) {
       console.error('Failed to update priority:', error);
-      toast.error("Failed to update priority");
+      // Re-throw to let the calling component handle the error
+      throw error;
     }
   };
 
@@ -165,109 +156,90 @@ const handleStatusChange = async (taskId, newStatus, userId) => {
       if (refetch) refetch();
     } catch (error) {
       console.error('Failed to remove attachment:', error);
-      toast.error("Failed to remove attachment");
+      toast.error(error?.data?.detail || "Failed to remove attachment");
     }
   };
 
-  const handleSaveAll = async (formData, fieldPermissions) => {
-  try {
-    setIsUploading(true);
-    
-    const userId = currentUser?.user?.id || currentUser?.id;
-    
-    if (!userId) {
-      throw new Error('User ID not available for saving task');
+  // ✅ SIMPLIFIED: Removed fieldPermissions parameter
+  const handleSaveAll = async (formData) => {
+    try {
+      setIsUploading(true);
+      
+      const userId = currentUser?.user?.id || currentUser?.id;
+      
+      if (!userId) {
+        throw new Error('User ID not available for saving task');
+      }
+
+      const updateData = {
+        title: formData.titleValue || task.title,
+        description: formData.descriptionValue || task.description,
+        assignee: formData.assigneeValue || task.assignee || userId,
+        department: formData.departmentValue || task.department,
+        due_date: formData.dueDateValue || task.due_date,
+        priority: task.priority,
+        status: task.status,
+        progress: formData.progressValue || task.progress,
+      };
+
+      const response = await updateTask(task.id, updateData);
+      
+      if (files && files.length > 0) {
+        await uploadAttachments(task.id);
+      }
+
+      return response;
+    } catch (error) {
+      console.error('Failed to update task:', error);
+      // Re-throw to let component handle the error
+      throw error;
+    } finally {
+      setIsUploading(false);
     }
-
-    // Debug what's in formData
-    console.log('=== handleSaveAll DEBUG ===');
-    console.log('formData.assigneeValue:', formData.assigneeValue);
-    console.log('task.assignee (original):', task.assignee);
-    console.log('Current User ID:', userId);
-    console.log('=== END DEBUG ===');
-
-    const updateData = {
-      title: formData.titleValue || task.title,
-      description: formData.descriptionValue || task.description,
-      // 🔥 CRITICAL: Use the formData.assigneeValue which should be the user ID (40)
-      // If it's empty or invalid, fall back to the original task.assignee
-      assignee: formData.assigneeValue || task.assignee || userId,
-      department: formData.departmentValue || task.department,
-      due_date: formData.dueDateValue || task.due_date,
-      priority: task.priority, // Keep original if not in formData
-      status: task.status, // Keep original if not in formData
-      progress: formData.progressValue || task.progress,
-    };
-
-    // If we're still getting the wrong ID, force the correct one
-    if (updateData.assignee === 21) {
-      console.warn('Wrong assignee ID detected, correcting to:', userId);
-      updateData.assignee = userId;
-    }
-
-    console.log('Final update data:', updateData);
-
-    const response = await updateTask(task.id, updateData);
-    
-    // 🔥 FIX: Call uploadAttachments instead of handleFileUpload
-    if (files && files.length > 0) {
-      await uploadAttachments(task.id);
-    }
-
-    return response;
-  } catch (error) {
-    console.error('Failed to update task:', error);
-    throw error;
-  } finally {
-    setIsUploading(false);
-  }
-};
+  };
 
   const handleDeleteTask = async () => {
     if (!task) return;
     try {
       await deleteTask(task.id).unwrap();
-      // Don't call refetch or toast here - let the component handle it
-      return true; // Indicate success
+      return true;
     } catch (error) {
       console.error('Failed to delete task:', error);
-      throw error; // Re-throw to let component handle the error
+      // Re-throw to let component handle the error
+      throw error;
     }
   };
 
   const handleAddComment = async () => {
-  if (!newComment.trim() || !task) return;
-  try {
-    // 🔥 FIX: Extract user ID correctly
-    const userId = currentUser?.user?.id || currentUser?.id;
-    
-    if (!userId) {
-      console.error("Cannot determine user ID from currentUser:", currentUser);
-      toast.error("Failed to add comment: User ID not found");
-      return;
-    }
-    
-    await createComment({
-      task_pk: task.id,
-      data: {
-        content: newComment.trim(),
-        user: userId  // Use the extracted user ID
+    if (!newComment.trim() || !task) return;
+    try {
+      const userId = currentUser?.user?.id || currentUser?.id;
+      
+      if (!userId) {
+        console.error("Cannot determine user ID from currentUser:", currentUser);
+        toast.error("Failed to add comment: User ID not found");
+        return;
       }
-    }).unwrap();
-    setNewComment("");
-    toast.success("Comment added successfully!");
-  } catch (error) {
-    console.error('Failed to add comment:', error);
-    console.error('Error details:', error?.data);
-    
-    // Show specific error message
-    if (error?.data?.user) {
-      toast.error(`User error: ${error.data.user[0]}`);
-    } else {
-      toast.error("Failed to add comment");
+      
+      await createComment({
+        task_pk: task.id,
+        data: {
+          content: newComment.trim(),
+          user: userId
+        }
+      }).unwrap();
+      setNewComment("");
+      toast.success("Comment added successfully!");
+    } catch (error) {
+      console.error('Failed to add comment:', error);
+      
+      if (error?.data?.user) {
+        toast.error(`User error: ${error.data.user[0]}`);
+      } else {
+        toast.error(error?.data?.detail || "Failed to add comment");
+      }
     }
-  }
-};
+  };
 
   const handleEditComment = (comment) => {
     setEditingCommentId(comment.id);
@@ -275,41 +247,37 @@ const handleStatusChange = async (taskId, newStatus, userId) => {
   };
 
   const handleSaveComment = async (commentId) => {
-  if (!editCommentContent.trim()) return;
-  try {
-    // 🔥 FIX: Extract user ID correctly
-    const userId = currentUser?.user?.id || currentUser?.id;
-    
-    if (!userId) {
-      console.error("Cannot determine user ID from currentUser:", currentUser);
-      toast.error("Failed to update comment: User ID not found");
-      return;
-    }
-    
-    await updateComment({
-      task_pk: task.id,
-      id: commentId,
-      data: {
-        content: editCommentContent.trim(),
-        user: userId  // Use the extracted user ID
+    if (!editCommentContent.trim()) return;
+    try {
+      const userId = currentUser?.user?.id || currentUser?.id;
+      
+      if (!userId) {
+        console.error("Cannot determine user ID from currentUser:", currentUser);
+        toast.error("Failed to update comment: User ID not found");
+        return;
       }
-    }).unwrap();
-    setEditingCommentId(null);
-    setEditCommentContent("");
-    toast.success("Comment updated successfully!");
-  } catch (error) {
-    console.error('Failed to update comment:', error);
-    console.error('Error details:', error?.data);
-    
-    // Show specific error message
-    if (error?.data?.user) {
-      toast.error(`User error: ${error.data.user[0]}`);
-    } else {
-      toast.error("Failed to update comment");
+      
+      await updateComment({
+        task_pk: task.id,
+        id: commentId,
+        data: {
+          content: editCommentContent.trim(),
+          user: userId
+        }
+      }).unwrap();
+      setEditingCommentId(null);
+      setEditCommentContent("");
+      toast.success("Comment updated successfully!");
+    } catch (error) {
+      console.error('Failed to update comment:', error);
+      
+      if (error?.data?.user) {
+        toast.error(`User error: ${error.data.user[0]}`);
+      } else {
+        toast.error(error?.data?.detail || "Failed to update comment");
+      }
     }
-  }
-};
-
+  };
 
   const handleDeleteComment = async (commentId) => {
     if (!window.confirm('Are you sure you want to delete this comment?')) return;
@@ -321,7 +289,7 @@ const handleStatusChange = async (taskId, newStatus, userId) => {
       toast.success("Comment deleted successfully!");
     } catch (error) {
       console.error('Failed to delete comment:', error);
-      toast.error("Failed to delete comment");
+      toast.error(error?.data?.detail || "Failed to delete comment");
     }
   };
 
@@ -339,7 +307,6 @@ const handleStatusChange = async (taskId, newStatus, userId) => {
     setFiles(prev => prev.filter((_, i) => i !== index));
   };
 
-  // In hooks/useTaskOperations.js, update the return statement:
   return {
     taskOperations: {
       handleProgressUpdate,
@@ -360,10 +327,10 @@ const handleStatusChange = async (taskId, newStatus, userId) => {
     isUploading,
     files,
     newComment,
-    setNewComment, // Make sure this is directly exported, not nested in taskOperations
+    setNewComment,
     editingCommentId,
     editCommentContent,
-    setEditCommentContent, // Make sure this is also directly exported
+    setEditCommentContent,
     statusMap,
     priorityMap
   };

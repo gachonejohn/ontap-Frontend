@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useSelector } from "react-redux";
 import Select from "react-select";
 import { useGetEmployeesQuery } from "../../store/services/employees/employeesService";
@@ -44,8 +44,30 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit, preselectedParentTask = null 
   const [parentTaskSearchQuery, setParentTaskSearchQuery] = useState("");
   const [showParentTaskDropdown, setShowParentTaskDropdown] = useState(false);
 
-  const { data: employeesData } = useGetEmployeesQuery({}, { skip: !canViewAll });
-  const employees = employeesData?.results || [];
+  // Employee pagination state
+  const [currentEmployeePage, setCurrentEmployeePage] = useState(1);
+  const [allEmployees, setAllEmployees] = useState([]);
+  const [totalEmployeesCount, setTotalEmployeesCount] = useState(0);
+  const [employeeSearchQuery, setEmployeeSearchQuery] = useState("");
+
+  // Parent task pagination state
+  const [currentTaskPage, setCurrentTaskPage] = useState(1);
+  const [allParentTasks, setAllParentTasks] = useState([]);
+  const [totalTasksCount, setTotalTasksCount] = useState(0);
+  const [hasMoreTasks, setHasMoreTasks] = useState(true);
+
+  const parentTaskScrollRef = useRef();
+
+  const { data: employeesData, isFetching: isEmployeesFetching } = useGetEmployeesQuery(
+    { 
+      page: currentEmployeePage, 
+      page_size: 10 
+    },
+    { 
+      skip: !canViewAll || !isOpen,
+      refetchOnMountOrArgChange: true 
+    }
+  );
 
   const { data: departmentsData } = useGetDepartmentsQuery(
     {},
@@ -53,16 +75,84 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit, preselectedParentTask = null 
   );
   const departments = departmentsData || [];
 
-  const { data: tasksData } = useGetTasksQuery(
+  const { data: tasksData, isFetching: isTasksFetching } = useGetTasksQuery(
     { 
       search: parentTaskSearchQuery,
-      page_size: 50 
+      page: currentTaskPage,
+      page_size: 10 
     },
     { 
       skip: !isOpen 
     }
   );
-  const availableTasks = tasksData?.results || [];
+
+  // Reset modal state when modal opens/closes
+  useEffect(() => {
+    if (isOpen) {
+      setCurrentEmployeePage(1);
+      setAllEmployees([]);
+      setTotalEmployeesCount(0);
+      setSearchQuery("");
+      setEmployeeSearchQuery("");
+      setCurrentTaskPage(1);
+      setAllParentTasks([]);
+      setTotalTasksCount(0);
+      setHasMoreTasks(true);
+      setParentTaskSearchQuery("");
+    }
+  }, [isOpen]);
+
+  // Handle employee pagination - accumulate employees
+  useEffect(() => {
+    if (employeesData?.results?.length) {
+      console.log('Employees data received:', {
+        page: currentEmployeePage,
+        resultsCount: employeesData.results.length,
+        totalCount: employeesData.count,
+        hasNext: !!employeesData.next
+      });
+
+      setTotalEmployeesCount(employeesData.count);
+
+      setAllEmployees(prev => {
+        const existingIds = new Set(prev.map(e => e.id));
+        const newEmployees = employeesData.results.filter(e => !existingIds.has(e.id));
+        return [...prev, ...newEmployees];
+      });
+    }
+  }, [employeesData, currentEmployeePage]);
+
+  // Handle parent task pagination - accumulate tasks
+  useEffect(() => {
+    if (tasksData?.results?.length) {
+      console.log('Tasks data received:', {
+        page: currentTaskPage,
+        resultsCount: tasksData.results.length,
+        totalCount: tasksData.count,
+        hasNext: !!tasksData.next,
+        searchQuery: parentTaskSearchQuery
+      });
+
+      setTotalTasksCount(tasksData.count);
+      
+      setAllParentTasks(prev => {
+        const existingIds = new Set(prev.map(t => t.id));
+        const newTasks = tasksData.results.filter(t => !existingIds.has(t.id));
+        return [...prev, ...newTasks];
+      });
+
+      setHasMoreTasks(tasksData.next !== null);
+    }
+  }, [tasksData, currentTaskPage]);
+
+  // Reset pagination when search query changes
+  useEffect(() => {
+    if (isOpen) {
+      setCurrentTaskPage(1);
+      setAllParentTasks([]);
+      setHasMoreTasks(true);
+    }
+  }, [parentTaskSearchQuery, isOpen]);
 
   const statusMap = {
     TO_DO: "To Do",
@@ -90,18 +180,17 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit, preselectedParentTask = null 
     value,
   }));
 
-  const employeeOptions = employees.map((emp) => ({
+  const employeeOptions = allEmployees.map((emp) => ({
     value: emp.user?.id,
     label: `${emp.user?.first_name} ${emp.user?.last_name}`,
   }));
 
-  const parentTaskOptions = availableTasks.map((task) => ({
+  const parentTaskOptions = allParentTasks.map((task) => ({
     value: task.id,
     label: `${task.title} (${statusMap[task.status] || task.status})`,
     task: task,
   }));
 
-  // Get selected parent task display name
   const getSelectedParentTaskName = () => {
     if (!formData.parent_task) return "Select a parent task...";
     const selectedTask = parentTaskOptions.find(opt => opt.value === formData.parent_task);
@@ -255,7 +344,7 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit, preselectedParentTask = null 
   };
 
   const handleSelectAllTeamMembers = () => {
-    const allEmployeeIds = employees.map(emp => emp.user?.id);
+    const allEmployeeIds = allEmployees.map(emp => emp.user?.id);
     setFormData((prev) => ({
       ...prev,
       teamMembers: prev.teamMembers.length === allEmployeeIds.length ? [] : allEmployeeIds,
@@ -302,14 +391,14 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit, preselectedParentTask = null 
     }));
   };
 
-  const filteredEmployees = employees.filter(emp => {
+  const filteredEmployees = allEmployees.filter(emp => {
     const fullName = `${emp.user?.first_name} ${emp.user?.last_name}`.toLowerCase();
-    return fullName.includes(searchQuery.toLowerCase());
+    return fullName.includes(employeeSearchQuery.toLowerCase());
   });
 
-  const filteredParentTasks = parentTaskOptions.filter(task => {
+  const filteredParentTasks = allParentTasks.filter(task => {
     const searchLower = parentTaskSearchQuery.toLowerCase();
-    return task.label.toLowerCase().includes(searchLower);
+    return task.title.toLowerCase().includes(searchLower);
   });
 
   const getProfilePicture = (employee) => {
@@ -325,6 +414,55 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit, preselectedParentTask = null 
     }
     return profilePic;
   };
+
+  // Infinite scroll for parent tasks
+  useEffect(() => {
+    if (!showParentTaskDropdown) {
+      console.log('⚠️ Dropdown not open, skipping scroll listener');
+      return;
+    }
+
+    const div = parentTaskScrollRef.current;
+    if (!div) {
+      console.log('⚠️ Scroll ref not found, will retry');
+      return;
+    }
+
+    console.log('✅ Scroll listener attached');
+
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = div;
+      
+      console.log('📊 Scroll Position:', {
+        scrollTop,
+        clientHeight,
+        scrollHeight,
+        scrollPercentage: ((scrollTop + clientHeight) / scrollHeight) * 100,
+        hasMoreTasks,
+        isTasksFetching,
+        currentPage: currentTaskPage
+      });
+      
+      if (scrollTop + clientHeight >= scrollHeight - 50 && hasMoreTasks && !isTasksFetching) {
+        console.log('🔄 Loading next page of tasks:', currentTaskPage + 1);
+        setCurrentTaskPage(prev => prev + 1);
+      }
+    };
+
+    div.addEventListener("scroll", handleScroll);
+    return () => div.removeEventListener("scroll", handleScroll);
+  }, [showParentTaskDropdown, hasMoreTasks, isTasksFetching, currentTaskPage]);
+
+  useEffect(() => {
+    console.log('🔍 Parent tasks state:', {
+      totalTasks: allParentTasks.length,
+      currentPage: currentTaskPage,
+      hasMore: hasMoreTasks,
+      isFetching: isTasksFetching,
+      filteredCount: filteredParentTasks.length,
+      totalCount: totalTasksCount
+    });
+  }, [allParentTasks, currentTaskPage, hasMoreTasks, isTasksFetching, filteredParentTasks, totalTasksCount]);
 
   const handleCreateTask = async (e) => {
     e.preventDefault();
@@ -390,16 +528,43 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit, preselectedParentTask = null 
     }
   };
 
+  // Employee infinite scroll
+  const employeeScrollRef = useRef();
+  const employeeHasMorePages = employeesData?.next !== null;
+
+  useEffect(() => {
+    const div = employeeScrollRef.current;
+    if (!div || !employeeHasMorePages || isEmployeesFetching) return;
+
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = div;
+      
+      if (scrollTop + clientHeight >= scrollHeight - 50 && employeeHasMorePages && !isEmployeesFetching) {
+        console.log('🔄 Loading next page of employees:', currentEmployeePage + 1);
+        setCurrentEmployeePage(prev => prev + 1);
+      }
+    };
+
+    div.addEventListener("scroll", handleScroll);
+    return () => div.removeEventListener("scroll", handleScroll);
+  }, [employeeHasMorePages, isEmployeesFetching, currentEmployeePage]);
+
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="flex flex-col rounded-2xl w-[560px] max-h-[90vh] bg-white overflow-hidden">
-        {/* Fixed Header */}
         <div className="flex justify-between items-center p-6 bg-white">
-          <h2 className="text-lg text-neutral-900 font-semibold">
-            {formData.parent_task ? "Create Subtask" : "Create New Task"}
-          </h2>
+          <div className="flex items-center gap-2">
+            <img 
+              src="/images/Createtask.png" 
+              alt="Create Task" 
+              className="w-8 h-8"
+            />
+            <h2 className="text-lg text-neutral-900 font-semibold">
+              {formData.parent_task ? "Create Subtask" : "Create New Task"}
+            </h2>
+          </div>
           <button
             onClick={onClose}
             className="flex justify-center items-center w-7 h-7 hover:bg-gray-100 rounded-full"
@@ -411,10 +576,8 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit, preselectedParentTask = null 
           </button>
         </div>
 
-        {/* Scrollable Content */}
         <div className="overflow-y-auto p-6">
           <form onSubmit={handleCreateTask} className="flex flex-col gap-4 w-full">
-            {/* Parent Task Selection - Custom Dropdown */}
             <div className="flex flex-col gap-2 w-full">
               <label className="text-sm text-neutral-900 font-medium">Parent Task (Optional)</label>
               <div className="relative">
@@ -433,8 +596,7 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit, preselectedParentTask = null 
                 
                 {showParentTaskDropdown && (
                   <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
-                    {/* Search Input */}
-                    <div className="sticky top-0 bg-white p-2 border-b border-gray-100">
+                    <div className="sticky top-0 bg-white p-2 border-b border-gray-100 z-20">
                       <div className="flex items-center gap-2 px-2">
                         <svg width="16.5" height="16.5" viewBox="0 0 24 24" fill="none">
                           <circle cx="11" cy="11" r="8" stroke="#6B7280" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -451,58 +613,79 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit, preselectedParentTask = null 
                       </div>
                     </div>
 
-                    {/* Clear Selection Option */}
-                    <button
-                      type="button"
-                      onClick={() => handleParentTaskSelect(null)}
-                      className="w-full text-left px-4 py-2 hover:bg-gray-50 text-sm text-gray-900 border-b border-gray-100"
+                    <div 
+                      ref={parentTaskScrollRef}
+                      className="max-h-60 overflow-y-auto"
                     >
-                      <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 border border-gray-300 rounded flex items-center justify-center">
-                          {!formData.parent_task && (
-                            <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                              <path d="M8 2.5L2.5 8M2.5 2.5L8 8" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round"/>
-                            </svg>
-                          )}
-                        </div>
-                        <span className={!formData.parent_task ? "text-teal-600 font-medium" : ""}>
-                          No parent task
-                        </span>
-                      </div>
-                    </button>
-
-                    {/* Task List */}
-                    {filteredParentTasks.length > 0 ? (
-                      filteredParentTasks.map((task) => (
-                        <button
-                          key={task.value}
-                          type="button"
-                          onClick={() => handleParentTaskSelect(task)}
-                          className="w-full text-left px-4 py-2 hover:bg-gray-50 text-sm text-gray-900 flex items-center gap-2"
-                        >
+                      <button
+                        type="button"
+                        onClick={() => handleParentTaskSelect(null)}
+                        className="w-full text-left px-4 py-2 hover:bg-gray-50 text-sm text-gray-900 border-b border-gray-100"
+                      >
+                        <div className="flex items-center gap-2">
                           <div className="w-4 h-4 border border-gray-300 rounded flex items-center justify-center">
-                            {formData.parent_task === task.value && (
+                            {!formData.parent_task && (
                               <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                                <path d="M8 2.5L2.5 8M2.5 2.5L8 8" stroke="#14b8a6" strokeWidth="1.5" strokeLinecap="round"/>
+                                <path d="M8 2.5L2.5 8M2.5 2.5L8 8" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round"/>
                               </svg>
                             )}
                           </div>
-                          <div className="flex flex-col text-left">
-                            <div className={`text-sm ${formData.parent_task === task.value ? "text-teal-600 font-medium" : "text-gray-900"}`}>
-                              {task.task.title}
+                          <span className={!formData.parent_task ? "text-teal-600 font-medium" : ""}>
+                            No parent task
+                          </span>
+                        </div>
+                      </button>
+
+                      {filteredParentTasks.length > 0 ? (
+                        <>
+                          {filteredParentTasks.map((task) => (
+                            <button
+                              key={task.id}
+                              type="button"
+                              onClick={() => handleParentTaskSelect({ value: task.id, task })}
+                              className="w-full text-left px-4 py-2 hover:bg-gray-50 text-sm text-gray-900 flex items-center gap-2"
+                            >
+                              <div className="w-4 h-4 border border-gray-300 rounded flex items-center justify-center">
+                                {formData.parent_task === task.id && (
+                                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                                    <path d="M8 2.5L2.5 8M2.5 2.5L8 8" stroke="#14b8a6" strokeWidth="1.5" strokeLinecap="round"/>
+                                  </svg>
+                                )}
+                              </div>
+                              <div className="flex flex-col text-left">
+                                <div className={`text-sm ${formData.parent_task === task.id ? "text-teal-600 font-medium" : "text-gray-900"}`}>
+                                  {task.title}
+                                </div>
+                                <div className="text-xs text-gray-500">
+                                  Status: {statusMap[task.status] || task.status}
+                                  {task.due_date && ` • Due: ${new Date(task.due_date).toLocaleDateString()}`}
+                                </div>
+                              </div>
+                            </button>
+                          ))}
+                          {isTasksFetching && (
+                            <div className="px-3 py-4 text-sm text-gray-500 text-center border-t">
+                              <div className="flex items-center justify-center gap-2">
+                                <svg className="animate-spin h-4 w-4 text-teal-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                                </svg>
+                                <span>Loading more...</span>
+                              </div>
                             </div>
-                            <div className="text-xs text-gray-500">
-                              Status: {statusMap[task.task.status] || task.task.status}
-                              {task.task.due_date && ` • Due: ${new Date(task.task.due_date).toLocaleDateString()}`}
+                          )}
+                          {!hasMoreTasks && allParentTasks.length > 0 && (
+                            <div className="px-3 py-2 text-sm text-gray-500 text-center border-t bg-gray-50">
+                              {allParentTasks.length} tasks
                             </div>
-                          </div>
-                        </button>
-                      ))
-                    ) : (
-                      <div className="px-3 py-4 text-sm text-gray-500 text-center">
-                        {parentTaskSearchQuery ? "No tasks found" : "No tasks available"}
-                      </div>
-                    )}
+                          )}
+                        </>
+                      ) : (
+                        <div className="px-3 py-4 text-sm text-gray-500 text-center">
+                          {isTasksFetching ? "Loading tasks..." : "No tasks available"}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>
@@ -511,7 +694,6 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit, preselectedParentTask = null 
               </p>
             </div>
 
-            {/* Rest of the form remains exactly the same */}
             <div className="flex flex-col gap-2 w-full">
               <label className="text-sm text-neutral-900 font-medium">Task Title *</label>
               <input
@@ -607,10 +789,8 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit, preselectedParentTask = null 
               )}
             </div>
 
-            {/* TEAM SELECTION */}
-            {canViewAll && employees.length > 0 && (
+            {canViewAll && (
               <div className="flex flex-col gap-3 w-full">
-                {/* Team Field - Static display */}
                 <div className="flex flex-col gap-2 w-full">
                   <label className="text-sm text-neutral-900 font-medium">Team</label>
                   <div className="flex justify-start items-center pl-3 rounded-lg border-neutral-200 border w-full p-3 bg-white">
@@ -630,7 +810,6 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit, preselectedParentTask = null 
                   </div>
                 </div>
 
-                {/* Assignee Field */}
                 <div className="flex flex-col gap-2 w-full">
                   <div className="flex justify-between items-center">
                     <label className="text-sm text-neutral-900 font-medium">Assignee</label>
@@ -675,7 +854,6 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit, preselectedParentTask = null 
                         </button>
                       )}
                     </div>
-                    {/* Search Results Dropdown */}
                     {searchQuery && !formData.assignee && filteredEmployees.length > 0 && (
                       <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
                         {filteredEmployees.map((emp) => (
@@ -706,7 +884,7 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit, preselectedParentTask = null 
                                 {emp.user?.first_name} {emp.user?.last_name}
                               </div>
                               <div className="text-xs text-gray-600">
-                                {emp.position || 'Employee'}
+                                {emp.position?.title || 'Employee'}
                               </div>
                             </div>
                           </button>
@@ -716,7 +894,6 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit, preselectedParentTask = null 
                   </div>
                 </div>
 
-                {/* Select Team Members */}
                 <div className="flex flex-col gap-2 w-full">
                   <div className="flex justify-between items-center">
                     <label className="text-sm text-black font-medium">Select Team Members *</label>
@@ -729,10 +906,11 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit, preselectedParentTask = null 
                     </button>
                   </div>
 
-                  {/* Team Members List */}
-                  <div className="flex flex-col rounded-lg border border-gray-200 max-h-[200px] overflow-y-auto">
-                    {/* Search Input */}
-                    <div className="sticky top-0 bg-white p-2 border-b border-gray-100">
+                  <div 
+                    ref={employeeScrollRef}
+                    className="flex flex-col rounded-lg border border-gray-200 max-h-[200px] overflow-y-auto"
+                  >
+                    <div className="sticky top-0 bg-white p-2 border-b border-gray-100 z-10">
                       <div className="flex items-center gap-2 px-2">
                         <svg width="16.5" height="16.5" viewBox="0 0 24 24" fill="none">
                           <circle cx="11" cy="11" r="8" stroke="#6B7280" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -740,65 +918,82 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit, preselectedParentTask = null 
                         </svg>
                         <input
                           type="text"
-                          value={searchQuery}
-                          onChange={(e) => setSearchQuery(e.target.value)}
+                          value={employeeSearchQuery}
+                          onChange={(e) => setEmployeeSearchQuery(e.target.value)}
                           placeholder="Search by Name"
                           className="flex-1 text-xs text-neutral-900/70 outline-none"
                         />
                       </div>
                     </div>
 
-                    {/* Employee List */}
                     {filteredEmployees.length > 0 ? (
-                      filteredEmployees.map((emp, index) => (
-                        <div
-                          key={emp.user?.id || index}
-                          className={`flex items-center justify-between px-3 py-3 hover:bg-gray-50 cursor-pointer ${
-                            index !== filteredEmployees.length - 1 ? 'border-b border-gray-100' : ''
-                          }`}
-                          onClick={() => handleTeamMemberToggle(emp.user?.id)}
-                        >
-                          <div className="flex items-center gap-3.5">
-                            <div className="rounded border border-black w-4 h-4 shadow-sm bg-gray-100 flex items-center justify-center">
-                              {formData.teamMembers.includes(emp.user?.id) && (
-                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                                  <path d="M10 3L4.5 8.5L2 6" stroke="#14b8a6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                </svg>
+                      <>
+                        {filteredEmployees.map((emp, index) => (
+                          <div
+                            key={emp.user?.id || index}
+                            className={`flex items-center justify-between px-3 py-3 hover:bg-gray-50 cursor-pointer ${
+                              index !== filteredEmployees.length - 1 ? 'border-b border-gray-100' : ''
+                            }`}
+                            onClick={() => handleTeamMemberToggle(emp.user?.id)}
+                          >
+                            <div className="flex items-center gap-3.5">
+                              <div className="rounded border border-black w-4 h-4 shadow-sm bg-gray-100 flex items-center justify-center">
+                                {formData.teamMembers.includes(emp.user?.id) && (
+                                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                                    <path d="M10 3L4.5 8.5L2 6" stroke="#14b8a6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                  </svg>
+                                )}
+                              </div>
+                              {emp.user?.profile_picture ? (
+                                <img
+                                  src={getProfilePicture(emp)}
+                                  alt={`${emp.user?.first_name} ${emp.user?.last_name}`}
+                                  className="w-9 h-9 rounded-full object-cover"
+                                />
+                              ) : (
+                                <div className="flex items-center justify-center rounded-full w-9 h-9 bg-indigo-100">
+                                  <span className="text-sm text-indigo-700 font-normal">
+                                    {emp.user?.first_name?.charAt(0)}{emp.user?.last_name?.charAt(0)}
+                                  </span>
+                                </div>
                               )}
-                            </div>
-                            {emp.user?.profile_picture ? (
-                              <img
-                                src={getProfilePicture(emp)}
-                                alt={`${emp.user?.first_name} ${emp.user?.last_name}`}
-                                className="w-9 h-9 rounded-full object-cover"
-                              />
-                            ) : (
-                              <div className="flex items-center justify-center rounded-full w-9 h-9 bg-indigo-100">
-                                <span className="text-sm text-indigo-700 font-normal">
-                                  {emp.user?.first_name?.charAt(0)}{emp.user?.last_name?.charAt(0)}
-                                </span>
-                              </div>
-                            )}
-                            <div className="flex flex-col">
-                              <div className="text-sm text-gray-900 font-medium">
-                                {emp.user?.first_name} {emp.user?.last_name}
-                              </div>
-                              <div className="text-xs text-gray-600">
-                                {emp.position || 'Employee'}
+                              <div className="flex flex-col">
+                                <div className="text-sm text-gray-900 font-medium">
+                                  {emp.user?.first_name} {emp.user?.last_name}
+                                </div>
+                                <div className="text-xs text-gray-600">
+                                  {emp.position?.title || 'Employee'}
+                                </div>
                               </div>
                             </div>
                           </div>
-                        </div>
-                      ))
+                        ))}
+                        {isEmployeesFetching && (
+                          <div className="px-3 py-4 text-sm text-gray-500 text-center border-t">
+                            <div className="flex items-center justify-center gap-2">
+                              <svg className="animate-spin h-4 w-4 text-teal-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                              </svg>
+                              <span>Loading more...</span>
+                            </div>
+                          </div>
+                        )}
+                        {!employeeHasMorePages && allEmployees.length > 0 && (
+                          <div className="px-3 py-2 text-sm text-gray-500 text-center border-t bg-gray-50">
+                            {allEmployees.length} team members
+                          </div>
+                        )}
+                      </>
                     ) : (
                       <div className="px-3 py-4 text-sm text-gray-500 text-center">
-                        No employees found
+                        {isEmployeesFetching ? "Loading employees..." : "No employees found"}
                       </div>
                     )}
                   </div>
 
                   <div className="text-sm text-gray-600 mt-1">
-                    {formData.teamMembers.length} of {employees.length} team members selected
+                    {formData.teamMembers.length} of {totalEmployeesCount} team members selected
                   </div>
                 </div>
               </div>

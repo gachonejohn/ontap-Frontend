@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import {
   useGetTasksQuery,
   useGetTaskAnalyticsQuery,
   useCreateTaskMutation,
   useGetTaskDetailQuery,
 } from "../../store/services/tasks/tasksService";
+import { PAGE_SIZE } from "@constants/constants";
 import LogTaskModal from "./LogTaskModal";
 import TaskModal from "./TaskModal";
 import { toast } from "react-toastify";
@@ -17,8 +18,7 @@ const TaskCard = ({ task, onClick }) => {
   const title = detail.title || task.title;
   const dueDate = detail.due_date || task.due_date;
   const priority = detail.priority || task.priority;
-  const assigneeName =
-    detail.assignee_name || task.assignee_name || "Unassigned";
+  const assigneeNames = detail.assignee_names?.join(", ") || task.assignee_names?.join(", ") || "Unassigned";
   const progress = detail.progress_percentage || task.progress_percentage || 0;
   const status = detail.status || task.status;
   const isOverdue = detail.is_overdue || task.is_overdue;
@@ -52,7 +52,7 @@ const TaskCard = ({ task, onClick }) => {
     <div
       key={task.id}
       className="flex flex-col gap-3 p-4 rounded-xl bg-slate-50/80 cursor-pointer hover:bg-slate-100/80 transition-colors border border-transparent hover:border-slate-200"
-      onClick={() => onClick(detail)}
+      onClick={() => onClick(task)}
     >
       <div className="flex justify-between items-start gap-2">
         <div className="text-sm text-neutral-900 font-semibold flex-1">
@@ -126,7 +126,7 @@ const TaskCard = ({ task, onClick }) => {
             alt="Assignee"
           />
           <div className="text-[10px] text-gray-600 font-medium">
-            Assigned to {assigneeName}
+            Assigned to {assigneeNames}
           </div>
         </div>
       </div>
@@ -188,14 +188,27 @@ export default function MainTaskDashboardContent() {
   const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
   const [isDaysDropdownOpen, setIsDaysDropdownOpen] = useState(false);
 
-  // Debounce search term
+  const [currentPage, setCurrentPage] = useState(1);
+  const [allTasks, setAllTasks] = useState([]);
+  const [hasMore, setHasMore] = useState(true);
+  const observerTarget = useRef(null);
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
-    }, 500); // Wait 500ms after user stops typing
+      setCurrentPage(1);
+      setAllTasks([]);
+      setHasMore(true);
+    }, 500);
 
     return () => clearTimeout(timer);
   }, [searchTerm]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+    setAllTasks([]);
+    setHasMore(true);
+  }, [statusFilter, debouncedSearchTerm]);
 
   const statusMap = {
     "All": "All Status",
@@ -224,32 +237,73 @@ export default function MainTaskDashboardContent() {
   const statusOptions = Object.entries(statusMap).map(([key, value]) => ({ key, value }));
   const daysOptions = Object.entries(daysMap).map(([key, value]) => ({ key, value }));
 
+  const queryParams = useMemo(
+    () => ({
+      page: currentPage,
+      page_size: PAGE_SIZE,
+      search: debouncedSearchTerm || undefined,
+      status: statusFilter !== "All" && statusFilter !== "OVERDUE" ? statusFilter : undefined,
+    }),
+    [currentPage, debouncedSearchTerm, statusFilter]
+  );
+
   const {
     data: tasksData,
     refetch,
     isFetching,
-  } = useGetTasksQuery({
-    search: debouncedSearchTerm || undefined,
-    status: statusFilter !== "All" && statusFilter !== "OVERDUE" ? statusFilter : undefined,
-    page_size: 100,
-  });
+  } = useGetTasksQuery(queryParams);
 
   const { data: analyticsData } = useGetTaskAnalyticsQuery({});
   const [createTask] = useCreateTaskMutation();
 
-  const tasks = tasksData?.results || [];
-  const totalTasksCount = tasksData?.count || tasks.length;
+  useEffect(() => {
+    if (tasksData?.results) {
+      if (currentPage === 1) {
+        setAllTasks(tasksData.results);
+      } else {
+        setAllTasks(prev => {
+          const newTasks = tasksData.results.filter(
+            newTask => !prev.some(existingTask => existingTask.id === newTask.id)
+          );
+          return [...prev, ...newTasks];
+        });
+      }
+      
+      setHasMore(tasksData.next !== null);
+    }
+  }, [tasksData, currentPage]);
 
-  // Client-side filtering for additional filters
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting && hasMore && !isFetching) {
+          setCurrentPage(prev => prev + 1);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    const currentTarget = observerTarget.current;
+    if (currentTarget) {
+      observer.observe(currentTarget);
+    }
+
+    return () => {
+      if (currentTarget) {
+        observer.unobserve(currentTarget);
+      }
+    };
+  }, [hasMore, isFetching]);
+
+  const totalTasksCount = tasksData?.count || allTasks.length;
+
   const filteredTasks = useMemo(() => {
-    let filtered = tasks;
+    let filtered = allTasks;
 
-    // Apply overdue filter
     if (statusFilter === "OVERDUE") {
       filtered = filtered.filter(task => task.is_overdue && task.status !== "COMPLETED");
     }
 
-    // Apply days filter
     if (daysFilter !== "All") {
       const today = new Date();
       const filterDays = parseInt(daysFilter);
@@ -263,23 +317,8 @@ export default function MainTaskDashboardContent() {
       });
     }
 
-    // Client-side search filtering (title and assignee only - descriptions not available in main list)
-    if (searchTerm && searchTerm.trim() !== "") {
-      const searchLower = searchTerm.toLowerCase().trim();
-      
-      filtered = filtered.filter(task => {
-        // Search in title
-        const titleMatch = task.title?.toLowerCase().includes(searchLower);
-        
-        // Search in assignee name
-        const assigneeMatch = task.assignee_name?.toLowerCase().includes(searchLower);
-        
-        return titleMatch || assigneeMatch;
-      });
-    }
-
     return filtered;
-  }, [tasks, statusFilter, daysFilter, searchTerm]);
+  }, [allTasks, statusFilter, daysFilter]);
 
   const groupedTasks = useMemo(() => ({
     todo: filteredTasks.filter((t) => t.status === "TO_DO"),
@@ -292,7 +331,7 @@ export default function MainTaskDashboardContent() {
 
   const completedCount = groupedTasks.completed.length;
   const inProgressCount = groupedTasks.inProgress.length;
-  const overdueCount = tasks.filter((t) => t.is_overdue && t.status !== "COMPLETED").length;
+  const overdueCount = allTasks.filter((t) => t.is_overdue && t.status !== "COMPLETED").length;
 
   const handleCreateTask = async (formData) => {
     try {
@@ -368,6 +407,10 @@ export default function MainTaskDashboardContent() {
 
       toast.success("Task created successfully!");
       setIsLogTaskModalOpen(false);
+      
+      setCurrentPage(1);
+      setAllTasks([]);
+      setHasMore(true);
       refetch();
     } catch (error) {
       console.error("Failed to create task:", error);
@@ -563,9 +606,14 @@ export default function MainTaskDashboardContent() {
               {groupedTasks.todo.map((task) => (
                 <TaskCard key={task.id} task={task} onClick={handleCardClick} />
               ))}
-              {groupedTasks.todo.length === 0 && (
+              {groupedTasks.todo.length === 0 && !isFetching && (
                 <div className="text-center text-gray-500 text-sm py-4">
                   No tasks to do
+                </div>
+              )}
+              {isFetching && groupedTasks.todo.length === 0 && (
+                <div className="text-center text-gray-500 text-sm py-4">
+                  Loading tasks...
                 </div>
               )}
             </div>
@@ -582,9 +630,14 @@ export default function MainTaskDashboardContent() {
               {groupedTasks.inProgress.map((task) => (
                 <TaskCard key={task.id} task={task} onClick={handleCardClick} />
               ))}
-              {groupedTasks.inProgress.length === 0 && (
+              {groupedTasks.inProgress.length === 0 && !isFetching && (
                 <div className="text-center text-gray-500 text-sm py-4">
                   No tasks in progress
+                </div>
+              )}
+              {isFetching && groupedTasks.inProgress.length === 0 && (
+                <div className="text-center text-gray-500 text-sm py-4">
+                  Loading tasks...
                 </div>
               )}
             </div>
@@ -601,9 +654,14 @@ export default function MainTaskDashboardContent() {
               {groupedTasks.completed.map((task) => (
                 <TaskCard key={task.id} task={task} onClick={handleCardClick} />
               ))}
-              {groupedTasks.completed.length === 0 && (
+              {groupedTasks.completed.length === 0 && !isFetching && (
                 <div className="text-center text-gray-500 text-sm py-4">
                   No completed tasks
+                </div>
+              )}
+              {isFetching && groupedTasks.completed.length === 0 && (
+                <div className="text-center text-gray-500 text-sm py-4">
+                  Loading tasks...
                 </div>
               )}
             </div>
@@ -660,6 +718,16 @@ export default function MainTaskDashboardContent() {
               )}
             </div>
           )}
+
+          {/* Infinite Scroll Observer Target */}
+          <div 
+            ref={observerTarget} 
+            className="md:col-span-2 lg:col-span-3 h-10 flex items-center justify-center"
+          >
+            {isFetching && hasMore && (
+              <div className="text-sm text-gray-500">Loading more tasks...</div>
+            )}
+          </div>
         </div>
       ) : (
         <div className="flex flex-col justify-between items-center gap-6 w-full">
@@ -794,12 +862,12 @@ export default function MainTaskDashboardContent() {
                   <div className="text-base text-green-900 font-medium">Average Progress</div>
                   <div className="text-xs text-green-700 font-medium">
                     Team average task progress is{" "}
-                    {tasks.length > 0
+                    {allTasks.length > 0
                       ? Math.round(
-                          tasks.reduce(
+                          allTasks.reduce(
                             (sum, task) => sum + (task.progress_percentage || 0),
                             0
-                          ) / tasks.length
+                          ) / allTasks.length
                         )
                       : 0}
                     %.
@@ -814,13 +882,13 @@ export default function MainTaskDashboardContent() {
                   <div className="text-xs text-purple-700 font-medium">
                     High:{" "}
                     {
-                      tasks.filter(
+                      allTasks.filter(
                         (t) => t.priority === "HIGH" || t.priority === "URGENT"
                       ).length
                     }{" "}
                     tasks, Medium:{" "}
-                    {tasks.filter((t) => t.priority === "MEDIUM").length} tasks,
-                    Low: {tasks.filter((t) => t.priority === "LOW").length} tasks.
+                    {allTasks.filter((t) => t.priority === "MEDIUM").length} tasks,
+                    Low: {allTasks.filter((t) => t.priority === "LOW").length} tasks.
                   </div>
                 </div>
               </div>
@@ -839,7 +907,13 @@ export default function MainTaskDashboardContent() {
         isOpen={isTaskModalOpen}
         onClose={() => setIsTaskModalOpen(false)}
         task={selectedTask}
-        refetch={refetch}
+        refetch={() => {
+          setCurrentPage(1);
+          setAllTasks([]);
+          setHasMore(true);
+          refetch();
+        }}
+        onSubmit={handleCreateTask}  
       />
     </div>
   );
