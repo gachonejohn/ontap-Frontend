@@ -9,6 +9,7 @@ import LogTaskModal from "./LogTaskModal";
 import TaskModal from "./TaskModal";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
+import OnboardingStepsBoard from "../../components/onboardingSteps/OnboardingStepsBoard";
 
 const TaskCard = ({ task, onClick }) => {
   const { data: taskDetail } = useGetTaskDetailQuery(task.id);
@@ -54,7 +55,6 @@ const TaskCard = ({ task, onClick }) => {
       className="flex flex-col gap-3 p-4 rounded-xl bg-slate-50/80 cursor-pointer hover:bg-slate-100/80 transition-colors border border-transparent hover:border-slate-200"
       onClick={() => onClick(detail)}
     >
-      {/* Title and Status */}
       <div className="flex justify-between items-start gap-2">
         <div className="text-sm text-neutral-900 font-semibold flex-1">{title}</div>
         <div className="flex flex-col items-end gap-1">
@@ -63,7 +63,6 @@ const TaskCard = ({ task, onClick }) => {
               Overdue
             </span>
           )}
-          {/* Priority Flag instead of status badge */}
           <img 
             src={priorityFlags[priority] || priorityFlags.MEDIUM} 
             alt={`${priorityMap[priority] || priority} priority`}
@@ -75,12 +74,10 @@ const TaskCard = ({ task, onClick }) => {
         </div>
       </div>
 
-      {/* Description */}
       <div className="text-xs text-gray-700 line-clamp-3 leading-relaxed">
         {description}
       </div>
 
-      {/* Dates + Priority */}
       <div className="flex justify-between items-center pt-2">
         <div className="flex items-center gap-1">
           <img width="12.2" height="12.2" src="/images/calendar1.png" alt="Calendar" />
@@ -114,7 +111,6 @@ const TaskCard = ({ task, onClick }) => {
         </div>
       </div>
 
-      {/* Assigned by */}
       <div className="pt-2 border-t border-neutral-200">
         <div className="flex items-center gap-1">
           <img width="11.5" height="12.8" src="/images/assignee.png" alt="Assignee" />
@@ -124,7 +120,6 @@ const TaskCard = ({ task, onClick }) => {
         </div>
       </div>
 
-      {/* Progress bar */}
       {progress > 0 && (
         <div className="mt-2">
           <div className="flex justify-between text-[10px] text-gray-500 mb-1">
@@ -171,6 +166,7 @@ const ColumnHeader = ({ icon, title, count, bgColor = "bg-blue-500" }) => (
 );
 
 const EmployeeTasksDashboardContent = () => {
+  const [showOnboardingDashboard, setShowOnboardingDashboard] = useState(false);
   const [isLogTaskModalOpen, setIsLogTaskModalOpen] = useState(false);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
@@ -254,6 +250,8 @@ const EmployeeTasksDashboardContent = () => {
     data: tasksData,
     refetch,
     isFetching,
+    isLoading,
+    error,
   } = useGetMyTasksQuery(queryParams);
 
   const [createTask] = useCreateTaskMutation();
@@ -448,9 +446,32 @@ const EmployeeTasksDashboardContent = () => {
     setIsDaysDropdownOpen(false);
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center p-8">
+        <div className="text-gray-500">Loading your tasks...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center p-8">
+        <div className="text-red-500">
+          Error loading tasks: {error?.data?.detail || 'Unknown error'}
+        </div>
+      </div>
+    );
+  }
+
+  if (showOnboardingDashboard) {
+    return (
+      <OnboardingStepsBoard onBack={() => setShowOnboardingDashboard(false)} />
+    );
+  }
+
   return (
     <div className="flex flex-col gap-6">
-      {/* Task Header */}
       <div className="flex flex-row justify-between items-center">
         <div className="flex flex-col">
           <div className="text-lg text-neutral-900 font-semibold">
@@ -460,31 +481,49 @@ const EmployeeTasksDashboardContent = () => {
             Manage and track your assigned tasks
           </div>
         </div>
-        {canCreateTask && (
-          <div
-            className="flex justify-center items-center rounded-md w-[180px] h-12 bg-teal-500 cursor-pointer hover:bg-teal-600 transition-colors"
-            onClick={() => setIsLogTaskModalOpen(true)}
+
+        <div className="flex flex-row items-center gap-3">
+          <div className="flex justify-center items-center rounded-md w-[220px] h-12 bg-gray-200 cursor-pointer hover:bg-gray-300 transition-colors"
+            onClick={() => setShowOnboardingDashboard(true)}
           >
             <div className="flex flex-row items-center gap-2">
               <div className="flex justify-center items-center w-5 h-5">
                 <img
                   width="15.3px"
                   height="15.3px"
-                  src="/images/addtask.png"
-                  alt="Add Task icon"
+                  src="/images/task.png"
+                  alt="Dashboard icon"
                 />
               </div>
-              <div className="text-sm text-white font-medium">
-                New Task
+              <div className="text-sm text-gray-800 font-medium">
+                Other Tasks
               </div>
             </div>
           </div>
-        )}
+          {canCreateTask && (
+            <div
+              className="flex justify-center items-center rounded-md w-[180px] h-12 bg-teal-500 cursor-pointer hover:bg-teal-600 transition-colors"
+              onClick={() => setIsLogTaskModalOpen(true)}
+            >
+              <div className="flex flex-row items-center gap-2">
+                <div className="flex justify-center items-center w-5 h-5">
+                  <img
+                    width="15.3px"
+                    height="15.3px"
+                    src="/images/addtask.png"
+                    alt="Add Task icon"
+                  />
+                </div>
+                <div className="text-sm text-white font-medium">
+                  New Task
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Search and Filters */}
       <div className="flex flex-row justify-between items-center gap-4 w-full">
-        {/* Search Bar */}
         <div className="flex flex-row items-center gap-2 p-2 rounded-lg border border-slate-100 h-10 shadow-md transition-transform duration-200 hover:-translate-y-1 bg-white flex-1">
           <div className="flex justify-center items-center h-5">
             <img
@@ -503,7 +542,6 @@ const EmployeeTasksDashboardContent = () => {
           />
         </div>
 
-        {/* Days Filter Dropdown */}
         <div className="relative">
           <div 
             className="flex flex-row justify-center items-center gap-2 p-2 rounded-lg border border-neutral-200 w-[150px] h-10 bg-white cursor-pointer hover:bg-gray-50 transition-colors"
@@ -527,7 +565,6 @@ const EmployeeTasksDashboardContent = () => {
             </div>
           </div>
 
-          {/* Days Dropdown Menu */}
           {isDaysDropdownOpen && (
             <div className="absolute top-full left-0 mt-1 w-full rounded-md border border-neutral-200 bg-white shadow-lg z-10 max-h-60 overflow-y-auto">
               {daysOptions.map(({ key, value }) => (
@@ -545,7 +582,6 @@ const EmployeeTasksDashboardContent = () => {
           )}
         </div>
 
-        {/* Status Filter Dropdown */}
         <div className="relative">
           <div 
             className="flex flex-row justify-center items-center gap-2 p-2 rounded-lg border border-neutral-200 w-[150px] h-10 bg-white cursor-pointer hover:bg-gray-50 transition-colors"
@@ -569,7 +605,6 @@ const EmployeeTasksDashboardContent = () => {
             </div>
           </div>
 
-          {/* Status Dropdown Menu */}
           {isStatusDropdownOpen && (
             <div className="absolute top-full left-0 mt-1 w-full rounded-md border border-neutral-200 bg-white shadow-lg z-10">
               {statusOptions.map(({ key, value }) => (
@@ -588,7 +623,6 @@ const EmployeeTasksDashboardContent = () => {
         </div>
       </div>
 
-      {/* Tabs */}
       <div className="flex rounded-lg border border-slate-100 h-10 bg-slate-50 overflow-hidden">
         <div
           className={`flex items-center justify-center h-10 w-1/2 cursor-pointer ${activeTab === 'taskManagement' ? 'bg-white' : ''}`}
@@ -610,7 +644,6 @@ const EmployeeTasksDashboardContent = () => {
 
       {activeTab === 'taskManagement' ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
-          {/* To Do Column */}
           <div className="flex flex-col gap-4">
             <ColumnHeader
               icon="/images/taskstatus.png"
@@ -635,7 +668,6 @@ const EmployeeTasksDashboardContent = () => {
             </div>
           </div>
 
-          {/* In Progress Column */}
           <div className="flex flex-col gap-4">
             <ColumnHeader
               icon="/images/taskstatus.png"
@@ -660,7 +692,6 @@ const EmployeeTasksDashboardContent = () => {
             </div>
           </div>
 
-          {/* Completed Column */}
           <div className="flex flex-col gap-4">
             <ColumnHeader
               icon="/images/taskstatus.png"
@@ -685,7 +716,6 @@ const EmployeeTasksDashboardContent = () => {
             </div>
           </div>
 
-          {/* Infinite Scroll Observer Target */}
           <div 
             ref={observerTarget} 
             className="md:col-span-2 lg:col-span-3 h-10 flex items-center justify-center"
@@ -696,9 +726,7 @@ const EmployeeTasksDashboardContent = () => {
           </div>
         </div>
       ) : (
-        /* Task Analytics Content */
         <div className="flex flex-col justify-between items-center gap-6 w-full">
-          {/* Task Stats Cards */}
           <div className="flex flex-row justify-between items-center gap-3 w-full h-[123px]">
             <div className="flex flex-col justify-between p-4 rounded-xl w-64 h-[121px] shadow-lg bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl">
               <div className="flex justify-between items-center">
@@ -780,7 +808,6 @@ const EmployeeTasksDashboardContent = () => {
             </div>
           </div>
 
-          {/* Task Performance Section */}
           <div className="flex flex-col justify-start items-start gap-6 h-[334px] w-full">
             <div className="flex flex-row justify-start items-center gap-4 py-4 h-14 w-full">
               <div className="text-lg text-neutral-900 font-medium">Task Performance</div>
@@ -818,7 +845,6 @@ const EmployeeTasksDashboardContent = () => {
         </div>
       )}
 
-      {/* Modals */}
       <LogTaskModal
         isOpen={isLogTaskModalOpen}
         onClose={() => setIsLogTaskModalOpen(false)}
