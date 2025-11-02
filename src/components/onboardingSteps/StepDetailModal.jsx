@@ -193,9 +193,9 @@ const StepDetailModal = ({ stepId, onClose }) => {
                   Assigned To
                 </label>
                 <div className="text-sm font-medium text-gray-900 bg-slate-50 p-3 rounded-md border">
-                  {step.step.assignee.full_name}
-                  {step.step.assignee.department && (
-                    <p className="text-xs text-gray-500 mt-1">{step.step.assignee.department}</p>
+                  {step.assignee.user.first_name} {step.assignee.user.last_name}
+                  {step.assignee.department && (
+                    <p className="text-xs text-gray-500 mt-1">{step.assignee.department}</p>
                   )}
                 </div>
               </div>
