@@ -38,21 +38,12 @@ const TaskCard = ({ task, onClick }) => {
     URGENT: "/images/urgentflag.png",
   };
 
-  const statusColors = {
-    TO_DO: "bg-blue-100 text-blue-800",
-    IN_PROGRESS: "bg-yellow-100 text-yellow-800",
-    COMPLETED: "bg-green-100 text-green-800",
-    UNDER_REVIEW: "bg-purple-100 text-purple-800",
-    CANCELLED: "bg-red-100 text-red-800",
-    ON_HOLD: "bg-gray-100 text-gray-800",
-  };
-
   const showOverdueBadge = isOverdue && status !== "COMPLETED";
 
   return (
     <div
       key={task.id}
-      className="flex flex-col gap-3 p-4 rounded-xl bg-slate-50/80 cursor-pointer hover:bg-slate-100/80 transition-colors border border-transparent hover:border-slate-200"
+      className="flex flex-col gap-3 p-4 rounded-xl bg-slate-50/80 cursor-pointer hover:bg-slate-100/80 transition-colors border border-slate-300 hover:border-slate-500"
       onClick={() => onClick(detail)}
     >
       <div className="flex justify-between items-start gap-2">
@@ -181,6 +172,7 @@ const EmployeeTasksDashboardContent = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [allTasks, setAllTasks] = useState([]);
   const [hasMore, setHasMore] = useState(true);
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
   const observerTarget = useRef(null);
 
   useEffect(() => {
@@ -189,6 +181,7 @@ const EmployeeTasksDashboardContent = () => {
       setCurrentPage(1);
       setAllTasks([]);
       setHasMore(true);
+      setInitialLoadComplete(false);
     }, 500);
 
     return () => clearTimeout(timer);
@@ -198,6 +191,7 @@ const EmployeeTasksDashboardContent = () => {
     setCurrentPage(1);
     setAllTasks([]);
     setHasMore(true);
+    setInitialLoadComplete(false);
   }, [statusFilter, debouncedSearchTerm]);
 
   const statusMap = {
@@ -257,7 +251,16 @@ const EmployeeTasksDashboardContent = () => {
   const [createTask] = useCreateTaskMutation();
 
   useEffect(() => {
+    if (error) {
+      if (currentPage > 1) {
+        setHasMore(false);
+      }
+    }
+  }, [error, currentPage]);
+
+  useEffect(() => {
     if (tasksData?.results) {
+      setInitialLoadComplete(true);
       if (currentPage === 1) {
         setAllTasks(tasksData.results);
       } else {
@@ -276,7 +279,7 @@ const EmployeeTasksDashboardContent = () => {
   useEffect(() => {
     const observer = new IntersectionObserver(
       entries => {
-        if (entries[0].isIntersecting && hasMore && !isFetching) {
+        if (entries[0].isIntersecting && hasMore && !isFetching && !error) {
           setCurrentPage(prev => prev + 1);
         }
       },
@@ -293,7 +296,7 @@ const EmployeeTasksDashboardContent = () => {
         observer.unobserve(currentTarget);
       }
     };
-  }, [hasMore, isFetching]);
+  }, [hasMore, isFetching, error]);
 
   const totalTasksCount = tasksData?.count || allTasks.length;
 
@@ -454,7 +457,7 @@ const EmployeeTasksDashboardContent = () => {
     );
   }
 
-  if (error) {
+  if (error && currentPage === 1 && !initialLoadComplete) {
     return (
       <div className="flex justify-center items-center p-8">
         <div className="text-red-500">

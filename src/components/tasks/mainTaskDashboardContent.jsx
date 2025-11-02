@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import {
   useGetTasksQuery,
   useGetTaskAnalyticsQuery,
@@ -6,9 +6,6 @@ import {
   useGetTaskDetailQuery,
 } from "../../store/services/tasks/tasksService";
 import { PAGE_SIZE } from "@constants/constants";
-import LogTaskModal from "./LogTaskModal";
-import TaskModal from "./TaskModal";
-import { toast } from "react-toastify";
 import LogTaskModal from "./LogTaskModal";
 import TaskModal from "./TaskModal";
 import { toast } from "react-toastify";
@@ -41,21 +38,12 @@ const TaskCard = ({ task, onClick }) => {
     URGENT: "/images/urgentflag.png",
   };
 
-  const statusColors = {
-    TO_DO: "bg-blue-100 text-blue-800",
-    IN_PROGRESS: "bg-yellow-100 text-yellow-800",
-    COMPLETED: "bg-green-100 text-green-800",
-    UNDER_REVIEW: "bg-purple-100 text-purple-800",
-    CANCELLED: "bg-red-100 text-red-800",
-    ON_HOLD: "bg-gray-100 text-gray-800",
-  };
-
   const showOverdueBadge = isOverdue && status !== "COMPLETED";
 
   return (
     <div
       key={task.id}
-      className="flex flex-col gap-3 p-4 rounded-xl bg-slate-50/80 cursor-pointer hover:bg-slate-100/80 transition-colors border border-transparent hover:border-slate-200"
+      className="flex flex-col gap-3 p-4 rounded-xl bg-slate-50/80 cursor-pointer hover:bg-slate-100/80 transition-colors border border-slate-300 hover:border-slate-500"
       onClick={() => onClick(task)}
     >
       <div className="flex justify-between items-start gap-2">
@@ -258,7 +246,6 @@ export default function MainTaskDashboardContent() {
     isFetching,
   } = useGetTasksQuery(queryParams);
 
-  const { data: analyticsData } = useGetTaskAnalyticsQuery({});
   const [createTask] = useCreateTaskMutation();
 
   useEffect(() => {
@@ -456,56 +443,54 @@ export default function MainTaskDashboardContent() {
     );
   }
 
-return (
-  <div className="flex flex-col gap-6">
-    <div className="flex flex-row justify-between items-center">
-      <div className="flex flex-col">
-        <div className="text-lg text-neutral-900 font-semibold">Task Management</div>
-        <div className="text-sm text-gray-600 font-normal">
-          Manage and track all team tasks
-        </div>
-      </div>
-
-      <div className="flex flex-row items-center gap-3">
-        <div
-          className="flex justify-center items-center rounded-md w-[220px] h-12 bg-gray-200 cursor-pointer hover:bg-gray-300 transition-colors"
-          onClick={() => setShowOnboardingDashboard(true)}
-        >
-          <div className="flex flex-row items-center gap-2">
-            <div className="flex justify-center items-center w-5 h-5">
-              <img
-                width="15.3px"
-                height="15.3px"
-                src="/images/task.png"
-                alt="Dashboard icon"
-              />
-            </div>
-            <div className="text-sm text-gray-800 font-medium">
-              Other Tasks
-            </div>
+  return (
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-row justify-between items-center">
+        <div className="flex flex-col">
+          <div className="text-lg text-neutral-900 font-semibold">Task Management</div>
+          <div className="text-sm text-gray-600 font-normal">
+            Manage and track all team tasks
           </div>
         </div>
 
-        <div
-          className="flex justify-center items-center rounded-md w-[180px] h-12 bg-teal-500 cursor-pointer hover:bg-teal-600 transition-colors"
-          onClick={() => setIsLogTaskModalOpen(true)}
-        >
-          <div className="flex flex-row items-center gap-2">
-            <div className="flex justify-center items-center w-5 h-5">
-              <img
-                width="15.3px"
-                height="15.3px"
-                src="/images/addtask.png"
-                alt="Add Task icon"
-              />
+        <div className="flex flex-row items-center gap-3">
+          <div
+            className="flex justify-center items-center rounded-md w-[220px] h-12 bg-gray-200 cursor-pointer hover:bg-gray-300 transition-colors"
+            onClick={() => setShowOnboardingDashboard(true)}
+          >
+            <div className="flex flex-row items-center gap-2">
+              <div className="flex justify-center items-center w-5 h-5">
+                <img
+                  width="15.3px"
+                  height="15.3px"
+                  src="/images/task.png"
+                  alt="Dashboard icon"
+                />
+              </div>
+              <div className="text-sm text-gray-800 font-medium">
+                Other Tasks
+              </div>
             </div>
-            <div className="text-sm text-white font-medium">New Task</div>
+          </div>
+
+          <div
+            className="flex justify-center items-center rounded-md w-[180px] h-12 bg-teal-500 cursor-pointer hover:bg-teal-600 transition-colors"
+            onClick={() => setIsLogTaskModalOpen(true)}
+          >
+            <div className="flex flex-row items-center gap-2">
+              <div className="flex justify-center items-center w-5 h-5">
+                <img
+                  width="15.3px"
+                  height="15.3px"
+                  src="/images/addtask.png"
+                  alt="Add Task icon"
+                />
+              </div>
+              <div className="text-sm text-white font-medium">New Task</div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-
-
 
       <div className="flex flex-row justify-between items-center gap-4 w-full">
         <div className="flex flex-row items-center gap-2 p-2 rounded-lg border border-slate-100 h-10 shadow-md transition-transform duration-200 hover:-translate-y-1 bg-white flex-1">
@@ -754,7 +739,6 @@ return (
             </div>
           )}
 
-          {/* Infinite Scroll Observer Target */}
           <div 
             ref={observerTarget} 
             className="md:col-span-2 lg:col-span-3 h-10 flex items-center justify-center"
