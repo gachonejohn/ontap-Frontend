@@ -1,7 +1,7 @@
 // pages/Employees.js
 import React, { useState, useEffect } from 'react';
 import NewEmployeeModal from './NewEmployeeModal';
-import { useGetEmployeesQuery } from  '../../../store/services/employees/employeesService';
+import { useGetEmployeesQuery } from '../../../store/services/employees/employeesService';
 
 export default function Employees() {
   const [showNewEmployeeModal, setShowNewEmployeeModal] = useState(false);
@@ -10,10 +10,11 @@ export default function Employees() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const itemsPerPage = 4;
-const {data, isLoading, error, refetch} = useGetEmployeesQuery({},
-  { refetchOnMountOrArgChange: true,}
-)
-console.log("data",data)
+  const { data, isLoading, error, refetch } = useGetEmployeesQuery(
+    {},
+    { refetchOnMountOrArgChange: true }
+  );
+  console.log('data', data);
   // Fetch employees on component mount
   useEffect(() => {
     fetchEmployees();
@@ -22,15 +23,12 @@ console.log("data",data)
   const fetchEmployees = async () => {
     try {
       setLoading(true);
-   
-      
+
       // Handle different response formats
       let employeesData = [];
-      
-      
+
       console.log('Employees data:', employeesData); // Debug log
       setEmployees(employeesData);
-      
     } catch (error) {
       console.error('Error fetching employees:', error);
       alert('Failed to load employees. Please try again.');
@@ -42,15 +40,18 @@ console.log("data",data)
 
   const handleEmployeeAdded = (newEmployee) => {
     // Add the new employee to the beginning of the list
-    setEmployees(prev => [newEmployee, ...prev]);
+    setEmployees((prev) => [newEmployee, ...prev]);
   };
 
   // Filter employees based on search term - with safe array check
-  const filteredEmployees = Array.isArray(employees) ? employees.filter(emp =>
-    emp?.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    emp?.last_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    emp?.email?.toLowerCase().includes(searchTerm.toLowerCase())
-  ) : [];
+  const filteredEmployees = Array.isArray(employees)
+    ? employees.filter(
+        (emp) =>
+          emp?.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          emp?.last_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          emp?.email?.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : [];
 
   // Calculate pagination
   const totalPages = Math.ceil(filteredEmployees.length / itemsPerPage);
@@ -61,16 +62,20 @@ console.log("data",data)
 
   // Safe counting functions
   const getActiveCount = () => {
-    return Array.isArray(employees) ? employees.filter(emp => emp?.status === 'active').length : 0;
+    return Array.isArray(employees)
+      ? employees.filter((emp) => emp?.status === 'active').length
+      : 0;
   };
 
   const getOnLeaveCount = () => {
-    return Array.isArray(employees) ? employees.filter(emp => emp?.status === 'on_leave').length : 0;
+    return Array.isArray(employees)
+      ? employees.filter((emp) => emp?.status === 'on_leave').length
+      : 0;
   };
 
   const getDepartmentCount = () => {
     if (!Array.isArray(employees)) return 0;
-    const departments = employees.map(emp => emp.department?.name).filter(Boolean);
+    const departments = employees.map((emp) => emp.department?.name).filter(Boolean);
     return new Set(departments).size;
   };
 
@@ -79,16 +84,14 @@ console.log("data",data)
       {/* Header section */}
       <div className="flex justify-between items-center">
         <div className="flex flex-col gap-1.5">
-          <div className="text-lg text-neutral-900 font-semibold">
-            Employee Management
-          </div>
+          <div className="text-lg text-neutral-900 font-semibold">Employee Management</div>
           <div className="text-sm text-gray-600 font-normal">
             Manage your organization's workforce.
           </div>
         </div>
 
         {/* Add Employee Button */}
-        <button 
+        <button
           onClick={() => setShowNewEmployeeModal(true)}
           className="flex justify-center items-center gap-2 p-2 rounded-md h-12 bg-teal-500 text-white text-sm hover:bg-teal-600 transition-colors"
         >
@@ -123,9 +126,7 @@ console.log("data",data)
           <div className="flex justify-between items-center">
             <div className="flex flex-col">
               <div className="text-sm text-gray-600 font-medium">Active</div>
-              <div className="mt-2 text-lg text-neutral-900 font-semibold">
-                {getActiveCount()}
-              </div>
+              <div className="mt-2 text-lg text-neutral-900 font-semibold">{getActiveCount()}</div>
             </div>
             <div className="flex items-center justify-center p-1 rounded-2xl h-8 w-8 bg-green-100 shadow-sm">
               <img
@@ -142,9 +143,7 @@ console.log("data",data)
           <div className="flex justify-between items-center">
             <div className="flex flex-col">
               <div className="text-sm text-gray-600 font-medium">On Leave</div>
-              <div className="mt-2 text-lg text-neutral-900 font-semibold">
-                {getOnLeaveCount()}
-              </div>
+              <div className="mt-2 text-lg text-neutral-900 font-semibold">{getOnLeaveCount()}</div>
             </div>
             <div className="flex items-center justify-center p-1 rounded-2xl h-8 w-8 bg-orange-100 shadow-sm">
               <img
@@ -180,12 +179,7 @@ console.log("data",data)
       <div className="flex flex-col lg:flex-row justify-between items-center gap-4">
         <div className="flex items-center gap-2 p-2 rounded-lg border border-slate-100 h-10 shadow-md bg-white flex-1">
           <div className="flex justify-center items-center h-5">
-            <img
-              width="16.5px"
-              height="16.5px"
-              src="/images/search.png"
-              alt="Search icon"
-            />
+            <img width="16.5px" height="16.5px" src="/images/search.png" alt="Search icon" />
           </div>
           <input
             type="text"
@@ -200,38 +194,19 @@ console.log("data",data)
           <div className="flex flex-row justify-center items-center gap-2 p-2 rounded-lg border border-neutral-200 w-[150px] h-10 bg-white cursor-pointer hover:bg-gray-50 transition-colors">
             <div className="flex flex-row items-center gap-0.9">
               <div className="flex justify-center items-center h-5">
-                <img
-                  width="16.3px"
-                  height="16.3px"
-                  src="/images/filter.png"
-                  alt="Filter icon"
-                />
+                <img width="16.3px" height="16.3px" src="/images/filter.png" alt="Filter icon" />
               </div>
-              <div className="text-xs text-neutral-900 font-semibold">
-                All Departments
-              </div>
+              <div className="text-xs text-neutral-900 font-semibold">All Departments</div>
             </div>
             <div className="flex flex-col justify-center items-center w-4 h-4">
-              <img
-                width="9.5px"
-                height="5.1px"
-                src="/images/dropdown.png"
-                alt="Dropdown icon"
-              />
+              <img width="9.5px" height="5.1px" src="/images/dropdown.png" alt="Dropdown icon" />
             </div>
           </div>
 
           <div className="flex flex-row justify-center items-center gap-2 p-2 rounded-lg border border-neutral-200 w-[120px] h-10 bg-white cursor-pointer hover:bg-gray-50 transition-colors">
-            <div className="text-xs text-neutral-900 font-semibold">
-              All Status
-            </div>
+            <div className="text-xs text-neutral-900 font-semibold">All Status</div>
             <div className="flex flex-col justify-center items-center w-4 h-4">
-              <img
-                width="9.5px"
-                height="5.1px"
-                src="/images/dropdown.png"
-                alt="Dropdown icon"
-              />
+              <img width="9.5px" height="5.1px" src="/images/dropdown.png" alt="Dropdown icon" />
             </div>
           </div>
         </div>
@@ -250,11 +225,19 @@ console.log("data",data)
         <div className="flex flex-col w-full">
           {/* Column Headers */}
           <div className="flex flex-row w-full bg-slate-50 border-b border-neutral-200">
-            <div className="flex-1 min-w-[400px] p-4 text-xs font-medium text-gray-500">Employee</div>
+            <div className="flex-1 min-w-[400px] p-4 text-xs font-medium text-gray-500">
+              Employee
+            </div>
             <div className="w-[200px] p-4 text-xs font-medium text-gray-500 text-center">Role</div>
-            <div className="w-[200px] p-4 text-xs font-medium text-gray-500 text-center">Department</div>
-            <div className="w-[152px] p-4 text-xs font-medium text-gray-500 text-center">Status</div>
-            <div className="w-[152px] p-4 text-xs font-medium text-gray-500 text-center">Actions</div>
+            <div className="w-[200px] p-4 text-xs font-medium text-gray-500 text-center">
+              Department
+            </div>
+            <div className="w-[152px] p-4 text-xs font-medium text-gray-500 text-center">
+              Status
+            </div>
+            <div className="w-[152px] p-4 text-xs font-medium text-gray-500 text-center">
+              Actions
+            </div>
           </div>
 
           {/* {loading ? (
@@ -312,7 +295,7 @@ console.log("data",data)
             ))
           )} */}
         </div>
-{/* 
+        {/* 
         {filteredEmployees.length > 0 && (
           <div className="flex flex-row justify-between items-center p-4 w-full h-[68px]">
             <div className="text-sm text-neutral-500">

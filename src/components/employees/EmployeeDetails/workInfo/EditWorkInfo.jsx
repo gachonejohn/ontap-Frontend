@@ -1,39 +1,29 @@
-import { zodResolver } from "@hookform/resolvers/zod";
+import { zodResolver } from '@hookform/resolvers/zod';
 
-import { updateEmployeeSchema } from "@schemas/employees/employeeSchema";
+import { updateEmployeeSchema } from '@schemas/employees/employeeSchema';
 import {
-    useGetDepartmentsQuery,
-    useGetPositionsQuery,
-} from "@store/services/companies/companiesService";
-import { useGetRolesQuery } from "@store/services/roles/rolesService";
-import { getApiErrorMessage } from "@utils/errorHandler";
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { FiEdit } from "react-icons/fi";
-import { IoCloseOutline } from "react-icons/io5";
-import Select from "react-select";
-import { toast } from "react-toastify";
-import { useUpdateWorkInfoMutation } from "../../../../store/services/employees/employeesService";
-import SubmitCancelButtons from "../../../common/Buttons/ActionButton";
-import CreateUpdateButton from "../../../common/Buttons/CreateUpdateButton";
+  useGetDepartmentsQuery,
+  useGetPositionsQuery,
+} from '@store/services/companies/companiesService';
+import { useGetRolesQuery } from '@store/services/roles/rolesService';
+import { getApiErrorMessage } from '@utils/errorHandler';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { FiEdit } from 'react-icons/fi';
+import { IoCloseOutline } from 'react-icons/io5';
+import Select from 'react-select';
+import { toast } from 'react-toastify';
+import { useUpdateWorkInfoMutation } from '../../../../store/services/employees/employeesService';
+import SubmitCancelButtons from '../../../common/Buttons/ActionButton';
+import CreateUpdateButton from '../../../common/Buttons/CreateUpdateButton';
 
 export const EditWorkInfo = ({ refetchData, data }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const [updateWorkInfo, { isLoading: isUpdating }] =
-    useUpdateWorkInfoMutation();
-  const { data: rolesData } = useGetRolesQuery(
-    {},
-    { refetchOnMountOrArgChange: true }
-  );
-  const { data: departmentsData } = useGetDepartmentsQuery(
-    {},
-    { refetchOnMountOrArgChange: true }
-  );
-  const { data: positionsData } = useGetPositionsQuery(
-    {},
-    { refetchOnMountOrArgChange: true }
-  );
+  const [updateWorkInfo, { isLoading: isUpdating }] = useUpdateWorkInfoMutation();
+  const { data: rolesData } = useGetRolesQuery({}, { refetchOnMountOrArgChange: true });
+  const { data: departmentsData } = useGetDepartmentsQuery({}, { refetchOnMountOrArgChange: true });
+  const { data: positionsData } = useGetPositionsQuery({}, { refetchOnMountOrArgChange: true });
   const {
     register,
     handleSubmit,
@@ -50,27 +40,27 @@ export const EditWorkInfo = ({ refetchData, data }) => {
     },
   });
   useEffect(() => {
-    console.log("Form Errors:", errors);
+    console.log('Form Errors:', errors);
   }, [errors]);
 
   const handleRoleChange = (selected) => {
     if (selected) {
       const item_id = Number(selected.value);
-      setValue("role", item_id);
+      setValue('role', item_id);
     }
   };
 
   const handleDepartmentChange = (selected) => {
     if (selected) {
       const item_id = Number(selected.value);
-      setValue("department", item_id);
+      setValue('department', item_id);
     }
   };
 
   const handlePositionChange = (selected) => {
     if (selected) {
       const item_id = Number(selected.value);
-      setValue("position", item_id);
+      setValue('position', item_id);
     }
   };
   const onSubmit = async (formData) => {
@@ -79,11 +69,11 @@ export const EditWorkInfo = ({ refetchData, data }) => {
         id: data.id,
         data: formData,
       }).unwrap();
-      toast.success("Work details updated successfully!");
+      toast.success('Work details updated successfully!');
       handleCloseModal();
       refetchData();
     } catch (error) {
-      const message = getApiErrorMessage(error, "Error Updating work Info.");
+      const message = getApiErrorMessage(error, 'Error Updating work Info.');
       toast.error(message);
     } finally {
       refetchData();
@@ -127,9 +117,7 @@ export const EditWorkInfo = ({ refetchData, data }) => {
             >
               {/* Header - sticky */}
               <div className="sticky top-0 bg-white z-40 flex px-4 justify-between items-center py-4 border-b border-gray-100">
-                <p className="text-sm md:text-lg lg:text-lg font-semibold">
-                  Edit Work Information
-                </p>
+                <p className="text-sm md:text-lg lg:text-lg font-semibold">Edit Work Information</p>
                 <IoCloseOutline
                   size={20}
                   className="cursor-pointer hover:text-gray-600"
@@ -151,7 +139,7 @@ export const EditWorkInfo = ({ refetchData, data }) => {
                       label: `${item.name}`,
                     }))}
                     defaultValue={{
-                      label: `${data?.department?.name ?? ""}`,
+                      label: `${data?.department?.name ?? ''}`,
                       value: `${data?.department?.id}`,
                     }}
                     menuPortalTarget={document.body}
@@ -163,40 +151,36 @@ export const EditWorkInfo = ({ refetchData, data }) => {
                       }),
                       control: (base) => ({
                         ...base,
-                        minHeight: "40px",
-                        borderColor: "#d1d5db",
-                        boxShadow: "none",
-                        "&:hover": {
-                          borderColor: "#9ca3af",
+                        minHeight: '40px',
+                        borderColor: '#d1d5db',
+                        boxShadow: 'none',
+                        '&:hover': {
+                          borderColor: '#9ca3af',
                         },
-                        "&:focus-within": {
-                          borderColor: "#9ca3af",
-                          boxShadow: "none",
+                        '&:focus-within': {
+                          borderColor: '#9ca3af',
+                          boxShadow: 'none',
                         },
-                        backgroundColor: "#F8FAFC",
+                        backgroundColor: '#F8FAFC',
                       }),
                     }}
                     onChange={handleDepartmentChange}
                   />
                   {errors.department_id && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {errors.department_id.message}
-                    </p>
+                    <p className="text-red-500 text-sm mt-1">{errors.department_id.message}</p>
                   )}
                 </div>
 
                 {/* Position */}
                 <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Position
-                  </label>
+                  <label className="block text-sm font-medium mb-2">Position</label>
                   <Select
                     options={positionsData?.results?.map((item) => ({
                       value: item.id,
                       label: `${item.title}`,
                     }))}
                     defaultValue={{
-                      label: `${data?.position?.title ?? ""} `,
+                      label: `${data?.position?.title ?? ''} `,
                       value: data?.position?.id,
                     }}
                     menuPortalTarget={document.body}
@@ -208,25 +192,23 @@ export const EditWorkInfo = ({ refetchData, data }) => {
                       }),
                       control: (base) => ({
                         ...base,
-                        minHeight: "40px",
-                        borderColor: "#d1d5db",
-                        boxShadow: "none",
-                        "&:hover": {
-                          borderColor: "#9ca3af",
+                        minHeight: '40px',
+                        borderColor: '#d1d5db',
+                        boxShadow: 'none',
+                        '&:hover': {
+                          borderColor: '#9ca3af',
                         },
-                        "&:focus-within": {
-                          borderColor: "#9ca3af",
-                          boxShadow: "none",
+                        '&:focus-within': {
+                          borderColor: '#9ca3af',
+                          boxShadow: 'none',
                         },
-                        backgroundColor: "#F8FAFC",
+                        backgroundColor: '#F8FAFC',
                       }),
                     }}
                     onChange={handlePositionChange}
                   />
                   {errors.position_id && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {errors.position_id.message}
-                    </p>
+                    <p className="text-red-500 text-sm mt-1">{errors.position_id.message}</p>
                   )}
                 </div>
 
@@ -239,7 +221,7 @@ export const EditWorkInfo = ({ refetchData, data }) => {
                       label: `${item.name}`,
                     }))}
                     defaultValue={{
-                      label: `${data?.role?.name ?? ""}`,
+                      label: `${data?.role?.name ?? ''}`,
                       value: `${data?.role?.id}`,
                     }}
                     menuPortalTarget={document.body}
@@ -251,25 +233,23 @@ export const EditWorkInfo = ({ refetchData, data }) => {
                       }),
                       control: (base) => ({
                         ...base,
-                        minHeight: "40px",
-                        borderColor: "#d1d5db",
-                        boxShadow: "none",
-                        "&:hover": {
-                          borderColor: "#9ca3af",
+                        minHeight: '40px',
+                        borderColor: '#d1d5db',
+                        boxShadow: 'none',
+                        '&:hover': {
+                          borderColor: '#9ca3af',
                         },
-                        "&:focus-within": {
-                          borderColor: "#9ca3af",
-                          boxShadow: "none",
+                        '&:focus-within': {
+                          borderColor: '#9ca3af',
+                          boxShadow: 'none',
                         },
-                        backgroundColor: "#F8FAFC",
+                        backgroundColor: '#F8FAFC',
                       }),
                     }}
                     onChange={handleRoleChange}
                   />
                   {errors.role_id && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {errors.role_id.message}
-                    </p>
+                    <p className="text-red-500 text-sm mt-1">{errors.role_id.message}</p>
                   )}
                 </div>
                 <SubmitCancelButtons

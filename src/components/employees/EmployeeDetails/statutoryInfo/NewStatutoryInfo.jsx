@@ -1,29 +1,28 @@
-import SubmitCancelButtons from "@components/common/Buttons/ActionButton";
-import CreateUpdateButton from "@components/common/Buttons/CreateUpdateButton";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { CreateEmployeeStatutorySchema } from "@schemas/employees/employeeSchema";
-import { useGetDocumentTypesQuery } from "@store/services/companies/documentsService";
-import { useCreateStatutoryInfoMutation } from "@store/services/employees/employeesService";
-import { getApiErrorMessage } from "@utils/errorHandler";
-import { useRef, useState } from "react";
-import { useForm } from "react-hook-form";
-import { FiCheckCircle, FiPlus, FiX } from "react-icons/fi";
-import { IoCloseOutline } from "react-icons/io5";
-import { MdOutlineCloudUpload } from "react-icons/md";
-import Select from "react-select";
-import { toast } from "react-toastify";
-export const NewStatutoryInfo = ({ refetchData, data:employeeData }) => {
+import SubmitCancelButtons from '@components/common/Buttons/ActionButton';
+import CreateUpdateButton from '@components/common/Buttons/CreateUpdateButton';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { CreateEmployeeStatutorySchema } from '@schemas/employees/employeeSchema';
+import { useGetDocumentTypesQuery } from '@store/services/companies/documentsService';
+import { useCreateStatutoryInfoMutation } from '@store/services/employees/employeesService';
+import { getApiErrorMessage } from '@utils/errorHandler';
+import { useRef, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { FiCheckCircle, FiPlus, FiX } from 'react-icons/fi';
+import { IoCloseOutline } from 'react-icons/io5';
+import { MdOutlineCloudUpload } from 'react-icons/md';
+import Select from 'react-select';
+import { toast } from 'react-toastify';
+export const NewStatutoryInfo = ({ refetchData, data: employeeData }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [file, setFile] = useState(null);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const fileInputRef = useRef(null);
-  const [createStatutoryInfo, { isLoading: isCreating }] =
-    useCreateStatutoryInfoMutation();
+  const [createStatutoryInfo, { isLoading: isCreating }] = useCreateStatutoryInfoMutation();
   const { data: documentTypesData } = useGetDocumentTypesQuery(
     {},
     { refetchOnMountOrArgChange: true }
   );
-  console.log("documentTypesData", documentTypesData);
+  console.log('documentTypesData', documentTypesData);
   const {
     register,
     handleSubmit,
@@ -36,10 +35,10 @@ export const NewStatutoryInfo = ({ refetchData, data:employeeData }) => {
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files?.[0];
-    setError("");
+    setError('');
     if (!selectedFile) return;
     setFile(selectedFile);
-    setValue("file", selectedFile, {
+    setValue('file', selectedFile, {
       shouldValidate: true,
       shouldDirty: true,
     });
@@ -51,34 +50,33 @@ export const NewStatutoryInfo = ({ refetchData, data:employeeData }) => {
 
   const onDrop = (e) => {
     e.preventDefault();
-    setError("");
+    setError('');
     const selectedFile = e.dataTransfer.files[0];
     if (!selectedFile) return;
     setFile(selectedFile);
-    setValue("file", selectedFile, { shouldValidate: true, shouldDirty: true });
+    setValue('file', selectedFile, { shouldValidate: true, shouldDirty: true });
   };
 
   const onDragOver = (e) => e.preventDefault();
   const onSubmit = async (data) => {
     const formData = new FormData();
 
-    if (data.document_type)
-      formData.append("document_type", data.document_type);
-    if (data.identifier) formData.append("identifier", data.identifier);
-    if (data.issue_date) formData.append("issue_date", data.issue_date);
-    if (data.expiry_date) formData.append("expiry_date", data.expiry_date);
-    formData.append("employee", employeeData.id);
+    if (data.document_type) formData.append('document_type', data.document_type);
+    if (data.identifier) formData.append('identifier', data.identifier);
+    if (data.issue_date) formData.append('issue_date', data.issue_date);
+    if (data.expiry_date) formData.append('expiry_date', data.expiry_date);
+    formData.append('employee', employeeData.id);
 
     // file is optional now
-    if (file) formData.append("file", file);
+    if (file) formData.append('file', file);
 
     try {
       const response = await createStatutoryInfo(formData).unwrap();
-      toast.success(response.message || "Info saved successfully!");
+      toast.success(response.message || 'Info saved successfully!');
       refetchData();
       handleCloseModal();
     } catch (err) {
-      const message = getApiErrorMessage(err, "Error saving info!.");
+      const message = getApiErrorMessage(err, 'Error saving info!.');
       toast.error(message);
     }
   };
@@ -92,7 +90,7 @@ export const NewStatutoryInfo = ({ refetchData, data:employeeData }) => {
   const handleDocumentTypeChange = (selected) => {
     if (selected) {
       const item_id = Number(selected.value);
-      setValue("document_type", item_id);
+      setValue('document_type', item_id);
     }
   };
   return (
@@ -135,11 +133,7 @@ export const NewStatutoryInfo = ({ refetchData, data:employeeData }) => {
                 <p className="text-sm md:text-lg lg:text-lg font-semibold">
                   Add New Statutory Info
                 </p>
-                <IoCloseOutline
-                  size={20}
-                  className="cursor-pointer"
-                  onClick={handleCloseModal}
-                />
+                <IoCloseOutline size={20} className="cursor-pointer" onClick={handleCloseModal} />
               </div>
 
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 p-4">
@@ -152,13 +146,11 @@ export const NewStatutoryInfo = ({ refetchData, data:employeeData }) => {
                   <input
                     type="text"
                     placeholder="E.g A071233R "
-                    {...register("identifier")}
+                    {...register('identifier')}
                     className="w-full py-2 px-4 rounded-md border border-gray-400 focus:outline-none focus:border-[#1E9FF2] focus:bg-white placeholder:text-sm"
                   />
                   {errors.identifier && (
-                    <p className="text-red-500 text-sm">
-                      {errors.identifier.message}
-                    </p>
+                    <p className="text-red-500 text-sm">{errors.identifier.message}</p>
                   )}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -169,13 +161,11 @@ export const NewStatutoryInfo = ({ refetchData, data:employeeData }) => {
                     <input
                       type="date"
                       placeholder="Start Date"
-                      {...register("issue_date")}
+                      {...register('issue_date')}
                       className="w-full py-2 px-4 rounded-md border bg-slate-50 focus:outline-none focus:border-primary focus:bg-white placeholder:text-[12px]"
                     />
                     {errors.issue_date && (
-                      <p className="text-red-500 text-sm mt-1">
-                        {errors.issue_date.message}
-                      </p>
+                      <p className="text-red-500 text-sm mt-1">{errors.issue_date.message}</p>
                     )}
                   </div>
                   <div>
@@ -185,20 +175,16 @@ export const NewStatutoryInfo = ({ refetchData, data:employeeData }) => {
                     <input
                       type="date"
                       placeholder="Expiry Date"
-                      {...register("expiry_date")}
+                      {...register('expiry_date')}
                       className="w-full py-2 px-4 rounded-md border bg-slate-50 focus:outline-none focus:border-primary focus:bg-white placeholder:text-[12px]"
                     />
                     {errors.expiry_date && (
-                      <p className="text-red-500 text-sm mt-1">
-                        {errors.expiry_date.message}
-                      </p>
+                      <p className="text-red-500 text-sm mt-1">{errors.expiry_date.message}</p>
                     )}
                   </div>
                 </div>
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium mb-2">
-                    Document Type
-                  </label>
+                  <label className="block text-sm font-medium mb-2">Document Type</label>
                   <Select
                     options={documentTypesData?.map((item) => ({
                       value: item.id,
@@ -213,35 +199,33 @@ export const NewStatutoryInfo = ({ refetchData, data:employeeData }) => {
                       }),
                       control: (base) => ({
                         ...base,
-                        minHeight: "40px",
-                        borderColor: "#d1d5db",
-                        boxShadow: "none",
-                        "&:hover": {
-                          borderColor: "#9ca3af",
+                        minHeight: '40px',
+                        borderColor: '#d1d5db',
+                        boxShadow: 'none',
+                        '&:hover': {
+                          borderColor: '#9ca3af',
                         },
-                        "&:focus-within": {
-                          borderColor: "#9ca3af",
-                          boxShadow: "none",
+                        '&:focus-within': {
+                          borderColor: '#9ca3af',
+                          boxShadow: 'none',
                         },
-                        backgroundColor: "#F8FAFC",
+                        backgroundColor: '#F8FAFC',
                       }),
                     }}
                     onChange={handleDocumentTypeChange}
                   />
                   {errors.document_type && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {errors.document_type.message}
-                    </p>
+                    <p className="text-red-500 text-sm mt-1">{errors.document_type.message}</p>
                   )}
                 </div>
                 <div
                   className={`border-2 border-dashed rounded-lg p-8 flex flex-col items-center justify-center cursor-pointer mb-6
                                 ${
                                   file
-                                    ? "border-primary bg-primary-50"
+                                    ? 'border-primary bg-primary-50'
                                     : error
-                                    ? "border-red-400 bg-red-50"
-                                    : "border-gray-300 hover:border-blue-400 hover:bg-blue-50"
+                                      ? 'border-red-400 bg-red-50'
+                                      : 'border-gray-300 hover:border-blue-400 hover:bg-blue-50'
                                 }`}
                   onClick={triggerFileInput}
                   onDrop={onDrop}
@@ -275,16 +259,12 @@ export const NewStatutoryInfo = ({ refetchData, data:employeeData }) => {
                   ) : (
                     <>
                       <MdOutlineCloudUpload
-                        className={`text-4xl mb-3 ${
-                          error ? "text-red-500" : "text-primary"
-                        }`}
+                        className={`text-4xl mb-3 ${error ? 'text-red-500' : 'text-primary'}`}
                       />
                       <p className="text-gray-700 font-medium">
                         Click to select or drag a file here
                       </p>
-                      <p className="text-gray-500 text-sm mt-1">
-                        Supported formats: PDF
-                      </p>
+                      <p className="text-gray-500 text-sm mt-1">Supported formats: PDF</p>
                     </>
                   )}
                 </div>

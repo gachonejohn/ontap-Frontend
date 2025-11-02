@@ -1,22 +1,22 @@
-import { useMemo, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useMemo, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
-import ActionModal from "@components/common/Modals/ActionModal";
-import { toast } from "react-toastify";
+import ActionModal from '@components/common/Modals/ActionModal';
+import { toast } from 'react-toastify';
 
-import DataTable from "@components/common/DataTable";
-import Pagination from "@components/common/pagination";
-import ContentSpinner from "@components/common/spinners/dataLoadingSpinner";
-import { PAGE_SIZE } from "@constants/constants";
-import { useFilters } from "@hooks/useFIlters";
+import DataTable from '@components/common/DataTable';
+import Pagination from '@components/common/pagination';
+import ContentSpinner from '@components/common/spinners/dataLoadingSpinner';
+import { PAGE_SIZE } from '@constants/constants';
+import { useFilters } from '@hooks/useFIlters';
 import {
-    useDeleteBreakCategoryMutation,
-    useGetBreakCategoriesQuery
-} from "@store/services/policies/policyService";
-import ButtonDropdown from "@components/common/ActionsPopover";
-import { LuArchiveX } from "react-icons/lu";
-import { NewCategory } from "./NewCategory";
-import { EditCategory } from "./EditCategory";
+  useDeleteBreakCategoryMutation,
+  useGetBreakCategoriesQuery,
+} from '@store/services/policies/policyService';
+import ButtonDropdown from '@components/common/ActionsPopover';
+import { LuArchiveX } from 'react-icons/lu';
+import { NewCategory } from './NewCategory';
+import { EditCategory } from './EditCategory';
 const BreakCategories = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -24,14 +24,14 @@ const BreakCategories = () => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  const currentPageParam = parseInt(searchParams.get("page") || "1", 10);
+  const currentPageParam = parseInt(searchParams.get('page') || '1', 10);
 
   const { filters, currentPage, handlePageChange } = useFilters({
     initialFilters: {},
     initialPage: currentPageParam,
     navigate,
     debounceTime: 100,
-    debouncedFields: [""],
+    debouncedFields: [''],
   });
 
   const queryParams = useMemo(
@@ -51,9 +51,8 @@ const BreakCategories = () => {
   } = useGetBreakCategoriesQuery(queryParams, {
     refetchOnMountOrArgChange: true,
   });
-  console.log("breakCategoriesData", breakCategoriesData);
-  const [deleteBreakCategory, { isLoading: deleting }] =
-    useDeleteBreakCategoryMutation();
+  console.log('breakCategoriesData', breakCategoriesData);
+  const [deleteBreakCategory, { isLoading: deleting }] = useDeleteBreakCategoryMutation();
 
   const openDeleteModal = (id) => {
     setSelectedItem(id);
@@ -68,28 +67,28 @@ const BreakCategories = () => {
   const handleDeleteProgram = async () => {
     try {
       await deleteBreakCategory(selectedItem).unwrap();
-      toast.success("Break type deleted successfully!");
+      toast.success('Break type deleted successfully!');
       closeDeleteModal();
       refetch();
     } catch (error) {
-      console.log("error", error);
-      if (error && typeof error === "object" && error.data) {
-        toast.error(error.data.error || "Error deleting break type.");
+      console.log('error', error);
+      if (error && typeof error === 'object' && error.data) {
+        toast.error(error.data.error || 'Error deleting break type.');
       } else {
-        toast.error("Unexpected error occurred. Please try again.");
+        toast.error('Unexpected error occurred. Please try again.');
       }
     }
   };
 
   const columns = [
     {
-      header: "Name",
-      accessor: "name",
+      header: 'Name',
+      accessor: 'name',
       cell: (item) => <span>{item.name}</span>,
     },
-       {
-      header: "Actions",
-      accessor: "id",
+    {
+      header: 'Actions',
+      accessor: 'id',
       cell: (item) => (
         <>
           <ButtonDropdown>
@@ -111,7 +110,6 @@ const BreakCategories = () => {
   return (
     <div className="bg-white w-full  font-nunito">
       <div className="p-3 flex flex-col md:flex-row md:items-center gap-4 justify-end">
-       
         <div>
           <NewCategory refetchData={refetch} />
         </div>
@@ -123,9 +121,9 @@ const BreakCategories = () => {
         </div>
       ) : error ? (
         <div className="bg-red-50 p-4 rounded-md text-red-800 text-center">
-          {"status" in error && error.data?.error
+          {'status' in error && error.data?.error
             ? error.data.error
-            : "An error occurred while fetching roles."}
+            : 'An error occurred while fetching roles.'}
         </div>
       ) : breakCategoriesData && breakCategoriesData.results.length > 0 ? (
         <DataTable

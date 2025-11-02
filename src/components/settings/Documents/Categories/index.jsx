@@ -1,30 +1,30 @@
-import { useMemo, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useMemo, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
-import { FiEdit, FiEye } from "react-icons/fi";
-import { toast } from "react-toastify";
-import ActionModal from "@components/common/Modals/ActionModal";
+import { FiEdit, FiEye } from 'react-icons/fi';
+import { toast } from 'react-toastify';
+import ActionModal from '@components/common/Modals/ActionModal';
 
-import { LuArchiveX } from "react-icons/lu";
-import { PAGE_SIZE } from "@constants/constants";
-import { useFilters } from "@hooks/useFIlters";
+import { LuArchiveX } from 'react-icons/lu';
+import { PAGE_SIZE } from '@constants/constants';
+import { useFilters } from '@hooks/useFIlters';
 
-import DataTable from "@components/common/DataTable";
-import Pagination from "@components/common/pagination";
-import ContentSpinner from "@components/common/spinners/dataLoadingSpinner";
+import DataTable from '@components/common/DataTable';
+import Pagination from '@components/common/pagination';
+import ContentSpinner from '@components/common/spinners/dataLoadingSpinner';
 // import { CreateRole } from "./NewRole";
 // import { EditRole } from "./editRole";
-import ButtonDropdown from "@components/common/ActionsPopover";
+import ButtonDropdown from '@components/common/ActionsPopover';
 import {
   useDeleteDocumentCategoryMutation,
   useGetDocumentCategoriesQuery,
-} from "@store/services/companies/documentsService";
+} from '@store/services/companies/documentsService';
 
-import { CustomDate } from "@utils/dates";
-import NoDataFound from "@components/common/NoData";
-import { NewDocumentCategory } from "./NewCategory";
-import { EditDocumentCategory } from "./EditCategory";
-import { getApiErrorMessage } from "@utils/errorHandler";
+import { CustomDate } from '@utils/dates';
+import NoDataFound from '@components/common/NoData';
+import { NewDocumentCategory } from './NewCategory';
+import { EditDocumentCategory } from './EditCategory';
+import { getApiErrorMessage } from '@utils/errorHandler';
 const DocumentCategories = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -32,14 +32,14 @@ const DocumentCategories = () => {
   const [selectedRole, setSelectedRole] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  const currentPageParam = parseInt(searchParams.get("page") || "1", 10);
+  const currentPageParam = parseInt(searchParams.get('page') || '1', 10);
 
   const { filters, currentPage, handlePageChange } = useFilters({
     initialFilters: {},
     initialPage: currentPageParam,
     navigate,
     debounceTime: 100,
-    debouncedFields: [""],
+    debouncedFields: [''],
   });
 
   const queryParams = useMemo(
@@ -59,9 +59,8 @@ const DocumentCategories = () => {
   } = useGetDocumentCategoriesQuery(queryParams, {
     refetchOnMountOrArgChange: true,
   });
-console.log("categoriesData",categoriesData)
-  const [deleteDocumentCategory, { isLoading: deleting }] =
-    useDeleteDocumentCategoryMutation();
+  console.log('categoriesData', categoriesData);
+  const [deleteDocumentCategory, { isLoading: deleting }] = useDeleteDocumentCategoryMutation();
 
   const openDeleteModal = (id) => {
     setSelectedRole(id);
@@ -76,14 +75,11 @@ console.log("categoriesData",categoriesData)
   const handleDelete = async () => {
     try {
       await deleteDocumentCategory(selectedRole).unwrap();
-      toast.success("Category deleted successfully!");
+      toast.success('Category deleted successfully!');
       closeDeleteModal();
       refetch();
     } catch (error) {
-      const message = getApiErrorMessage(
-        error,
-        "Error deleting document category."
-      );
+      const message = getApiErrorMessage(error, 'Error deleting document category.');
       toast.error(message);
     }
   };
@@ -91,30 +87,24 @@ console.log("categoriesData",categoriesData)
 
   const columns = [
     {
-      header: "Name",
-      accessor: "name",
+      header: 'Name',
+      accessor: 'name',
       cell: (item) => <span>{item.name}</span>,
     },
     {
-      header: "Description",
-      accessor: "description",
-      cell: (item) => (
-        <span className="text-xs font-medium">{item.description}</span>
-      ),
+      header: 'Description',
+      accessor: 'description',
+      cell: (item) => <span className="text-xs font-medium">{item.description}</span>,
     },
 
     {
-      header: "Date Created",
-      accessor: "created_at",
-      cell: (item) => (
-        <span className="text-xs font-medium">
-          {CustomDate(item.created_at)}
-        </span>
-      ),
+      header: 'Date Created',
+      accessor: 'created_at',
+      cell: (item) => <span className="text-xs font-medium">{CustomDate(item.created_at)}</span>,
     },
     {
-      header: "Actions",
-      accessor: "id",
+      header: 'Actions',
+      accessor: 'id',
       cell: (item) => (
         <>
           <ButtonDropdown>
@@ -150,9 +140,9 @@ console.log("categoriesData",categoriesData)
         </div>
       ) : error ? (
         <div className="bg-red-50 p-4 rounded-md text-red-800 text-center">
-          {"status" in error && error.data?.error
+          {'status' in error && error.data?.error
             ? error.data.error
-            : "An error occurred while fetching roles."}
+            : 'An error occurred while fetching roles.'}
         </div>
       ) : categoriesData && categoriesData.results.length > 0 ? (
         <DataTable

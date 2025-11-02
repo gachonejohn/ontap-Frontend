@@ -1,19 +1,19 @@
-import Select from "react-select";
+import Select from 'react-select';
 
 const NextOfKinTab = ({ register, errors, setValue }) => {
   const handleRelationshipChange = (selected) => {
     if (selected) {
-        setValue("next_of_kin.relationship", selected.value);
+      setValue('next_of_kin.relationship', selected.value);
     }
   };
 
   const relationshipOptions = [
-    { value: "spouse", label: "Spouse" },
-    { value: "parent", label: "Parent" },
-    { value: "child", label: "Child" },
-    { value: "sibling", label: "Sibling" },
-    { value: "relative", label: "Relative" },
-    { value: "other", label: "Other" },
+    { value: 'spouse', label: 'Spouse' },
+    { value: 'parent', label: 'Parent' },
+    { value: 'child', label: 'Child' },
+    { value: 'sibling', label: 'Sibling' },
+    { value: 'relative', label: 'Relative' },
+    { value: 'other', label: 'Other' },
   ];
 
   return (
@@ -27,7 +27,7 @@ const NextOfKinTab = ({ register, errors, setValue }) => {
             </label>
             <input
               type="text"
-              {...register("next_of_kin.full_name")}
+              {...register('next_of_kin.full_name')}
               className="w-full py-2 px-4 rounded-md border bg-slate-50 focus:outline-none 
               focus:border-primary focus:bg-white placeholder:text-[12px]"
               placeholder="Full name"
@@ -46,7 +46,7 @@ const NextOfKinTab = ({ register, errors, setValue }) => {
             </label>
             <input
               type="text"
-              {...register("next_of_kin.phone_number")}
+              {...register('next_of_kin.phone_number')}
               className="w-full py-2 px-4 rounded-md border bg-slate-50 focus:outline-none 
               focus:border-primary focus:bg-white placeholder:text-[12px]"
               placeholder="Phone number"
@@ -63,15 +63,13 @@ const NextOfKinTab = ({ register, errors, setValue }) => {
             <label className="block text-[12px] font-medium mb-1">Email</label>
             <input
               type="email"
-              {...register("next_of_kin.email")}
+              {...register('next_of_kin.email')}
               className="w-full py-2 px-4 rounded-md border bg-slate-50 focus:outline-none 
               focus:border-primary focus:bg-white placeholder:text-[12px]"
               placeholder="Email address"
             />
             {errors.next_of_kin?.email && (
-              <p className="text-red-500 text-[12px] mt-1">
-                {errors.next_of_kin.email.message}
-              </p>
+              <p className="text-red-500 text-[12px] mt-1">{errors.next_of_kin.email.message}</p>
             )}
           </div>
 
@@ -90,11 +88,11 @@ const NextOfKinTab = ({ register, errors, setValue }) => {
                 menuPortal: (base) => ({ ...base, zIndex: 9999 }),
                 control: (base) => ({
                   ...base,
-                  minHeight: "36px",
-                  borderColor: "#d1d5db",
-                  boxShadow: "none",
-                  "&:hover": { borderColor: "#9ca3af" },
-                  backgroundColor: "#F3F4F6",
+                  minHeight: '36px',
+                  borderColor: '#d1d5db',
+                  boxShadow: 'none',
+                  '&:hover': { borderColor: '#9ca3af' },
+                  backgroundColor: '#F3F4F6',
                 }),
               }}
             />
@@ -109,16 +107,14 @@ const NextOfKinTab = ({ register, errors, setValue }) => {
           <div className="md:col-span-2">
             <label className="block text-[12px] font-medium mb-1">Address</label>
             <textarea
-              {...register("next_of_kin.address")}
+              {...register('next_of_kin.address')}
               rows={3}
               className="w-full py-2 px-4 rounded-md border bg-slate-50 focus:outline-none 
               focus:border-primary focus:bg-white placeholder:text-[12px]"
               placeholder="Full address"
             />
             {errors.next_of_kin?.address && (
-              <p className="text-red-500 text-[12px] mt-1">
-                {errors.next_of_kin.address.message}
-              </p>
+              <p className="text-red-500 text-[12px] mt-1">{errors.next_of_kin.address.message}</p>
             )}
           </div>
         </div>

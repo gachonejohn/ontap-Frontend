@@ -1,27 +1,25 @@
-import SubmitCancelButtons from "@components/common/Buttons/ActionButton";
-import CreateUpdateButton from "@components/common/Buttons/CreateUpdateButton";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { selectTimezoneSchema } from "@schemas/settingsSchema";
-import { useGetTimezonesQuery, useSetTimezoneMutation } from "@store/services/employees/employeesService";
-import { getApiErrorMessage } from "@utils/errorHandler";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { FiGlobe } from "react-icons/fi";
-import { IoCloseOutline } from "react-icons/io5";
-import Select from "react-select";
-import { toast } from "react-toastify";
-export const SetTimezone= ({ refetchData, buttonText }) => {
+import SubmitCancelButtons from '@components/common/Buttons/ActionButton';
+import CreateUpdateButton from '@components/common/Buttons/CreateUpdateButton';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { selectTimezoneSchema } from '@schemas/settingsSchema';
+import {
+  useGetTimezonesQuery,
+  useSetTimezoneMutation,
+} from '@store/services/employees/employeesService';
+import { getApiErrorMessage } from '@utils/errorHandler';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { FiGlobe } from 'react-icons/fi';
+import { IoCloseOutline } from 'react-icons/io5';
+import Select from 'react-select';
+import { toast } from 'react-toastify';
+export const SetTimezone = ({ refetchData, buttonText }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const [setTimezone, { isLoading: isCreating }] =
-    useSetTimezoneMutation();
-  const { data: timezoneData } = useGetTimezonesQuery(
-    {},
-    { refetchOnMountOrArgChange: true }
-  );
-  console.log("timezoneData", timezoneData)
+  const [setTimezone, { isLoading: isCreating }] = useSetTimezoneMutation();
+  const { data: timezoneData } = useGetTimezonesQuery({}, { refetchOnMountOrArgChange: true });
+  console.log('timezoneData', timezoneData);
   const {
-   
     handleSubmit,
     reset,
     setValue,
@@ -33,14 +31,11 @@ export const SetTimezone= ({ refetchData, buttonText }) => {
   const onSubmit = async (formData) => {
     try {
       await setTimezone(formData).unwrap();
-      toast.success("Timezone updated successfully!");
+      toast.success('Timezone updated successfully!');
       handleCloseModal();
       refetchData();
     } catch (error) {
-      const message = getApiErrorMessage(
-        error,
-        "Error Updating timezone."
-      );
+      const message = getApiErrorMessage(error, 'Error Updating timezone.');
       toast.error(message);
     } finally {
       refetchData();
@@ -55,7 +50,7 @@ export const SetTimezone= ({ refetchData, buttonText }) => {
   const handleTimezoneChange = (selected) => {
     if (selected) {
       const item_id = String(selected.value);
-      setValue("timezone", item_id);
+      setValue('timezone', item_id);
     }
   };
   return (
@@ -82,9 +77,11 @@ export const SetTimezone= ({ refetchData, buttonText }) => {
           />
 
           {/* Modal */}
-          <div className="fixed inset-0 min-h-full z-50 w-screen 
+          <div
+            className="fixed inset-0 min-h-full z-50 w-screen 
           flex flex-col text-center md:items-center justify-start 
-          overflow-y-auto p-2 md:p-3 pointer-events-none">
+          overflow-y-auto p-2 md:p-3 pointer-events-none"
+          >
             <div
               className="relative transform animate-fadeIn max-h-[90vh] overflow-y-auto 
               rounded-xl bg-white text-left shadow-xl transition-all w-full 
@@ -92,22 +89,13 @@ export const SetTimezone= ({ refetchData, buttonText }) => {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="sticky top-0 bg-white z-40 flex px-4 justify-between items-center py-4">
-                <p className="text-sm md:text-lg lg:text-lg font-semibold">
-                 Configure Timezone
-                </p>
-                <IoCloseOutline
-                  size={20}
-                  className="cursor-pointer"
-                  onClick={handleCloseModal}
-                />
+                <p className="text-sm md:text-lg lg:text-lg font-semibold">Configure Timezone</p>
+                <IoCloseOutline size={20} className="cursor-pointer" onClick={handleCloseModal} />
               </div>
 
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 p-4">
-              
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium mb-2">
-                    Timezone
-                  </label>
+                  <label className="block text-sm font-medium mb-2">Timezone</label>
                   <Select
                     options={timezoneData?.map((item) => ({
                       value: item.value,
@@ -122,28 +110,26 @@ export const SetTimezone= ({ refetchData, buttonText }) => {
                       }),
                       control: (base) => ({
                         ...base,
-                        minHeight: "25px",
-                        borderColor: "#d1d5db",
-                        boxShadow: "none",
-                        "&:hover": {
-                          borderColor: "#9ca3af",
+                        minHeight: '25px',
+                        borderColor: '#d1d5db',
+                        boxShadow: 'none',
+                        '&:hover': {
+                          borderColor: '#9ca3af',
                         },
-                        "&:focus-within": {
-                          borderColor: "#9ca3af",
-                          boxShadow: "none",
+                        '&:focus-within': {
+                          borderColor: '#9ca3af',
+                          boxShadow: 'none',
                         },
-                        backgroundColor: "#F8FAFC",
+                        backgroundColor: '#F8FAFC',
                       }),
                     }}
                     onChange={handleTimezoneChange}
                   />
                   {errors.timezone && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {errors.timezone.message}
-                    </p>
+                    <p className="text-red-500 text-sm mt-1">{errors.timezone.message}</p>
                   )}
                 </div>
-               
+
                 {/* Buttons */}
                 <SubmitCancelButtons
                   onCancel={handleCloseModal}

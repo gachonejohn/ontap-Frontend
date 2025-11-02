@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 const StatementModal = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
@@ -16,9 +16,27 @@ const StatementModal = ({ isOpen, onClose }) => {
             onClick={onClose}
             className="flex justify-center items-center w-7 h-7 hover:bg-gray-100 rounded-full"
           >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 4L4 12" stroke="#4B5563" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M4 4L12 12" stroke="#4B5563" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 4L4 12"
+                stroke="#4B5563"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M4 4L12 12"
+                stroke="#4B5563"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           </button>
         </div>
@@ -79,10 +97,22 @@ const StatementModal = ({ isOpen, onClose }) => {
           <div className="flex flex-col justify-start gap-2 p-4 rounded-lg border border-neutral-200 bg-white w-full md:w-[260px]">
             <div className="text-base text-green-700 font-medium">Earnings</div>
             <div className="flex flex-col gap-1">
-              <div className="flex justify-between text-sm text-gray-600"><span>Basic Salary</span><span className="text-neutral-900">Ksh. 20,000.00</span></div>
-              <div className="flex justify-between text-sm text-gray-600"><span>Overtime</span><span className="text-neutral-900">Ksh. 400.00</span></div>
-              <div className="flex justify-between text-sm text-gray-600"><span>Allowances</span><span className="text-neutral-900">Ksh. 0.00</span></div>
-              <div className="flex justify-between text-sm text-gray-600"><span>Bonus</span><span className="text-neutral-900">Ksh. 0.00</span></div>
+              <div className="flex justify-between text-sm text-gray-600">
+                <span>Basic Salary</span>
+                <span className="text-neutral-900">Ksh. 20,000.00</span>
+              </div>
+              <div className="flex justify-between text-sm text-gray-600">
+                <span>Overtime</span>
+                <span className="text-neutral-900">Ksh. 400.00</span>
+              </div>
+              <div className="flex justify-between text-sm text-gray-600">
+                <span>Allowances</span>
+                <span className="text-neutral-900">Ksh. 0.00</span>
+              </div>
+              <div className="flex justify-between text-sm text-gray-600">
+                <span>Bonus</span>
+                <span className="text-neutral-900">Ksh. 0.00</span>
+              </div>
             </div>
             <div className="flex justify-between pt-1 border-t border-neutral-200 text-sm text-green-700 font-medium">
               <span>Total Earnings</span>
@@ -94,10 +124,22 @@ const StatementModal = ({ isOpen, onClose }) => {
           <div className="flex flex-col justify-start gap-2 p-4 rounded-lg border border-neutral-200 bg-white w-full md:w-[260px]">
             <div className="text-base text-red-700 font-medium">Deductions</div>
             <div className="flex flex-col gap-1">
-              <div className="flex justify-between text-sm text-gray-600"><span>Income Tax</span><span className="text-red-600">Ksh. 150</span></div>
-              <div className="flex justify-between text-sm text-gray-600"><span>Social Security</span><span className="text-red-600">Ksh. 150</span></div>
-              <div className="flex justify-between text-sm text-gray-600"><span>Health Insurance</span><span className="text-red-600">Ksh. 150</span></div>
-              <div className="flex justify-between text-sm text-gray-600"><span>Retirement</span><span className="text-red-600">Ksh. 150</span></div>
+              <div className="flex justify-between text-sm text-gray-600">
+                <span>Income Tax</span>
+                <span className="text-red-600">Ksh. 150</span>
+              </div>
+              <div className="flex justify-between text-sm text-gray-600">
+                <span>Social Security</span>
+                <span className="text-red-600">Ksh. 150</span>
+              </div>
+              <div className="flex justify-between text-sm text-gray-600">
+                <span>Health Insurance</span>
+                <span className="text-red-600">Ksh. 150</span>
+              </div>
+              <div className="flex justify-between text-sm text-gray-600">
+                <span>Retirement</span>
+                <span className="text-red-600">Ksh. 150</span>
+              </div>
             </div>
             <div className="flex justify-between pt-1 border-t border-neutral-200 text-sm text-red-700 font-medium">
               <span>Total Deductions</span>
@@ -111,7 +153,9 @@ const StatementModal = ({ isOpen, onClose }) => {
           <div className="flex flex-col items-center gap-1">
             <div className="text-base text-green-600 font-medium">NET PAY</div>
             <div className="text-lg text-green-700 font-semibold">Ksh. 20,140.00</div>
-            <div className="text-sm text-green-600 font-medium">Amount deposited to your account</div>
+            <div className="text-sm text-green-600 font-medium">
+              Amount deposited to your account
+            </div>
           </div>
         </div>
       </div>

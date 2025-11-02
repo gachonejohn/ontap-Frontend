@@ -1,8 +1,8 @@
-import { useEffect, useCallback, useRef } from "react";
-import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { useGetPermissionsQuery } from "../store/services/auth/authService";
-import { userLoggedIn } from "../store/services/auth/authSlice";
-import Cookies from "js-cookie";
+import { useEffect, useCallback, useRef } from 'react';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { useGetPermissionsQuery } from '../store/services/auth/authService';
+import { userLoggedIn } from '../store/services/auth/authSlice';
+import Cookies from 'js-cookie';
 
 export const usePermissions = () => {
   const dispatch = useAppDispatch();
@@ -10,9 +10,7 @@ export const usePermissions = () => {
   const previousPermissionsRef = useRef(null);
 
   const needsPermissions =
-    accessToken &&
-    user &&
-    (!user.role?.permissions || user.role.permissions.length === 0);
+    accessToken && user && (!user.role?.permissions || user.role.permissions.length === 0);
 
   const {
     data: permissionsData,
@@ -23,12 +21,12 @@ export const usePermissions = () => {
     skip: !needsPermissions,
   });
 
-  console.log("permissionsData", permissionsData);
+  console.log('permissionsData', permissionsData);
 
   useEffect(() => {
     if (permissionsData && accessToken && user) {
       const newPermissions = permissionsData.permissions || [];
-      
+
       // Compare with previous permissions to avoid unnecessary updates
       const permissionsString = JSON.stringify(newPermissions);
       if (previousPermissionsRef.current === permissionsString) {
@@ -38,13 +36,14 @@ export const usePermissions = () => {
       previousPermissionsRef.current = permissionsString;
 
       // Get the active role from profile.roles
-      const activeRole = permissionsData.profile?.roles?.find(r => r.name === permissionsData.role) 
-        || permissionsData.profile?.roles?.[0];
+      const activeRole =
+        permissionsData.profile?.roles?.find((r) => r.name === permissionsData.role) ||
+        permissionsData.profile?.roles?.[0];
 
       dispatch(
         userLoggedIn({
           accessToken,
-          refreshToken: Cookies.get("refreshToken") || "",
+          refreshToken: Cookies.get('refreshToken') || '',
           user: {
             ...user,
             ...permissionsData.profile, // Merge profile data

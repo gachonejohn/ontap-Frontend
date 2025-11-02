@@ -1,21 +1,17 @@
-import React from "react";
-import ContentSpinner from "../common/spinners/dataLoadingSpinner";
+import React from 'react';
+import ContentSpinner from '../common/spinners/dataLoadingSpinner';
 
 function renderCellValue(value) {
-  if (
-    typeof value === "string" ||
-    typeof value === "number" ||
-    typeof value === "boolean"
-  ) {
+  if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
     return value.toString();
   }
 
   if (Array.isArray(value)) {
-    return value.join(", ");
+    return value.join(', ');
   }
 
   if (value === null || value === undefined) {
-    return "-";
+    return '-';
   }
 
   if (value instanceof Date) {
@@ -34,13 +30,13 @@ const DataTable = ({
   columnBgColor,
   columnTextColor,
   stripedRows = false,
-  stripeColor = "bg-gray-50",
+  stripeColor = 'bg-gray-50',
 }) => {
   const getRowBgColor = (index) => {
     if (stripedRows) {
-      return index % 2 === 0 ? "bg-white" : stripeColor;
+      return index % 2 === 0 ? 'bg-white' : stripeColor;
     }
-    return rowBgColor || "bg-white";
+    return rowBgColor || 'bg-white';
   };
 
   return (
@@ -51,16 +47,12 @@ const DataTable = ({
             className={`
               text-gray-600 uppercase border-b text-xs font-medium font-inter 
               border-gray-200 leading-normal 
-              ${columnBgColor || "bg-white"} 
-              ${columnTextColor || "text-gray-600"}
+              ${columnBgColor || 'bg-white'} 
+              ${columnTextColor || 'text-gray-600'}
             `}
           >
             {columns.map((column, index) => (
-              <th
-                key={index}
-                scope="col"
-                className="px-4 py-3 text-xs text-left font-medium"
-              >
+              <th key={index} scope="col" className="px-4 py-3 text-xs text-left font-medium">
                 {column.header}
               </th>
             ))}

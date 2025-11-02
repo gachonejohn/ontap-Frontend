@@ -1,5 +1,5 @@
 // CardModal.js
-import React from "react";
+import React from 'react';
 
 const CardModal = ({ isOpen, onClose, card }) => {
   if (!isOpen) return null;
@@ -10,13 +10,32 @@ const CardModal = ({ isOpen, onClose, card }) => {
         <div className="flex flex-col justify-start items-end gap-6 h-[525px]">
           {/* Header with Close Button */}
           <div className="flex flex-row justify-between items-center w-[418px] h-7">
-            <div className="font-inter text-lg text-neutral-900 font-semibold">
-              Card Preview
-            </div>
-            <button onClick={onClose} className="flex justify-center items-center w-7 h-7 hover:bg-gray-100 rounded-full">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 4L4 12" stroke="#4B5563" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M4 4L12 12" stroke="#4B5563" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <div className="font-inter text-lg text-neutral-900 font-semibold">Card Preview</div>
+            <button
+              onClick={onClose}
+              className="flex justify-center items-center w-7 h-7 hover:bg-gray-100 rounded-full"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M12 4L4 12"
+                  stroke="#4B5563"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M4 4L12 12"
+                  stroke="#4B5563"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
             </button>
           </div>
@@ -35,20 +54,34 @@ const CardModal = ({ isOpen, onClose, card }) => {
                     </div>
                   </div>
                   <div className="flex flex-col justify-between items-start w-8 h-12">
-                    <div className="font-inter text-sm text-rose-200 font-semibold">
-                      Staff
-                    </div>
-                    <img className="ml-px" width="28" height="28" src="/images/code.png" alt="QR Code icon" />
+                    <div className="font-inter text-sm text-rose-200 font-semibold">Staff</div>
+                    <img
+                      className="ml-px"
+                      width="28"
+                      height="28"
+                      src="/images/code.png"
+                      alt="QR Code icon"
+                    />
                   </div>
                 </div>
 
                 <div className="flex flex-row justify-between items-start gap-[140px] w-[386px] h-20">
                   <div className="flex flex-row justify-center items-center gap-3 w-[205px]">
-                    <img className="rounded-md border border-red-500" src="/images/cardprofile.png" alt="Profile" width="80" height="80" />
+                    <img
+                      className="rounded-md border border-red-500"
+                      src="/images/cardprofile.png"
+                      alt="Profile"
+                      width="80"
+                      height="80"
+                    />
                     <div className="flex flex-col gap-0.5">
                       <div className="font-inter text-base text-white font-bold">Victor Smith</div>
-                      <div className="font-inter text-sm text-rose-200 font-medium">Product Designer</div>
-                      <div className="font-inter text-sm text-rose-200 font-medium">ID: 1003E84155</div>
+                      <div className="font-inter text-sm text-rose-200 font-medium">
+                        Product Designer
+                      </div>
+                      <div className="font-inter text-sm text-rose-200 font-medium">
+                        ID: 1003E84155
+                      </div>
                     </div>
                   </div>
                   <div className="flex justify-center items-center p-2 rounded-md w-12 h-12 bg-white/20">
@@ -79,7 +112,9 @@ const CardModal = ({ isOpen, onClose, card }) => {
                   <div className="flex flex-row justify-between w-[350px] h-11">
                     <div className="flex flex-col gap-1.5">
                       <div className="font-inter text-sm text-gray-600 font-medium">Member ID</div>
-                      <div className="font-inter text-sm text-neutral-900 font-medium">1004M92847</div>
+                      <div className="font-inter text-sm text-neutral-900 font-medium">
+                        1004M92847
+                      </div>
                     </div>
                     <div className="flex flex-col gap-1.5">
                       <div className="font-inter text-sm text-gray-600 font-medium">Status</div>
@@ -89,10 +124,14 @@ const CardModal = ({ isOpen, onClose, card }) => {
                   <div className="flex flex-row justify-between w-[350px] h-11">
                     <div className="flex flex-col gap-1.5">
                       <div className="font-inter text-sm text-gray-600 font-medium">Department</div>
-                      <div className="font-inter text-sm text-neutral-900 font-medium">Design & UX</div>
+                      <div className="font-inter text-sm text-neutral-900 font-medium">
+                        Design & UX
+                      </div>
                     </div>
                     <div className="flex flex-col gap-1.5">
-                      <div className="font-inter text-sm text-gray-600 font-medium">Access Level</div>
+                      <div className="font-inter text-sm text-gray-600 font-medium">
+                        Access Level
+                      </div>
                       <div className="font-inter text-sm text-neutral-900 font-medium">Senior</div>
                     </div>
                   </div>

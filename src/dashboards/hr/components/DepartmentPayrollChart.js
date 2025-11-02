@@ -1,5 +1,5 @@
-import React from "react";
-import { Bar } from "react-chartjs-2";
+import React from 'react';
+import { Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -8,25 +8,18 @@ import {
   Title,
   Tooltip,
   Legend,
-} from "chart.js";
+} from 'chart.js';
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
-);
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 export default function DepartmentPayrollChart() {
   const data = {
-    labels: ["Engineering", "Design", "Product", "Marketing", "Sales", "HR"],
+    labels: ['Engineering', 'Design', 'Product', 'Marketing', 'Sales', 'HR'],
     datasets: [
       {
-        label: "Total Payroll",
+        label: 'Total Payroll',
         data: [60000, 30000, 45000, 50000, 55000, 40000],
-        backgroundColor: "#10B981",
+        backgroundColor: '#10B981',
       },
     ],
   };
@@ -36,7 +29,7 @@ export default function DepartmentPayrollChart() {
     maintainAspectRatio: false, // ✅ Needed
     plugins: {
       legend: {
-        position: "bottom",
+        position: 'bottom',
       },
       title: {
         display: false,
@@ -47,7 +40,9 @@ export default function DepartmentPayrollChart() {
   return (
     <div className="bg-white rounded-lg border border-gray-100 shadow p-4">
       <h2 className="text-md font-semibold text-gray-800 mb-4">Department Payroll Distribution</h2>
-      <div className="h-64"> {/* ✅ Chart container height */}
+      <div className="h-64">
+        {' '}
+        {/* ✅ Chart container height */}
         <Bar data={data} options={options} />
       </div>
     </div>

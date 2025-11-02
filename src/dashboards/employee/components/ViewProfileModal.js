@@ -1,18 +1,17 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import { useLogoutUserMutation } from "../../../store/services/auth/authService";
-import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import { userLoggedOut } from "../../../store/services/auth/authSlice";
-import { usePermissions } from "../../../hooks/getPermissions";
-import { toast } from "react-toastify";
-import ClickOutside from "@hooks/ClickOutside";
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useLogoutUserMutation } from '../../../store/services/auth/authService';
+import { useAppDispatch, useAppSelector } from '../../../store/hooks';
+import { userLoggedOut } from '../../../store/services/auth/authSlice';
+import { usePermissions } from '../../../hooks/getPermissions';
+import { toast } from 'react-toastify';
+import ClickOutside from '@hooks/ClickOutside';
 
 const ViewProfileModal = ({ isOpen, onClose, exceptionRef }) => {
   const dispatch = useAppDispatch();
   const { user, loading } = useAppSelector((state) => state.auth);
   const { isLoadingPermissions } = usePermissions();
 
-  
   const isLoadingUser = loading || isLoadingPermissions;
 
   const [logoutUser, { isLoading }] = useLogoutUserMutation();
@@ -20,21 +19,21 @@ const ViewProfileModal = ({ isOpen, onClose, exceptionRef }) => {
 
   const handleLogout = async () => {
     try {
-      const loadingToast = toast.loading("Logging out...");
+      const loadingToast = toast.loading('Logging out...');
 
       await logoutUser({}).unwrap();
 
       dispatch(userLoggedOut());
       toast.update(loadingToast, {
-        render: "Logged out successfully!",
-        type: "success",
+        render: 'Logged out successfully!',
+        type: 'success',
         isLoading: false,
         autoClose: 2000,
       });
-      navigate("/");
+      navigate('/');
     } catch (error) {
-      toast.error("Failed to logout. Please try again.");
-      console.error("Logout error:", error);
+      toast.error('Failed to logout. Please try again.');
+      console.error('Logout error:', error);
     }
   };
 
@@ -49,14 +48,14 @@ const ViewProfileModal = ({ isOpen, onClose, exceptionRef }) => {
         {/* User Info */}
         <div className="flex flex-col gap-0.5 px-3 min-w-40 min-h-16 w-full">
           <div className="font-inter text-base text-neutral-900 font-medium whitespace-nowrap">
-            {user?.first_name ?? ""} {user?.last_name ?? ""}
+            {user?.first_name ?? ''} {user?.last_name ?? ''}
           </div>
 
           <div className="font-inter text-xs text-gray-600 font-normal whitespace-normal break-works">
-            {user?.email ?? ""}
+            {user?.email ?? ''}
           </div>
           <div className="font-inter text-xs mt-3 py-2 px-3 rounded-2xl shadow-sm bg-primary-50 text-primary w-fit font-normal whitespace-normal break-works">
-            {user?.position?.name ?? ""}
+            {user?.position?.name ?? ''}
           </div>
         </div>
 
@@ -70,14 +69,9 @@ const ViewProfileModal = ({ isOpen, onClose, exceptionRef }) => {
             {isLoading ? (
               <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"></span>
             ) : (
-              <img
-                width="17"
-                height="17"
-                src="/images/logout.png"
-                alt="Logout Icon"
-              />
+              <img width="17" height="17" src="/images/logout.png" alt="Logout Icon" />
             )}
-            {isLoading ? "Logging out..." : "Log out"}
+            {isLoading ? 'Logging out...' : 'Log out'}
           </div>
         </div>
       </div>

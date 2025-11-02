@@ -1,4 +1,4 @@
-import { apiSlice } from "../../api/apiSlice";
+import { apiSlice } from '../../api/apiSlice';
 
 export const documentsApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -10,7 +10,7 @@ export const documentsApi = apiSlice.injectEndpoints({
         if (employee_no) queryParams.employee_no = employee_no;
         return {
           url: `companies/document-categories/`,
-          method: "GET",
+          method: 'GET',
           params: queryParams,
         };
       },
@@ -24,7 +24,7 @@ export const documentsApi = apiSlice.injectEndpoints({
         if (employee_no) queryParams.employee_no = employee_no;
         return {
           url: `companies/document-types/`,
-          method: "GET",
+          method: 'GET',
           params: queryParams,
         };
       },
@@ -32,53 +32,53 @@ export const documentsApi = apiSlice.injectEndpoints({
     createDocumentCategory: builder.mutation({
       query: (data) => ({
         url: `companies/document-categories/create/`,
-        method: "POST",
+        method: 'POST',
         body: data,
       }),
     }),
     updateDocumentCategory: builder.mutation({
       query: ({ id, data }) => ({
         url: `companies/document-categories/${id}/`,
-        method: "PATCH",
+        method: 'PATCH',
         body: data,
       }),
     }),
     deleteDocumentCategory: builder.mutation({
       query: (id) => ({
         url: `companies/document-categories/${id}/`,
-        method: "DELETE",
+        method: 'DELETE',
       }),
     }),
     createDocumentType: builder.mutation({
       query: (data) => ({
         url: `companies/document-types/create/`,
-        method: "POST",
+        method: 'POST',
         body: data,
       }),
     }),
     updateDocumentType: builder.mutation({
       query: ({ id, data }) => ({
         url: `companies/document-types/${id}/`,
-        method: "PATCH",
+        method: 'PATCH',
         body: data,
       }),
     }),
     deleteDocumentType: builder.mutation({
       query: (id) => ({
         url: `companies/document-types/${id}/`,
-        method: "DELETE",
+        method: 'DELETE',
       }),
     }),
   }),
 });
 
-export const { 
-    useGetDocumentCategoriesQuery,
-    useGetDocumentTypesQuery,
-    useCreateDocumentCategoryMutation,
-    useUpdateDocumentCategoryMutation,
-    useDeleteDocumentCategoryMutation,
-    useCreateDocumentTypeMutation,
-    useUpdateDocumentTypeMutation,
-    useDeleteDocumentTypeMutation,
-} =documentsApi;
+export const {
+  useGetDocumentCategoriesQuery,
+  useGetDocumentTypesQuery,
+  useCreateDocumentCategoryMutation,
+  useUpdateDocumentCategoryMutation,
+  useDeleteDocumentCategoryMutation,
+  useCreateDocumentTypeMutation,
+  useUpdateDocumentTypeMutation,
+  useDeleteDocumentTypeMutation,
+} = documentsApi;

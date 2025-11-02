@@ -1,22 +1,22 @@
-import { useMemo, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useMemo, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
-import ActionModal from "@components/common/Modals/ActionModal";
-import { toast } from "react-toastify";
+import ActionModal from '@components/common/Modals/ActionModal';
+import { toast } from 'react-toastify';
 
-import ButtonDropdown from "@components/common/ActionsPopover";
-import DataTable from "@components/common/DataTable";
-import Pagination from "@components/common/pagination";
-import ContentSpinner from "@components/common/spinners/dataLoadingSpinner";
-import { PAGE_SIZE } from "@constants/constants";
-import { useFilters } from "@hooks/useFIlters";
+import ButtonDropdown from '@components/common/ActionsPopover';
+import DataTable from '@components/common/DataTable';
+import Pagination from '@components/common/pagination';
+import ContentSpinner from '@components/common/spinners/dataLoadingSpinner';
+import { PAGE_SIZE } from '@constants/constants';
+import { useFilters } from '@hooks/useFIlters';
 import {
-    useDeleteBreakTypeAssignmentMutation,
-    useGetBreakTypesAssignmentsQuery
-} from "@store/services/policies/policyService";
-import { LuArchiveX } from "react-icons/lu";
-import { AssignBreakTypePolicy } from "./NewAssignment";
-import { EditBreakTypePolicyAssignment } from "./EditAssignment";
+  useDeleteBreakTypeAssignmentMutation,
+  useGetBreakTypesAssignmentsQuery,
+} from '@store/services/policies/policyService';
+import { LuArchiveX } from 'react-icons/lu';
+import { AssignBreakTypePolicy } from './NewAssignment';
+import { EditBreakTypePolicyAssignment } from './EditAssignment';
 
 const BreakTypeRuleAssignments = () => {
   const [searchParams] = useSearchParams();
@@ -25,14 +25,14 @@ const BreakTypeRuleAssignments = () => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  const currentPageParam = parseInt(searchParams.get("page") || "1", 10);
+  const currentPageParam = parseInt(searchParams.get('page') || '1', 10);
 
   const { filters, currentPage, handlePageChange } = useFilters({
     initialFilters: {},
     initialPage: currentPageParam,
     navigate,
     debounceTime: 100,
-    debouncedFields: [""],
+    debouncedFields: [''],
   });
 
   const queryParams = useMemo(
@@ -52,7 +52,7 @@ const BreakTypeRuleAssignments = () => {
   } = useGetBreakTypesAssignmentsQuery(queryParams, {
     refetchOnMountOrArgChange: true,
   });
-  console.log("breaktypesAssignmentData", breaktypesAssignmentData);
+  console.log('breaktypesAssignmentData', breaktypesAssignmentData);
   const [deleteBreakTypeAssignment, { isLoading: deleting }] =
     useDeleteBreakTypeAssignmentMutation();
 
@@ -69,60 +69,52 @@ const BreakTypeRuleAssignments = () => {
   const handleDeleteProgram = async () => {
     try {
       await deleteBreakTypeAssignment(selectedItem).unwrap();
-      toast.success("Break type policy assignment removed successfully!");
+      toast.success('Break type policy assignment removed successfully!');
       closeDeleteModal();
       refetch();
     } catch (error) {
-      console.log("error", error);
-      if (error && typeof error === "object" && error.data) {
-        toast.error(error.data.error || "Error removing policy assignment.");
+      console.log('error', error);
+      if (error && typeof error === 'object' && error.data) {
+        toast.error(error.data.error || 'Error removing policy assignment.');
       } else {
-        toast.error("Unexpected error occurred. Please try again.");
+        toast.error('Unexpected error occurred. Please try again.');
       }
     }
   };
 
   const columns = [
     {
-      header: "Break Type",
-      accessor: "break_type",
+      header: 'Break Type',
+      accessor: 'break_type',
       cell: (item) => <span>{item.break_type.name}</span>,
     },
     {
-      header: "Policy",
-      accessor: "break_rule",
+      header: 'Policy',
+      accessor: 'break_rule',
+      cell: (item) => <span className="text-xs font-medium">{item.break_rule.name}</span>,
+    },
+
+    {
+      header: 'Max Duration (Minutes)',
+      accessor: 'max_duration_minutes',
+      cell: (item) => <span className="text-xs font-medium">{item.max_duration_minutes}</span>,
+    },
+    {
+      header: 'Grace Period (Minutes)',
+      accessor: 'grace_period_minutes',
+      cell: (item) => <span className="text-xs font-medium">{item.grace_period_minutes}</span>,
+    },
+    {
+      header: 'Mandatory',
+      accessor: 'required',
       cell: (item) => (
-        <span className="text-xs font-medium">
-          {item.break_rule.name}
-        </span>
+        <span className="text-xs font-medium">{item.required === true ? 'Yes' : 'No'}</span>
       ),
     },
 
     {
-      header: "Max Duration (Minutes)",
-      accessor: "max_duration_minutes",
-      cell: (item) => (
-        <span className="text-xs font-medium">{item.max_duration_minutes}</span>
-      ),
-    },
-    {
-      header: "Grace Period (Minutes)",
-      accessor: "grace_period_minutes",
-      cell: (item) => (
-        <span className="text-xs font-medium">{item.grace_period_minutes}</span>
-      ),
-    },
-    {
-      header: "Mandatory",
-      accessor: "required",
-      cell: (item) => (
-        <span className="text-xs font-medium">{item.required === true ? "Yes" : "No"}</span>
-      ),
-    },
-   
-    {
-      header: "Actions",
-      accessor: "id",
+      header: 'Actions',
+      accessor: 'id',
       cell: (item) => (
         <>
           <ButtonDropdown>
@@ -144,7 +136,6 @@ const BreakTypeRuleAssignments = () => {
   return (
     <div className="bg-white w-full  font-nunito">
       <div className="p-3 flex flex-col md:flex-row md:items-center gap-4 justify-end">
-     
         <div>
           <AssignBreakTypePolicy refetchData={refetch} />
         </div>
@@ -156,9 +147,9 @@ const BreakTypeRuleAssignments = () => {
         </div>
       ) : error ? (
         <div className="bg-red-50 p-4 rounded-md text-red-800 text-center">
-          {"status" in error && error.data?.error
+          {'status' in error && error.data?.error
             ? error.data.error
-            : "An error occurred while fetching roles."}
+            : 'An error occurred while fetching roles.'}
         </div>
       ) : breaktypesAssignmentData && breaktypesAssignmentData.results.length > 0 ? (
         <DataTable

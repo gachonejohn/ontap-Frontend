@@ -1,21 +1,20 @@
-import { relationshipOptions } from "@constants/constants";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { EmployeeEmergencyContactSchema } from "@schemas/employees/employmentSchema";
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { FiEdit } from "react-icons/fi";
-import { IoCloseOutline } from "react-icons/io5";
-import Select from "react-select";
-import { toast } from "react-toastify";
-import { useUpdateEmergencyContactMutation } from "../../../../store/services/employees/employeesService";
-import SubmitCancelButtons from "../../../common/Buttons/ActionButton";
-import CreateUpdateButton from "../../../common/Buttons/CreateUpdateButton";
+import { relationshipOptions } from '@constants/constants';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { EmployeeEmergencyContactSchema } from '@schemas/employees/employmentSchema';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { FiEdit } from 'react-icons/fi';
+import { IoCloseOutline } from 'react-icons/io5';
+import Select from 'react-select';
+import { toast } from 'react-toastify';
+import { useUpdateEmergencyContactMutation } from '../../../../store/services/employees/employeesService';
+import SubmitCancelButtons from '../../../common/Buttons/ActionButton';
+import CreateUpdateButton from '../../../common/Buttons/CreateUpdateButton';
 
 export const EditEmployeeEmergencyContact = ({ refetchData, data }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const [updateEmergencyContact, { isLoading: isCreating }] =
-    useUpdateEmergencyContactMutation();
+  const [updateEmergencyContact, { isLoading: isCreating }] = useUpdateEmergencyContactMutation();
 
   const {
     register,
@@ -27,32 +26,31 @@ export const EditEmployeeEmergencyContact = ({ refetchData, data }) => {
   } = useForm({
     resolver: zodResolver(EmployeeEmergencyContactSchema),
     defaultValues: {
-      relationship: data?.relationship ?? "",
-      full_name: data?.full_name ?? "",
-      email: data?.email ?? "",
-      phone_number: data?.phone_number ?? "",
-      address: data?.address ?? "",
+      relationship: data?.relationship ?? '',
+      full_name: data?.full_name ?? '',
+      email: data?.email ?? '',
+      phone_number: data?.phone_number ?? '',
+      address: data?.address ?? '',
     },
   });
   useEffect(() => {
-    console.log("Form Errors:", errors);
+    console.log('Form Errors:', errors);
   }, [errors]);
   const onSubmit = async (formData) => {
-    
     try {
       await updateEmergencyContact({
-        id:data.id,
-        data:formData
+        id: data.id,
+        data: formData,
       }).unwrap();
-      toast.success("Emergency Contact details updated successfully!");
+      toast.success('Emergency Contact details updated successfully!');
       handleCloseModal();
       refetchData();
     } catch (error) {
-      console.error("Error:", error);
+      console.error('Error:', error);
       if (error && error.data && error.data.error) {
         toast.error(error.data.error);
       } else {
-        toast.error("An error occurred. Please try again.");
+        toast.error('An error occurred. Please try again.');
       }
     } finally {
       refetchData();
@@ -60,7 +58,7 @@ export const EditEmployeeEmergencyContact = ({ refetchData, data }) => {
   };
   const handleRelationshipChange = (selected) => {
     if (selected) {
-      setValue("relationship", selected.value);
+      setValue('relationship', selected.value);
     }
   };
 
@@ -134,18 +132,16 @@ export const EditEmployeeEmergencyContact = ({ refetchData, data }) => {
                       menuPortal: (base) => ({ ...base, zIndex: 9999 }),
                       control: (base) => ({
                         ...base,
-                        minHeight: "36px",
-                        borderColor: "#d1d5db",
-                        boxShadow: "none",
-                        "&:hover": { borderColor: "#9ca3af" },
-                        backgroundColor: "#F3F4F6",
+                        minHeight: '36px',
+                        borderColor: '#d1d5db',
+                        boxShadow: 'none',
+                        '&:hover': { borderColor: '#9ca3af' },
+                        backgroundColor: '#F3F4F6',
                       }),
                     }}
                   />
                   {errors.relationship && (
-                    <p className="text-red-500 text-[12px] mt-1">
-                      {errors.relationship.message}
-                    </p>
+                    <p className="text-red-500 text-[12px] mt-1">{errors.relationship.message}</p>
                   )}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -156,13 +152,11 @@ export const EditEmployeeEmergencyContact = ({ refetchData, data }) => {
                     <input
                       type="text"
                       placeholder="Peter Waigo"
-                      {...register("full_name")}
+                      {...register('full_name')}
                       className="w-full py-2 px-4 rounded-md border bg-slate-50 focus:outline-none focus:border-primary focus:bg-white placeholder:text-[12px]"
                     />
                     {errors.full_name && (
-                      <p className="text-red-500 text-sm mt-1">
-                        {errors.full_name.message}
-                      </p>
+                      <p className="text-red-500 text-sm mt-1">{errors.full_name.message}</p>
                     )}
                   </div>
                   <div>
@@ -172,13 +166,11 @@ export const EditEmployeeEmergencyContact = ({ refetchData, data }) => {
                     <input
                       type="email"
                       placeholder="A valid email address"
-                      {...register("email")}
+                      {...register('email')}
                       className="w-full py-2 px-4 rounded-md border bg-slate-50 focus:outline-none focus:border-primary focus:bg-white placeholder:text-[12px]"
                     />
                     {errors.email && (
-                      <p className="text-red-500 text-sm mt-1">
-                        {errors.email.message}
-                      </p>
+                      <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
                     )}
                   </div>
                 </div>
@@ -190,13 +182,11 @@ export const EditEmployeeEmergencyContact = ({ refetchData, data }) => {
                   <input
                     type="number"
                     placeholder="+254"
-                    {...register("phone_number")}
+                    {...register('phone_number')}
                     className="w-full py-2 px-4 rounded-md border bg-slate-50 focus:outline-none focus:border-primary focus:bg-white placeholder:text-[12px]"
                   />
                   {errors.mobile_number && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {errors.phone_number.message}
-                    </p>
+                    <p className="text-red-500 text-sm mt-1">{errors.phone_number.message}</p>
                   )}
                 </div>
 
@@ -208,13 +198,11 @@ export const EditEmployeeEmergencyContact = ({ refetchData, data }) => {
                     cols={5}
                     ros={3}
                     placeholder="address here.."
-                    {...register("address")}
+                    {...register('address')}
                     className="w-full py-2 px-4 rounded-md border bg-slate-50 focus:outline-none focus:border-primary focus:bg-white placeholder:text-[12px]"
                   />
                   {errors.address && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {errors.address.message}
-                    </p>
+                    <p className="text-red-500 text-sm mt-1">{errors.address.message}</p>
                   )}
                 </div>
 

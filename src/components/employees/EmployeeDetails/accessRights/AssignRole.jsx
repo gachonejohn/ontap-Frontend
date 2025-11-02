@@ -1,27 +1,23 @@
-import SubmitCancelButtons from "@components/common/Buttons/ActionButton";
-import CreateUpdateButton from "@components/common/Buttons/CreateUpdateButton";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { assignRoleSchema } from "@schemas/roleSchema";
-import { useCreateEmployeeRoleMutation } from "@store/services/employees/employeesService";
-import { useGetRolesQuery } from "@store/services/roles/rolesService";
-import { getApiErrorMessage } from "@utils/errorHandler";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { FiPlus } from "react-icons/fi";
-import { IoCloseOutline } from "react-icons/io5";
-import Select from "react-select";
-import { toast } from "react-toastify";
+import SubmitCancelButtons from '@components/common/Buttons/ActionButton';
+import CreateUpdateButton from '@components/common/Buttons/CreateUpdateButton';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { assignRoleSchema } from '@schemas/roleSchema';
+import { useCreateEmployeeRoleMutation } from '@store/services/employees/employeesService';
+import { useGetRolesQuery } from '@store/services/roles/rolesService';
+import { getApiErrorMessage } from '@utils/errorHandler';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { FiPlus } from 'react-icons/fi';
+import { IoCloseOutline } from 'react-icons/io5';
+import Select from 'react-select';
+import { toast } from 'react-toastify';
 
 export const AssignRole = ({ refetchData, data }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const [createEmployeeRole, { isLoading: isCreating }] =
-    useCreateEmployeeRoleMutation();
-  const { data: rolesData } = useGetRolesQuery(
-    {},
-    { refetchOnMountOrArgChange: true }
-  );
-  console.log("rolesData", rolesData)
+  const [createEmployeeRole, { isLoading: isCreating }] = useCreateEmployeeRoleMutation();
+  const { data: rolesData } = useGetRolesQuery({}, { refetchOnMountOrArgChange: true });
+  console.log('rolesData', rolesData);
   const {
     register,
     handleSubmit,
@@ -34,19 +30,16 @@ export const AssignRole = ({ refetchData, data }) => {
 
   const onSubmit = async (formData) => {
     const payLoad = {
-        employee: data?.id,
-        ...formData
-    }
+      employee: data?.id,
+      ...formData,
+    };
     try {
       await createEmployeeRole(payLoad).unwrap();
-      toast.success("Access Role granted successfully!");
+      toast.success('Access Role granted successfully!');
       handleCloseModal();
       refetchData();
     } catch (error) {
-      const message = getApiErrorMessage(
-        error,
-        "Error granting access role."
-      );
+      const message = getApiErrorMessage(error, 'Error granting access role.');
       toast.error(message);
     } finally {
       refetchData();
@@ -61,7 +54,7 @@ export const AssignRole = ({ refetchData, data }) => {
   const handleRoleChange = (selected) => {
     if (selected) {
       const itemId = Number(selected.value);
-      setValue("role", itemId);
+      setValue('role', itemId);
     }
   };
   return (
@@ -99,22 +92,16 @@ export const AssignRole = ({ refetchData, data }) => {
             >
               <div className="sticky top-0 bg-white z-40 flex px-4 justify-between items-center py-4">
                 <p className="text-sm md:text-lg lg:text-lg font-semibold">
-                Grant Role to Employee
+                  Grant Role to Employee
                 </p>
-                <IoCloseOutline
-                  size={20}
-                  className="cursor-pointer"
-                  onClick={handleCloseModal}
-                />
+                <IoCloseOutline size={20} className="cursor-pointer" onClick={handleCloseModal} />
               </div>
 
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 p-4">
                 {/* Name */}
-                
+
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium mb-2">
-                    Role
-                  </label>
+                  <label className="block text-sm font-medium mb-2">Role</label>
                   <Select
                     options={rolesData?.map((item) => ({
                       value: item.id,
@@ -129,39 +116,34 @@ export const AssignRole = ({ refetchData, data }) => {
                       }),
                       control: (base) => ({
                         ...base,
-                        minHeight: "40px",
-                        borderColor: "#d1d5db",
-                        boxShadow: "none",
-                        "&:hover": {
-                          borderColor: "#9ca3af",
+                        minHeight: '40px',
+                        borderColor: '#d1d5db',
+                        boxShadow: 'none',
+                        '&:hover': {
+                          borderColor: '#9ca3af',
                         },
-                        "&:focus-within": {
-                          borderColor: "#9ca3af",
-                          boxShadow: "none",
+                        '&:focus-within': {
+                          borderColor: '#9ca3af',
+                          boxShadow: 'none',
                         },
-                        backgroundColor: "#F8FAFC",
+                        backgroundColor: '#F8FAFC',
                       }),
                     }}
                     onChange={handleRoleChange}
                   />
                   {errors.role && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {errors.role.message}
-                    </p>
+                    <p className="text-red-500 text-sm mt-1">{errors.role.message}</p>
                   )}
                 </div>
-                
+
                 <div className="flex items-center space-x-2 mb-4">
                   <input
                     type="checkbox"
                     id="is_primary"
                     className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                    {...register("is_primary")}
+                    {...register('is_primary')}
                   />
-                  <label
-                    htmlFor="is_primary"
-                    className="ml-2 text-sm font-medium text-gray-700"
-                  >
+                  <label htmlFor="is_primary" className="ml-2 text-sm font-medium text-gray-700">
                     Set as Primary Role
                   </label>
                 </div>

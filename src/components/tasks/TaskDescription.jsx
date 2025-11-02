@@ -1,14 +1,18 @@
-import React from "react";
+import React from 'react';
 
-const TaskDescription = ({ task, isEditingMode, canEditDescription, descriptionValue, onDescriptionChange }) => {
+const TaskDescription = ({
+  task,
+  isEditingMode,
+  canEditDescription,
+  descriptionValue,
+  onDescriptionChange,
+}) => {
   return (
     <div className="flex flex-col justify-start items-start gap-3 w-full">
       <div className="flex justify-between items-center w-full">
-        <div className="text-sm font-semibold text-neutral-900">
-          Description
-        </div>
+        <div className="text-sm font-semibold text-neutral-900">Description</div>
       </div>
-      
+
       {isEditingMode && canEditDescription ? (
         <div className="w-full">
           <textarea

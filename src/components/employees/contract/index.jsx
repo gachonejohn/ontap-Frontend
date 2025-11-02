@@ -1,19 +1,18 @@
-import { CreateContract } from "./AddContract";
-import { UpdateContract } from "./EditContract";
-import { getApiErrorMessage } from "@utils/errorHandler";
-import { useState } from "react";
-import { CustomDate, YearMonthCustomDate } from "@utils/dates";
-import { FiBriefcase, FiTrash2 } from "react-icons/fi";
-import { toast } from "react-toastify";
-import ActionModal from "@components/common/Modals/ActionModal";
-import { useDeleteContractMutation } from "@store/services/employees/employeesService";
-import { calculateExpiryProgress } from "./CalculateProgress";
+import { CreateContract } from './AddContract';
+import { UpdateContract } from './EditContract';
+import { getApiErrorMessage } from '@utils/errorHandler';
+import { useState } from 'react';
+import { CustomDate, YearMonthCustomDate } from '@utils/dates';
+import { FiBriefcase, FiTrash2 } from 'react-icons/fi';
+import { toast } from 'react-toastify';
+import ActionModal from '@components/common/Modals/ActionModal';
+import { useDeleteContractMutation } from '@store/services/employees/employeesService';
+import { calculateExpiryProgress } from './CalculateProgress';
 
 export const ContractsDetails = ({ data: employeeData, refetch }) => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [deleteContract, { isLoading: isDeleting }] =
-    useDeleteContractMutation();
+  const [deleteContract, { isLoading: isDeleting }] = useDeleteContractMutation();
   const openDeleteModal = (id) => {
     setSelectedItem(id);
     setIsDeleteModalOpen(true);
@@ -26,11 +25,11 @@ export const ContractsDetails = ({ data: employeeData, refetch }) => {
   const handleDelete = async () => {
     try {
       await deleteContract(selectedItem).unwrap();
-      toast.success("Contract Deleted successfully!");
+      toast.success('Contract Deleted successfully!');
       closeDeleteModal();
       refetch();
     } catch (error) {
-      const message = getApiErrorMessage(error, "Error deleting contract.");
+      const message = getApiErrorMessage(error, 'Error deleting contract.');
       toast.error(message);
     } finally {
       closeDeleteModal();
@@ -40,18 +39,18 @@ export const ContractsDetails = ({ data: employeeData, refetch }) => {
 
   const statusStyles = (status) => {
     switch (status) {
-      case "ACTIVE":
-        return "bg-green-100 text-green-800";
-      case "EXPIRED":
-        return "bg-purple-500 text-white";
-      case "TERMINATED":
-        return "bg-red-100 text-red-600";
-      case "PENDING":
-        return "bg-yellow-100 text-yellow-800";
-      case "SUSPENDED":
-        return "bg-orange-100 text-orange-800";
+      case 'ACTIVE':
+        return 'bg-green-100 text-green-800';
+      case 'EXPIRED':
+        return 'bg-purple-500 text-white';
+      case 'TERMINATED':
+        return 'bg-red-100 text-red-600';
+      case 'PENDING':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'SUSPENDED':
+        return 'bg-orange-100 text-orange-800';
       default:
-        return "bg-gray-100 text-gray-800";
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
@@ -70,24 +69,22 @@ export const ContractsDetails = ({ data: employeeData, refetch }) => {
       {employeeData.contracts?.length > 0 ? (
         <div className="grid grid-cols-1 gap-6">
           {employeeData.contracts.map((contract, index) => {
-            const isActive = contract.status === "ACTIVE";
+            const isActive = contract.status === 'ACTIVE';
             return (
               <div
                 key={contract.id || index}
                 className={`rounded-xl shadow-md border p-4 hover:shadow-md transition-shadow ${
-                  isActive ? "border" : ""
+                  isActive ? 'border' : ''
                 }`}
               >
                 {/* Header */}
                 <div className="mb-4  flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <h4 className="text-base font-semibold text-gray-800">
-                      {contract.contract_type || "Contract"}
+                      {contract.contract_type || 'Contract'}
                     </h4>
                     {employeeData.contracts.length > 1 && (
-                      <span className="text-xs text-gray-500">
-                        #{index + 1}
-                      </span>
+                      <span className="text-xs text-gray-500">#{index + 1}</span>
                     )}
                   </div>
                   <div className="flex items-center gap-4">
@@ -116,52 +113,44 @@ export const ContractsDetails = ({ data: employeeData, refetch }) => {
                 {/* Fields */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 text-sm">
                   <div>
-                    <span className="font-medium text-gray-600">Status:</span>{" "}
+                    <span className="font-medium text-gray-600">Status:</span>{' '}
+                    <span className="text-gray-900">{employeeData.status || 'Not specified'}</span>
+                  </div>
+                  <div>
+                    <span className="font-medium text-gray-600">Work Location:</span>{' '}
                     <span className="text-gray-900">
-                      {employeeData.status || "Not specified"}
+                      {contract.work_location || 'Not specified'}
                     </span>
                   </div>
                   <div>
-                    <span className="font-medium text-gray-600">
-                      Work Location:
-                    </span>{" "}
-                    <span className="text-gray-900">
-                      {contract.work_location || "Not specified"}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="font-medium text-gray-600">Salary:</span>{" "}
+                    <span className="font-medium text-gray-600">Salary:</span>{' '}
                     <span className="text-gray-900">
                       {contract.salary_currency} {contract.basic_salary}
                     </span>
                   </div>
                   <div>
-                    <span className="font-medium text-gray-600">
-                      Pay Frequency:
-                    </span>{" "}
+                    <span className="font-medium text-gray-600">Pay Frequency:</span>{' '}
                     <span className="text-gray-900">
-                      {contract.pay_frequency || "Not specified"}
+                      {contract.pay_frequency || 'Not specified'}
                     </span>
                   </div>
                   <div>
-                    <span className="font-medium text-gray-600">
-                      Supervisor:
-                    </span>{" "}
+                    <span className="font-medium text-gray-600">Supervisor:</span>{' '}
                     <span className="text-gray-900">
-                      {contract.reporting_to || "Not specified"}
+                      {contract.reporting_to || 'Not specified'}
                     </span>
                   </div>
 
                   <div>
-                    <span className="font-medium text-gray-600">Paid:</span>{" "}
+                    <span className="font-medium text-gray-600">Paid:</span>{' '}
                     <span
                       className={` px-2.5 py-1 rounded-full font-medium ${
                         contract.is_paid
-                          ? "text-green-600 bg-green-100 border-green-500"
-                          : "text-red-600 bg-red-100 border-red-500"
+                          ? 'text-green-600 bg-green-100 border-green-500'
+                          : 'text-red-600 bg-red-100 border-red-500'
                       }`}
                     >
-                      {contract.is_paid ? "Yes" : "No"}
+                      {contract.is_paid ? 'Yes' : 'No'}
                     </span>
                   </div>
                 </div>
@@ -177,13 +166,9 @@ export const ContractsDetails = ({ data: employeeData, refetch }) => {
                         <>
                           <div className="flex justify-between mb-1 text-sm text-gray-600">
                             <span>
-                              Start Date:{" "}
-                              {YearMonthCustomDate(contract?.start_date ?? "")}
+                              Start Date: {YearMonthCustomDate(contract?.start_date ?? '')}
                             </span>
-                            <span>
-                              End Date:{" "}
-                              {YearMonthCustomDate(contract?.end_date ?? "")}
-                            </span>
+                            <span>End Date: {YearMonthCustomDate(contract?.end_date ?? '')}</span>
                           </div>
                           <div className="w-full bg-gray-200 rounded-full h-2.5">
                             <div

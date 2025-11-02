@@ -1,13 +1,13 @@
-import Cookies from "js-cookie";
-import { userLoading, userLoggedIn, userLoggedOut } from "./authSlice";
-import { apiSlice } from "../../api/apiSlice";
+import Cookies from 'js-cookie';
+import { userLoading, userLoggedIn, userLoggedOut } from './authSlice';
+import { apiSlice } from '../../api/apiSlice';
 
 export const authApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     login: builder.mutation({
       query: ({ email, password }) => ({
         url: `users/login/`,
-        method: "POST",
+        method: 'POST',
         body: { email, password },
       }),
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
@@ -15,8 +15,8 @@ export const authApi = apiSlice.injectEndpoints({
           dispatch(userLoading());
           const result = await queryFulfilled;
 
-          Cookies.set("accessToken", result.data.access);
-          Cookies.set("refreshToken", result.data.refresh);
+          Cookies.set('accessToken', result.data.access);
+          Cookies.set('refreshToken', result.data.refresh);
 
           try {
             const permissionsData = await dispatch(
@@ -43,7 +43,7 @@ export const authApi = apiSlice.injectEndpoints({
               })
             );
           } catch (permissionError) {
-            console.error("Failed to fetch permissions:", permissionError);
+            console.error('Failed to fetch permissions:', permissionError);
 
             dispatch(
               userLoggedIn({
@@ -61,14 +61,14 @@ export const authApi = apiSlice.injectEndpoints({
 
     logoutUser: builder.mutation({
       query: () => {
-        const refreshToken = Cookies.get("refreshToken");
+        const refreshToken = Cookies.get('refreshToken');
         if (!refreshToken) {
-          throw new Error("No refresh token found");
+          throw new Error('No refresh token found');
         }
 
         return {
           url: `users/logout/`,
-          method: "POST",
+          method: 'POST',
           body: { refresh: refreshToken },
         };
       },
@@ -77,15 +77,15 @@ export const authApi = apiSlice.injectEndpoints({
           dispatch(userLoading());
           await queryFulfilled;
 
-          Cookies.remove("accessToken");
-          Cookies.remove("refreshToken");
+          Cookies.remove('accessToken');
+          Cookies.remove('refreshToken');
           dispatch(userLoggedOut());
           dispatch(apiSlice.util.resetApiState());
         } catch (error) {
           if (error instanceof Error) {
             console.log(error.message);
           } else {
-            console.log("An unknown error occurred.");
+            console.log('An unknown error occurred.');
           }
         }
       },
@@ -94,14 +94,14 @@ export const authApi = apiSlice.injectEndpoints({
     getPermissions: builder.query({
       query: () => ({
         url: `users/permissions/`,
-        method: "GET",
+        method: 'GET',
       }),
     }),
 
     switchRole: builder.mutation({
       query: (data) => ({
         url: `users/switch-role/`,
-        method: "POST",
+        method: 'POST',
         body: data,
       }),
       async onQueryStarted(arg, { queryFulfilled, dispatch, getState }) {
@@ -110,19 +110,20 @@ export const authApi = apiSlice.injectEndpoints({
           const currentState = getState();
           const currentUser = currentState.auth.user;
 
-          const accessToken = Cookies.get("accessToken");
-          const refreshToken = Cookies.get("refreshToken");
+          const accessToken = Cookies.get('accessToken');
+          const refreshToken = Cookies.get('refreshToken');
 
           // Fetch fresh permissions after role switch
           const permissionsData = await dispatch(
             authApi.endpoints.getPermissions.initiate(undefined, { forceRefetch: true })
           ).unwrap();
 
-          console.log("Fresh permissions after switch:", permissionsData);
+          console.log('Fresh permissions after switch:', permissionsData);
 
           // Get the active role from profile.roles
-          const activeRole = permissionsData.profile?.roles?.find(r => r.name === permissionsData.role) 
-            || permissionsData.profile?.roles?.[0];
+          const activeRole =
+            permissionsData.profile?.roles?.find((r) => r.name === permissionsData.role) ||
+            permissionsData.profile?.roles?.[0];
 
           // Update user with new role data and permissions
           dispatch(
@@ -142,7 +143,7 @@ export const authApi = apiSlice.injectEndpoints({
             })
           );
         } catch (error) {
-          console.error("Failed to switch role:", error);
+          console.error('Failed to switch role:', error);
           throw error;
         }
       },

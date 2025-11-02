@@ -1,23 +1,23 @@
-import { useMemo, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useMemo, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
-import ActionModal from "@components/common/Modals/ActionModal";
-import { toast } from "react-toastify";
+import ActionModal from '@components/common/Modals/ActionModal';
+import { toast } from 'react-toastify';
 
-import ButtonDropdown from "@components/common/ActionsPopover";
-import DataTable from "@components/common/DataTable";
-import Pagination from "@components/common/pagination";
-import ContentSpinner from "@components/common/spinners/dataLoadingSpinner";
-import { PAGE_SIZE } from "@constants/constants";
-import { useFilters } from "@hooks/useFIlters";
+import ButtonDropdown from '@components/common/ActionsPopover';
+import DataTable from '@components/common/DataTable';
+import Pagination from '@components/common/pagination';
+import ContentSpinner from '@components/common/spinners/dataLoadingSpinner';
+import { PAGE_SIZE } from '@constants/constants';
+import { useFilters } from '@hooks/useFIlters';
 import {
   useDeleteBreakCategoryMutation,
   useDeleteBreakRuleMutation,
   useGetBreakRulesQuery,
-} from "@store/services/policies/policyService";
-import { LuArchiveX } from "react-icons/lu";
-import { CreateBreakRule } from "./NewRule";
-import { EditBreakRule } from "./EditRule";
+} from '@store/services/policies/policyService';
+import { LuArchiveX } from 'react-icons/lu';
+import { CreateBreakRule } from './NewRule';
+import { EditBreakRule } from './EditRule';
 
 const BreakPolicies = () => {
   const [searchParams] = useSearchParams();
@@ -26,14 +26,14 @@ const BreakPolicies = () => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  const currentPageParam = parseInt(searchParams.get("page") || "1", 10);
+  const currentPageParam = parseInt(searchParams.get('page') || '1', 10);
 
   const { filters, currentPage, handlePageChange } = useFilters({
     initialFilters: {},
     initialPage: currentPageParam,
     navigate,
     debounceTime: 100,
-    debouncedFields: [""],
+    debouncedFields: [''],
   });
 
   const queryParams = useMemo(
@@ -53,9 +53,8 @@ const BreakPolicies = () => {
   } = useGetBreakRulesQuery(queryParams, {
     refetchOnMountOrArgChange: true,
   });
-  console.log("breakRulesData", breakRulesData);
-  const [deleteBreakRule, { isLoading: deleting }] =
-    useDeleteBreakRuleMutation();
+  console.log('breakRulesData', breakRulesData);
+  const [deleteBreakRule, { isLoading: deleting }] = useDeleteBreakRuleMutation();
 
   const openDeleteModal = (id) => {
     setSelectedItem(id);
@@ -70,57 +69,53 @@ const BreakPolicies = () => {
   const handleDeleteProgram = async () => {
     try {
       await deleteBreakRule(selectedItem).unwrap();
-      toast.success("Break Rule deleted successfully!");
+      toast.success('Break Rule deleted successfully!');
       closeDeleteModal();
       refetch();
     } catch (error) {
-      console.log("error", error);
-      if (error && typeof error === "object" && error.data) {
-        toast.error(error.data.error || "Error deleting break rule.");
+      console.log('error', error);
+      if (error && typeof error === 'object' && error.data) {
+        toast.error(error.data.error || 'Error deleting break rule.');
       } else {
-        toast.error("Unexpected error occurred. Please try again.");
+        toast.error('Unexpected error occurred. Please try again.');
       }
     }
   };
 
   const columns = [
     {
-      header: "Name",
-      accessor: "name",
+      header: 'Name',
+      accessor: 'name',
       cell: (item) => <span>{item.name}</span>,
     },
     {
-      header: "Max Breaks Per day",
-      accessor: "name",
+      header: 'Max Breaks Per day',
+      accessor: 'name',
       cell: (item) => <span>{item.max_breaks_per_day}</span>,
     },
     {
-      header: "Max Total Duration(Minutes)",
-      accessor: "name",
+      header: 'Max Total Duration(Minutes)',
+      accessor: 'name',
       cell: (item) => <span>{item.max_total_break_minutes}</span>,
     },
     {
-      header: "Default Max Break Duration(Minutes)",
-      accessor: "name",
+      header: 'Default Max Break Duration(Minutes)',
+      accessor: 'name',
       cell: (item) => <span>{item.default_max_duration_minutes}</span>,
     },
     {
-      header: "Default Grace Duration(Minutes)",
-      accessor: "name",
+      header: 'Default Grace Duration(Minutes)',
+      accessor: 'name',
       cell: (item) => <span>{item.default_grace_period_minutes}</span>,
     },
     {
-      header: "Enforce Strictly",
-      accessor: "enforce_strictly",
-      cell: (item) => (
-        <span>
-          {item.enforce_strictly === true ? "Enforced" : "Not Enforced"}
-        </span>
-      ),
+      header: 'Enforce Strictly',
+      accessor: 'enforce_strictly',
+      cell: (item) => <span>{item.enforce_strictly === true ? 'Enforced' : 'Not Enforced'}</span>,
     },
     {
-      header: "Actions",
-      accessor: "id",
+      header: 'Actions',
+      accessor: 'id',
       cell: (item) => (
         <>
           <ButtonDropdown>
@@ -153,9 +148,9 @@ const BreakPolicies = () => {
         </div>
       ) : error ? (
         <div className="bg-red-50 p-4 rounded-md text-red-800 text-center">
-          {"status" in error && error.data?.error
+          {'status' in error && error.data?.error
             ? error.data.error
-            : "An error occurred while fetching roles."}
+            : 'An error occurred while fetching roles.'}
         </div>
       ) : breakRulesData && breakRulesData.results.length > 0 ? (
         <DataTable

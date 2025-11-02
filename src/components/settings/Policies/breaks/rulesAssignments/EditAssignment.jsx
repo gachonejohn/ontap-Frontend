@@ -1,20 +1,20 @@
-import SubmitCancelButtons from "@components/common/Buttons/ActionButton";
-import CreateUpdateButton from "@components/common/Buttons/CreateUpdateButton";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { CreateBreakTypePolicyAssignmentSchema } from "@schemas/companies/policies/breaksPolicySchema";
+import SubmitCancelButtons from '@components/common/Buttons/ActionButton';
+import CreateUpdateButton from '@components/common/Buttons/CreateUpdateButton';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { CreateBreakTypePolicyAssignmentSchema } from '@schemas/companies/policies/breaksPolicySchema';
 
 import {
-    useGetBreakCategoriesQuery,
-    useGetBreakRulesQuery,
-    useUpdateBreakTypeAssignmentMutation
-} from "@store/services/policies/policyService";
-import { getApiErrorMessage } from "@utils/errorHandler";
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { FiEdit } from "react-icons/fi";
-import { IoCloseOutline } from "react-icons/io5";
-import Select from "react-select";
-import { toast } from "react-toastify";
+  useGetBreakCategoriesQuery,
+  useGetBreakRulesQuery,
+  useUpdateBreakTypeAssignmentMutation,
+} from '@store/services/policies/policyService';
+import { getApiErrorMessage } from '@utils/errorHandler';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { FiEdit } from 'react-icons/fi';
+import { IoCloseOutline } from 'react-icons/io5';
+import Select from 'react-select';
+import { toast } from 'react-toastify';
 export const EditBreakTypePolicyAssignment = ({ data, refetchData }) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -24,11 +24,8 @@ export const EditBreakTypePolicyAssignment = ({ data, refetchData }) => {
     {},
     { refetchOnMountOrArgChange: true }
   );
-  const { data: rulesData } = useGetBreakRulesQuery(
-    {},
-    { refetchOnMountOrArgChange: true }
-  );
-  console.log("categoriesData", categoriesData);
+  const { data: rulesData } = useGetBreakRulesQuery({}, { refetchOnMountOrArgChange: true });
+  console.log('categoriesData', categoriesData);
 
   const {
     register,
@@ -47,7 +44,7 @@ export const EditBreakTypePolicyAssignment = ({ data, refetchData }) => {
     },
   });
   useEffect(() => {
-    console.log("Form Errors:", errors);
+    console.log('Form Errors:', errors);
   }, [errors]);
   const onSubmit = async (formData) => {
     try {
@@ -55,13 +52,13 @@ export const EditBreakTypePolicyAssignment = ({ data, refetchData }) => {
         id: data.id,
         data: formData,
       }).unwrap();
-      toast.success("Break Type assignment Policy updated successfully!");
+      toast.success('Break Type assignment Policy updated successfully!');
       handleCloseModal();
       refetchData();
     } catch (error) {
       const message = getApiErrorMessage(
         error,
-        "Error updating break assignment policy to break type."
+        'Error updating break assignment policy to break type.'
       );
       toast.error(message);
     } finally {
@@ -77,13 +74,13 @@ export const EditBreakTypePolicyAssignment = ({ data, refetchData }) => {
   const handleBreakTypeChange = (selected) => {
     if (selected) {
       const item_id = Number(selected.value);
-      setValue("break_type", item_id);
+      setValue('break_type', item_id);
     }
   };
   const handleBreakRuleChange = (selected) => {
     if (selected) {
       const item_id = Number(selected.value);
-      setValue("break_rule", item_id);
+      setValue('break_rule', item_id);
     }
   };
   return (
@@ -120,20 +117,14 @@ export const EditBreakTypePolicyAssignment = ({ data, refetchData }) => {
                 <p className="text-sm md:text-lg lg:text-lg font-semibold">
                   Edit Break Type Policy Assignment
                 </p>
-                <IoCloseOutline
-                  size={20}
-                  className="cursor-pointer"
-                  onClick={handleCloseModal}
-                />
+                <IoCloseOutline size={20} className="cursor-pointer" onClick={handleCloseModal} />
               </div>
 
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 p-4">
                 {/* Name */}
 
                 <div className="">
-                  <label className="block text-sm font-medium mb-2">
-                    Break Type
-                  </label>
+                  <label className="block text-sm font-medium mb-2">Break Type</label>
                   <Select
                     options={categoriesData?.map((item) => ({
                       value: item.id,
@@ -152,31 +143,27 @@ export const EditBreakTypePolicyAssignment = ({ data, refetchData }) => {
                       }),
                       control: (base) => ({
                         ...base,
-                        minHeight: "40px",
-                        borderColor: "#d1d5db",
-                        boxShadow: "none",
-                        "&:hover": {
-                          borderColor: "#9ca3af",
+                        minHeight: '40px',
+                        borderColor: '#d1d5db',
+                        boxShadow: 'none',
+                        '&:hover': {
+                          borderColor: '#9ca3af',
                         },
-                        "&:focus-within": {
-                          borderColor: "#9ca3af",
-                          boxShadow: "none",
+                        '&:focus-within': {
+                          borderColor: '#9ca3af',
+                          boxShadow: 'none',
                         },
-                        backgroundColor: "#F8FAFC",
+                        backgroundColor: '#F8FAFC',
                       }),
                     }}
                     onChange={handleBreakTypeChange}
                   />
                   {errors.break_type && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {errors.break_type.message}
-                    </p>
+                    <p className="text-red-500 text-sm mt-1">{errors.break_type.message}</p>
                   )}
                 </div>
                 <div className="">
-                  <label className="block text-sm font-medium mb-2">
-                    Break Policy
-                  </label>
+                  <label className="block text-sm font-medium mb-2">Break Policy</label>
                   <Select
                     options={rulesData?.map((item) => ({
                       value: item.id,
@@ -195,63 +182,53 @@ export const EditBreakTypePolicyAssignment = ({ data, refetchData }) => {
                       }),
                       control: (base) => ({
                         ...base,
-                        minHeight: "40px",
-                        borderColor: "#d1d5db",
-                        boxShadow: "none",
-                        "&:hover": {
-                          borderColor: "#9ca3af",
+                        minHeight: '40px',
+                        borderColor: '#d1d5db',
+                        boxShadow: 'none',
+                        '&:hover': {
+                          borderColor: '#9ca3af',
                         },
-                        "&:focus-within": {
-                          borderColor: "#9ca3af",
-                          boxShadow: "none",
+                        '&:focus-within': {
+                          borderColor: '#9ca3af',
+                          boxShadow: 'none',
                         },
-                        backgroundColor: "#F8FAFC",
+                        backgroundColor: '#F8FAFC',
                       }),
                     }}
                     onChange={handleBreakRuleChange}
                   />
                   {errors.break_rule && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {errors.break_rule.message}
-                    </p>
+                    <p className="text-red-500 text-sm mt-1">{errors.break_rule.message}</p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Max Duration (Minutes)
-                  </label>
+                  <label className="block text-sm font-medium mb-2">Max Duration (Minutes)</label>
                   <input
                     type="number"
                     min="1"
-                    {...register("max_duration_minutes", {
+                    {...register('max_duration_minutes', {
                       valueAsNumber: true,
                     })}
                     className="w-full py-2 px-4 rounded-md border border-gray-400 focus:outline-none focus:border-primary focus:bg-white placeholder:text-sm"
                   />
                   {errors.max_duration_minutes && (
-                    <p className="text-red-500 text-sm">
-                      {errors.max_duration_minutes.message}
-                    </p>
+                    <p className="text-red-500 text-sm">{errors.max_duration_minutes.message}</p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Grace Period (Minutes)
-                  </label>
+                  <label className="block text-sm font-medium mb-2">Grace Period (Minutes)</label>
                   <input
                     type="number"
                     min="0"
-                    {...register("grace_period_minutes", {
+                    {...register('grace_period_minutes', {
                       valueAsNumber: true,
                     })}
                     className="w-full py-2 px-4 rounded-md border border-gray-400 focus:outline-none focus:border-primary focus:bg-white placeholder:text-sm"
                   />
                   {errors.grace_period_minutes && (
-                    <p className="text-red-500 text-sm">
-                      {errors.grace_period_minutes.message}
-                    </p>
+                    <p className="text-red-500 text-sm">{errors.grace_period_minutes.message}</p>
                   )}
                 </div>
                 <div className="flex items-center space-x-2 mb-4">
@@ -259,12 +236,9 @@ export const EditBreakTypePolicyAssignment = ({ data, refetchData }) => {
                     type="checkbox"
                     id="required"
                     className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                    {...register("required")}
+                    {...register('required')}
                   />
-                  <label
-                    htmlFor="required"
-                    className="ml-2 text-sm font-medium text-gray-700"
-                  >
+                  <label htmlFor="required" className="ml-2 text-sm font-medium text-gray-700">
                     Required
                   </label>
                 </div>

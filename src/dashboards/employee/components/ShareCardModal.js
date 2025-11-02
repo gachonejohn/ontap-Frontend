@@ -1,5 +1,5 @@
 // ShareCardModal.js
-import React from "react";
+import React from 'react';
 
 const ShareCardModal = ({ isOpen, onClose, card }) => {
   if (!isOpen) return null;
@@ -10,16 +10,32 @@ const ShareCardModal = ({ isOpen, onClose, card }) => {
         <div className="flex flex-col justify-start items-start gap-6 h-[359px]">
           {/* Header with Close Button */}
           <div className="flex flex-row justify-between items-center w-[528px] h-7">
-            <div className="font-inter text-lg font-semibold text-neutral-900">
-              Share Card
-            </div>
+            <div className="font-inter text-lg font-semibold text-neutral-900">Share Card</div>
             <button
               onClick={onClose}
               className="flex justify-center items-center w-7 h-7 hover:bg-gray-100 rounded-full"
             >
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 4L4 12" stroke="#4B5563" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M4 4L12 12" stroke="#4B5563" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M12 4L4 12"
+                  stroke="#4B5563"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M4 4L12 12"
+                  stroke="#4B5563"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
             </button>
           </div>
@@ -50,9 +66,7 @@ const ShareCardModal = ({ isOpen, onClose, card }) => {
                   <img width="18" height="30" src="/images/nfc.png" alt="NFC icon" />
                 </div>
                 <div className="flex flex-col">
-                  <div className="font-inter text-base font-semibold text-neutral-900">
-                    NFC Tap
-                  </div>
+                  <div className="font-inter text-base font-semibold text-neutral-900">NFC Tap</div>
                   <div className="font-inter text-xs font-medium text-gray-600">
                     Share by tapping devices together
                   </div>

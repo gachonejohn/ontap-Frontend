@@ -1,13 +1,13 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { FiEdit } from "react-icons/fi";
-import { IoCloseOutline } from "react-icons/io5";
-import { toast } from "react-toastify";
-import { createRoleSchema } from "../../schemas/roleSchema";
-import SubmitSpinner from "../common/spinners/submitSpinner";
-import { useUpdateRoleMutation } from "../../store/services/roles/rolesService";
-import CreateUpdateButton from "@components/common/Buttons/CreateUpdateButton";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { FiEdit } from 'react-icons/fi';
+import { IoCloseOutline } from 'react-icons/io5';
+import { toast } from 'react-toastify';
+import { createRoleSchema } from '../../schemas/roleSchema';
+import SubmitSpinner from '../common/spinners/submitSpinner';
+import { useUpdateRoleMutation } from '../../store/services/roles/rolesService';
+import CreateUpdateButton from '@components/common/Buttons/CreateUpdateButton';
 export const EditRole = ({ refetchData, data }) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -21,8 +21,8 @@ export const EditRole = ({ refetchData, data }) => {
   } = useForm({
     resolver: zodResolver(createRoleSchema),
     defaultValues: {
-      name: data?.name ?? "",
-      description: data?.description ?? "",
+      name: data?.name ?? '',
+      description: data?.description ?? '',
     },
   });
 
@@ -32,15 +32,15 @@ export const EditRole = ({ refetchData, data }) => {
         id: data.id,
         data: formData,
       }).unwrap();
-      toast.success("Role updated successfully!");
+      toast.success('Role updated successfully!');
       handleCloseModal();
       refetchData();
     } catch (error) {
-      console.error("Error:", error);
+      console.error('Error:', error);
       if (error && error.data && error.data.error) {
         toast.error(error.data.error);
       } else {
-        toast.error("An error occurred. Please try again.");
+        toast.error('An error occurred. Please try again.');
       }
     } finally {
       refetchData();
@@ -60,7 +60,7 @@ export const EditRole = ({ refetchData, data }) => {
         // title="Edit"
         label="Edit"
         icon={<FiEdit className="w-4 h-4 text-amber-500" />}
-       className="px-4 py-2 w-full focus:outline-none focus:border-none ffocus:ring-none"  
+        className="px-4 py-2 w-full focus:outline-none focus:border-none ffocus:ring-none"
       />
 
       {isOpen && (
@@ -83,14 +83,8 @@ export const EditRole = ({ refetchData, data }) => {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="sticky top-0 bg-white z-40 flex px-4 justify-between items-center py-4">
-                <p className="text-sm md:text-lg lg:text-lg font-semibold">
-                  Edit Role
-                </p>
-                <IoCloseOutline
-                  size={20}
-                  className="cursor-pointer"
-                  onClick={handleCloseModal}
-                />
+                <p className="text-sm md:text-lg lg:text-lg font-semibold">Edit Role</p>
+                <IoCloseOutline size={20} className="cursor-pointer" onClick={handleCloseModal} />
               </div>
 
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 p-4">
@@ -102,30 +96,22 @@ export const EditRole = ({ refetchData, data }) => {
                   <input
                     type="text"
                     placeholder="E.g. HR"
-                    {...register("name")}
+                    {...register('name')}
                     className="w-full py-2 px-4 rounded-md border border-gray-400 focus:outline-none focus:border-[#1E9FF2] focus:bg-white placeholder:text-sm"
                   />
-                  {errors.name && (
-                    <p className="text-red-500 text-sm">
-                      {errors.name.message}
-                    </p>
-                  )}
+                  {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
                 </div>
 
                 {/* Description */}
                 <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Description
-                  </label>
+                  <label className="block text-sm font-medium mb-2">Description</label>
                   <textarea
                     placeholder="Description here..."
-                    {...register("description")}
+                    {...register('description')}
                     className="w-full py-2 px-4 rounded-md border border-gray-400 focus:outline-none focus:border-[#1E9FF2] focus:bg-white placeholder:text-sm"
                   />
                   {errors.description && (
-                    <p className="text-red-500 text-sm">
-                      {errors.description.message}
-                    </p>
+                    <p className="text-red-500 text-sm">{errors.description.message}</p>
                   )}
                 </div>
 
@@ -149,7 +135,7 @@ export const EditRole = ({ refetchData, data }) => {
                         <span>Submitting...</span>
                       </span>
                     ) : (
-                      "Submit"
+                      'Submit'
                     )}
                   </button>
                 </div>

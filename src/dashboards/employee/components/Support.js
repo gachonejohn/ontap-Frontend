@@ -1,9 +1,9 @@
-import React, { useState } from "react";
-import CreateTicketModal from "./CreateTicketModal";
-import ViewProfileModal from "./ViewProfileModal.js";
+import React, { useState } from 'react';
+import CreateTicketModal from './CreateTicketModal';
+import ViewProfileModal from './ViewProfileModal.js';
 
 const Support = () => {
-  const [activeTab, setActiveTab] = useState("myTickets");
+  const [activeTab, setActiveTab] = useState('myTickets');
   const [isCreateTicketModalOpen, setIsCreateTicketModalOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
@@ -30,37 +30,43 @@ const Support = () => {
       {/* Tabs */}
       <div className="flex rounded-lg border border-slate-100 bg-slate-50 overflow-hidden">
         <div
-          className={`flex-1 flex items-center justify-center h-10 cursor-pointer border-r border-slate-100 ${activeTab === "myTickets" ? "bg-white" : "hover:bg-gray-50"
-            }`}
-          onClick={() => setActiveTab("myTickets")}
+          className={`flex-1 flex items-center justify-center h-10 cursor-pointer border-r border-slate-100 ${
+            activeTab === 'myTickets' ? 'bg-white' : 'hover:bg-gray-50'
+          }`}
+          onClick={() => setActiveTab('myTickets')}
         >
           <div
-            className={`text-xs text-neutral-900 tracking-wide ${activeTab === "myTickets" ? "font-semibold" : "font-medium"
-              }`}
+            className={`text-xs text-neutral-900 tracking-wide ${
+              activeTab === 'myTickets' ? 'font-semibold' : 'font-medium'
+            }`}
           >
             My Tickets
           </div>
         </div>
         <div
-          className={`flex-1 flex items-center justify-center h-10 cursor-pointer border-r border-slate-100 ${activeTab === "resources" ? "bg-white" : "hover:bg-gray-50"
-            }`}
-          onClick={() => setActiveTab("resources")}
+          className={`flex-1 flex items-center justify-center h-10 cursor-pointer border-r border-slate-100 ${
+            activeTab === 'resources' ? 'bg-white' : 'hover:bg-gray-50'
+          }`}
+          onClick={() => setActiveTab('resources')}
         >
           <div
-            className={`text-xs text-neutral-900 tracking-wide ${activeTab === "resources" ? "font-semibold" : "font-medium"
-              }`}
+            className={`text-xs text-neutral-900 tracking-wide ${
+              activeTab === 'resources' ? 'font-semibold' : 'font-medium'
+            }`}
           >
             Resources
           </div>
         </div>
         <div
-          className={`flex-1 flex items-center justify-center h-10 cursor-pointer ${activeTab === "contactInfo" ? "bg-white" : "hover:bg-gray-50"
-            }`}
-          onClick={() => setActiveTab("contactInfo")}
+          className={`flex-1 flex items-center justify-center h-10 cursor-pointer ${
+            activeTab === 'contactInfo' ? 'bg-white' : 'hover:bg-gray-50'
+          }`}
+          onClick={() => setActiveTab('contactInfo')}
         >
           <div
-            className={`text-xs text-neutral-900 tracking-wide ${activeTab === "contactInfo" ? "font-semibold" : "font-medium"
-              }`}
+            className={`text-xs text-neutral-900 tracking-wide ${
+              activeTab === 'contactInfo' ? 'font-semibold' : 'font-medium'
+            }`}
           >
             Contact Info
           </div>
@@ -68,19 +74,27 @@ const Support = () => {
       </div>
 
       {/* Tab Content */}
-      {activeTab === "myTickets" && (
+      {activeTab === 'myTickets' && (
         <div className="flex flex-col gap-4">
           <div className="text-lg text-neutral-900 font-medium">My Support Tickets</div>
           {/* Ticket 1 */}
           <div className="flex flex-col p-4 rounded-xl shadow-sm bg-white hover:shadow-md transition-shadow">
             <div className="flex justify-between items-center mb-2">
               <div className="flex items-center gap-4">
-                <div className="text-sm text-neutral-900 font-semibold">Request for additional vacation days</div>
-                <div className="px-4 py-1 rounded-lg border border-neutral-200 text-xs text-gray-800 font-medium">TICK-089</div>
+                <div className="text-sm text-neutral-900 font-semibold">
+                  Request for additional vacation days
+                </div>
+                <div className="px-4 py-1 rounded-lg border border-neutral-200 text-xs text-gray-800 font-medium">
+                  TICK-089
+                </div>
               </div>
               <div className="flex gap-2">
-                <span className="px-2 py-1 rounded-md bg-blue-100 text-[10px] text-blue-800 font-medium">Open</span>
-                <span className="px-2 py-1 rounded-md bg-yellow-100 text-[10px] text-yellow-800 font-medium">Medium</span>
+                <span className="px-2 py-1 rounded-md bg-blue-100 text-[10px] text-blue-800 font-medium">
+                  Open
+                </span>
+                <span className="px-2 py-1 rounded-md bg-yellow-100 text-[10px] text-yellow-800 font-medium">
+                  Medium
+                </span>
               </div>
             </div>
             <div className="text-xs text-gray-600 mb-3">
@@ -101,12 +115,20 @@ const Support = () => {
           <div className="flex flex-col p-4 rounded-xl shadow-sm bg-white hover:shadow-md transition-shadow">
             <div className="flex justify-between items-center mb-2">
               <div className="flex items-center gap-4">
-                <div className="text-sm text-neutral-900 font-semibold">Unable to access payslip portal</div>
-                <div className="px-4 py-1 rounded-lg border border-neutral-200 text-xs text-gray-800 font-medium">TICK-090</div>
+                <div className="text-sm text-neutral-900 font-semibold">
+                  Unable to access payslip portal
+                </div>
+                <div className="px-4 py-1 rounded-lg border border-neutral-200 text-xs text-gray-800 font-medium">
+                  TICK-090
+                </div>
               </div>
               <div className="flex gap-2">
-                <span className="px-2 py-1 rounded-md bg-yellow-100 text-[10px] text-yellow-800 font-medium">In Progress</span>
-                <span className="px-2 py-1 rounded-md bg-red-100 text-[10px] test-red-800 font-medium">High</span>
+                <span className="px-2 py-1 rounded-md bg-yellow-100 text-[10px] text-yellow-800 font-medium">
+                  In Progress
+                </span>
+                <span className="px-2 py-1 rounded-md bg-red-100 text-[10px] test-red-800 font-medium">
+                  High
+                </span>
               </div>
             </div>
             <div className="text-xs text-gray-600 mb-3">
@@ -127,12 +149,20 @@ const Support = () => {
           <div className="flex flex-col p-4 rounded-xl shadow-sm bg-white hover:shadow-md transition-shadow">
             <div className="flex justify-between items-center mb-2">
               <div className="flex items-center gap-4">
-                <div className="text-sm text-neutral-900 font-semibold">VPN access issue resolved</div>
-                <div className="px-4 py-1 rounded-lg border border-neutral-200 text-xs text-gray-800 font-medium">TICK-091</div>
+                <div className="text-sm text-neutral-900 font-semibold">
+                  VPN access issue resolved
+                </div>
+                <div className="px-4 py-1 rounded-lg border border-neutral-200 text-xs text-gray-800 font-medium">
+                  TICK-091
+                </div>
               </div>
               <div className="flex gap-2">
-                <span className="px-2 py-1 rounded-md bg-green-100 text-[10px] text-green-800 font-medium">Resolved</span>
-                <span className="px-2 py-1 rounded-md bg-green-100 text-[10px] text-green-800 font-medium">Low</span>
+                <span className="px-2 py-1 rounded-md bg-green-100 text-[10px] text-green-800 font-medium">
+                  Resolved
+                </span>
+                <span className="px-2 py-1 rounded-md bg-green-100 text-[10px] text-green-800 font-medium">
+                  Low
+                </span>
               </div>
             </div>
             <div className="text-xs text-gray-600 mb-3">
@@ -152,18 +182,25 @@ const Support = () => {
         </div>
       )}
 
-      {activeTab === "resources" && (
+      {activeTab === 'resources' && (
         <div className="flex flex-col gap-6">
           <div className="grid grid-cols-2 gap-6">
             {/* Resource 1 */}
             <div className="flex items-center p-4 rounded-xl shadow-sm bg-white hover:shadow-md transition-shadow">
               <div className="flex items-center gap-4 w-full">
                 <div className="flex justify-center items-center w-16 h-16 rounded-full bg-teal-100">
-                  <img width="30px" height="30px" src="/images/resources.png" alt="Resources icon" />
+                  <img
+                    width="30px"
+                    height="30px"
+                    src="/images/resources.png"
+                    alt="Resources icon"
+                  />
                 </div>
                 <div className="flex flex-col gap-1 flex-1">
                   <div className="text-lg text-neutral-900 font-semibold">Employee Handbook</div>
-                  <div className="text-xs text-gray-600">Complete guide to company policies and procedures</div>
+                  <div className="text-xs text-gray-600">
+                    Complete guide to company policies and procedures
+                  </div>
                 </div>
               </div>
             </div>
@@ -171,11 +208,18 @@ const Support = () => {
             <div className="flex items-center p-4 rounded-xl shadow-sm bg-white hover:shadow-md transition-shadow">
               <div className="flex items-center gap-4 w-full">
                 <div className="flex justify-center items-center w-16 h-16 rounded-full bg-teal-100">
-                  <img width="30px" height="30px" src="/images/resources.png" alt="Resources icon" />
+                  <img
+                    width="30px"
+                    height="30px"
+                    src="/images/resources.png"
+                    alt="Resources icon"
+                  />
                 </div>
                 <div className="flex flex-col gap-1 flex-1">
                   <div className="text-lg text-neutral-900 font-semibold">HR Policies</div>
-                  <div className="text-xs text-gray-600">Human resources policies and guidelines</div>
+                  <div className="text-xs text-gray-600">
+                    Human resources policies and guidelines
+                  </div>
                 </div>
               </div>
             </div>
@@ -183,11 +227,20 @@ const Support = () => {
             <div className="flex items-center p-4 rounded-xl shadow-sm bg-white hover:shadow-md transition-shadow">
               <div className="flex items-center gap-4 w-full">
                 <div className="flex justify-center items-center w-16 h-16 rounded-full bg-teal-100">
-                  <img width="30px" height="30px" src="/images/resources.png" alt="Resources icon" />
+                  <img
+                    width="30px"
+                    height="30px"
+                    src="/images/resources.png"
+                    alt="Resources icon"
+                  />
                 </div>
                 <div className="flex flex-col gap-1 flex-1">
-                  <div className="text-lg text-neutral-900 font-semibold">Legal & Compliance Information</div>
-                  <div className="text-xs text-gray-600">Complete guide to company policies and procedures</div>
+                  <div className="text-lg text-neutral-900 font-semibold">
+                    Legal & Compliance Information
+                  </div>
+                  <div className="text-xs text-gray-600">
+                    Complete guide to company policies and procedures
+                  </div>
                 </div>
               </div>
             </div>
@@ -195,11 +248,20 @@ const Support = () => {
             <div className="flex items-center p-4 rounded-xl shadow-sm bg-white hover:shadow-md transition-shadow">
               <div className="flex items-center gap-4 w-full">
                 <div className="flex justify-center items-center w-16 h-16 rounded-full bg-teal-100">
-                  <img width="30px" height="30px" src="/images/resources.png" alt="Resources icon" />
+                  <img
+                    width="30px"
+                    height="30px"
+                    src="/images/resources.png"
+                    alt="Resources icon"
+                  />
                 </div>
                 <div className="flex flex-col gap-1 flex-1">
-                  <div className="text-lg text-neutral-900 font-semibold">Compensation & Benefits Information</div>
-                  <div className="text-xs text-gray-600">Human resources policies and guidelines</div>
+                  <div className="text-lg text-neutral-900 font-semibold">
+                    Compensation & Benefits Information
+                  </div>
+                  <div className="text-xs text-gray-600">
+                    Human resources policies and guidelines
+                  </div>
                 </div>
               </div>
             </div>
@@ -207,7 +269,7 @@ const Support = () => {
         </div>
       )}
 
-      {activeTab === "contactInfo" && (
+      {activeTab === 'contactInfo' && (
         <div className="flex flex-col gap-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* IT Support */}
@@ -251,7 +313,9 @@ const Support = () => {
       )}
 
       {/* Create Ticket Modal */}
-      {isCreateTicketModalOpen && <CreateTicketModal isOpen={isCreateTicketModalOpen} onClose={closeCreateTicketModal} />}
+      {isCreateTicketModalOpen && (
+        <CreateTicketModal isOpen={isCreateTicketModalOpen} onClose={closeCreateTicketModal} />
+      )}
     </div>
   );
 };
