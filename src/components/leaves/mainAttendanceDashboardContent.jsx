@@ -202,10 +202,10 @@ const refetchInfo = () => {
       <div className="flex justify-between items-center mb-3 py-2">
         <div className="flex flex-col gap-1.5">
           <div className="text-lg text-neutral-900 font-semibold">
-            Leave & Attendance
+            Attendance
           </div>
           <div className="text-sm text-gray-600 font-normal">
-            Manage employee leave requests and attendance records.
+            Manage employee attendance records.
           </div>
         </div>
         <button className="flex justify-center items-center gap-2 p-2 rounded-md h-12 bg-teal-500 text-white text-sm hover:bg-teal-600 transition-colors">
@@ -383,99 +383,7 @@ const refetchInfo = () => {
                 )}
               </div>
       </div>
-
-         {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
-        {/* Pending Requests Card */}
-        <div className="flex flex-col justify-between p-4 rounded-xl h-[120px]
-         shadow-sm border
-         bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
-          <div className="flex justify-between items-center">
-            <div className="flex flex-col">
-              <div className="text-sm text-gray-600 font-medium">
-                Pending Requests
-              </div>
-              <div className="mt-2 text-lg text-neutral-900 font-semibold">
-                {leaveRequests.filter((req) => req.status === "Pending").length}
-              </div>
-            </div>
-            <div className="flex items-center justify-center p-1 rounded-2xl h-8 w-8 bg-blue-500 shadow-sm">
-              <img
-                className="h-5 w-5 object-contain"
-                src="/images/pending_risk.png"
-                alt="Pending Requests icon"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Approved This Month Card */}
-        <div className="flex flex-col justify-between p-4 rounded-xl h-[120px]  shadow-sm border
-         bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
-          <div className="flex justify-between items-center">
-            <div className="flex flex-col">
-              <div className="text-sm text-gray-600 font-medium">
-                Approved This Month
-              </div>
-              <div className="mt-2 text-lg text-neutral-900 font-semibold">
-                3
-              </div>
-            </div>
-            <div className="flex items-center justify-center p-1 rounded-2xl h-8 w-8 bg-green-500 shadow-sm">
-              <img
-                className="h-5 w-5 object-contain"
-                src="/images/approved.png"
-                alt="Approved icon"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Total Days Requested Card */}
-        <div className="flex flex-col justify-between p-4 rounded-xl h-[120px]  shadow-sm border
-         bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
-          <div className="flex justify-between items-center">
-            <div className="flex flex-col">
-              <div className="text-sm text-gray-600 font-medium">
-                Total Days Requested
-              </div>
-              <div className="mt-2 text-lg text-neutral-900 font-semibold">
-                36
-              </div>
-            </div>
-            <div className="flex items-center justify-center p-1 rounded-2xl h-8 w-8 bg-purple-500 shadow-sm">
-              <img
-                className="h-5 w-5 object-contain"
-                src="/images/Total_days.png"
-                alt="Total Days icon"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Average Attendance Card */}
-        <div className="flex flex-col justify-between p-4 rounded-xl h-[120px]  shadow-sm border
-         bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
-          <div className="flex justify-between items-center">
-            <div className="flex flex-col">
-              <div className="text-sm text-gray-600 font-medium">
-                Avg. Attendance
-              </div>
-              <div className="mt-2 text-lg text-neutral-900 font-semibold">
-                {attendance?.average_attendance_percent ?? 0} %
-              </div>
-            </div>
-            <div className="flex items-center justify-center p-1 rounded-2xl h-8 w-8 bg-orange-500 shadow-sm">
-              <img
-                className="h-5 w-5 object-contain"
-                src="/images/average_attendance.png"
-                alt="Average Attendance icon"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-
+      
       {/* Today's Clock-ins & Todo's */}
       <AttendanceList />
       {/* Charts */}
