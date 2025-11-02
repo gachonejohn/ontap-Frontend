@@ -8,6 +8,8 @@ import LogTaskModal from "./LogTaskModal";
 import TaskModal from "./TaskModal";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
+import OnboardingStepsBoard from "../../components/onboardingSteps/OnboardingStepsBoard";
+
 
 // Component for individual task card
 const TaskCard = ({ task, onClick }) => {
@@ -175,6 +177,7 @@ const ColumnHeader = ({ icon, title, count, bgColor = "bg-blue-500" }) => (
 );
 
 const EmployeeTasksDashboardContent = () => {
+  const [showOnboardingDashboard, setShowOnboardingDashboard] = useState(false);
   const [isLogTaskModalOpen, setIsLogTaskModalOpen] = useState(false);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
@@ -383,6 +386,12 @@ const EmployeeTasksDashboardContent = () => {
     );
   }
 
+  if (showOnboardingDashboard) {
+      return (
+        <OnboardingStepsBoard onBack={() => setShowOnboardingDashboard(false)} />
+      );
+    }
+
   return (
     <div className="flex flex-col gap-6">
       {/* Task Header */}
@@ -393,6 +402,25 @@ const EmployeeTasksDashboardContent = () => {
           </div>
           <div className="text-sm text-gray-600 font-normal">
             Manage and track your assigned tasks
+          </div>
+        </div>
+
+      <div className="flex flex-row items-center gap-3">
+      <div className="flex justify-center items-center rounded-md w-[220px] h-12 bg-gray-200 cursor-pointer hover:bg-gray-300 transition-colors"
+      onClick={() => setShowOnboardingDashboard(true)}
+        >
+          <div className="flex flex-row items-center gap-2">
+            <div className="flex justify-center items-center w-5 h-5">
+              <img
+                width="15.3px"
+                height="15.3px"
+                src="/images/task.png"
+                alt="Dashboard icon"
+              />
+            </div>
+            <div className="text-sm text-gray-800 font-medium">
+              Other Tasks
+            </div>
           </div>
         </div>
         {canCreateTask && (
@@ -415,6 +443,7 @@ const EmployeeTasksDashboardContent = () => {
             </div>
           </div>
         )}
+          </div>
       </div>
 
       {/* Search and Filters */}

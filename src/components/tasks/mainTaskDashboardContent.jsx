@@ -8,6 +8,7 @@ import {
 import LogTaskModal from "./LogTaskModal";
 import TaskModal from "./TaskModal";
 import { toast } from "react-toastify";
+import OnboardingStepsBoard from "../../components/onboardingSteps/OnboardingStepsBoard";
 
 const TaskCard = ({ task, onClick }) => {
   const { data: taskDetail } = useGetTaskDetailQuery(task.id);
@@ -177,6 +178,7 @@ const ColumnHeader = ({ icon, title, count, bgColor = "bg-blue-500" }) => (
 );
 
 export default function MainTaskDashboardContent() {
+  const [showOnboardingDashboard, setShowOnboardingDashboard] = useState(false);
   const [isLogTaskModalOpen, setIsLogTaskModalOpen] = useState(false);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
@@ -402,32 +404,61 @@ export default function MainTaskDashboardContent() {
     setIsDaysDropdownOpen(false);
   };
 
+  if (showOnboardingDashboard) {
+    return (
+      <OnboardingStepsBoard onBack={() => setShowOnboardingDashboard(false)} />
+    );
+  }
+
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-row justify-between items-center">
-        <div className="flex flex-col">
-          <div className="text-lg text-neutral-900 font-semibold">Task Management</div>
-          <div className="text-sm text-gray-600 font-normal">
-            Manage and track all team tasks
-          </div>
+  <div className="flex flex-col gap-6">
+  <div className="flex flex-row justify-between items-center">
+  <div className="flex flex-col">
+    <div className="text-lg text-neutral-900 font-semibold">Task Management</div>
+    <div className="text-sm text-gray-600 font-normal">
+      Manage and track all team tasks
+    </div>
+  </div>
+
+  <div className="flex flex-row items-center gap-3">
+    <div
+      className="flex justify-center items-center rounded-md w-[220px] h-12 bg-gray-200 cursor-pointer hover:bg-gray-300 transition-colors"
+      onClick={() => setShowOnboardingDashboard(true)}
+    >
+      <div className="flex flex-row items-center gap-2">
+        <div className="flex justify-center items-center w-5 h-5">
+          <img
+            width="15.3px"
+            height="15.3px"
+            src="/images/task.png"
+            alt="Dashboard icon"
+          />
         </div>
-        <div
-          className="flex justify-center items-center rounded-md w-[180px] h-12 bg-teal-500 cursor-pointer hover:bg-teal-600 transition-colors"
-          onClick={() => setIsLogTaskModalOpen(true)}
-        >
-          <div className="flex flex-row items-center gap-2">
-            <div className="flex justify-center items-center w-5 h-5">
-              <img
-                width="15.3px"
-                height="15.3px"
-                src="/images/addtask.png"
-                alt="Add Task icon"
-              />
-            </div>
-            <div className="text-sm text-white font-medium">New Task</div>
-          </div>
+        <div className="text-sm text-gray-800 font-medium">
+          Other Tasks
         </div>
       </div>
+    </div>
+
+    <div
+      className="flex justify-center items-center rounded-md w-[180px] h-12 bg-teal-500 cursor-pointer hover:bg-teal-600 transition-colors"
+      onClick={() => setIsLogTaskModalOpen(true)}
+    >
+      <div className="flex flex-row items-center gap-2">
+        <div className="flex justify-center items-center w-5 h-5">
+          <img
+            width="15.3px"
+            height="15.3px"
+            src="/images/addtask.png"
+            alt="Add Task icon"
+          />
+        </div>
+        <div className="text-sm text-white font-medium">New Task</div>
+      </div>
+    </div>
+    </div>
+  </div>
+
 
       <div className="flex flex-row justify-between items-center gap-4 w-full">
         <div className="flex flex-row items-center gap-2 p-2 rounded-lg border border-slate-100 h-10 shadow-md transition-transform duration-200 hover:-translate-y-1 bg-white flex-1">
