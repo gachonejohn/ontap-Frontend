@@ -1,24 +1,21 @@
-import { useMemo, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useMemo, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
-import { FiEdit, FiEye } from "react-icons/fi";
-import { toast } from "react-toastify";
-import ActionModal from "../common/Modals/ActionModal";
+import { FiEdit, FiEye } from 'react-icons/fi';
+import { toast } from 'react-toastify';
+import ActionModal from '../common/Modals/ActionModal';
 
-import { LuArchiveX } from "react-icons/lu";
-import { PAGE_SIZE } from "../../constants/constants";
-import { useFilters } from "../../hooks/useFIlters";
-import {
-  useDeleteRoleMutation,
-  useGetRolesQuery,
-} from "../../store/services/roles/rolesService";
-import { CustomDate } from "../../utils/dates";
-import DataTable from "../common/DataTable";
-import Pagination from "../common/pagination";
-import ContentSpinner from "../common/spinners/dataLoadingSpinner";
-import { CreateRole } from "./NewRole";
-import { EditRole } from "./editRole";
-import ButtonDropdown from "@components/common/ActionsPopover";
+import { LuArchiveX } from 'react-icons/lu';
+import { PAGE_SIZE } from '../../constants/constants';
+import { useFilters } from '../../hooks/useFIlters';
+import { useDeleteRoleMutation, useGetRolesQuery } from '../../store/services/roles/rolesService';
+import { CustomDate } from '../../utils/dates';
+import DataTable from '../common/DataTable';
+import Pagination from '../common/pagination';
+import ContentSpinner from '../common/spinners/dataLoadingSpinner';
+import { CreateRole } from './NewRole';
+import { EditRole } from './editRole';
+import ButtonDropdown from '@components/common/ActionsPopover';
 const RolesList = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -26,14 +23,14 @@ const RolesList = () => {
   const [selectedRole, setSelectedRole] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  const currentPageParam = parseInt(searchParams.get("page") || "1", 10);
+  const currentPageParam = parseInt(searchParams.get('page') || '1', 10);
 
   const { filters, currentPage, handlePageChange } = useFilters({
     initialFilters: {},
     initialPage: currentPageParam,
     navigate,
     debounceTime: 100,
-    debouncedFields: [""],
+    debouncedFields: [''],
   });
 
   const queryParams = useMemo(
@@ -67,15 +64,15 @@ const RolesList = () => {
   const handleDeleteProgram = async () => {
     try {
       // await deleteAdmin(selectedRole).unwrap();
-      toast.success("Role deleted successfully!");
+      toast.success('Role deleted successfully!');
       closeDeleteModal();
       refetch();
     } catch (error) {
-      console.log("error", error);
-      if (error && typeof error === "object" && error.data) {
-        toast.error(error.data.error || "Error deleting role.");
+      console.log('error', error);
+      if (error && typeof error === 'object' && error.data) {
+        toast.error(error.data.error || 'Error deleting role.');
       } else {
-        toast.error("Unexpected error occurred. Please try again.");
+        toast.error('Unexpected error occurred. Please try again.');
       }
     }
   };
@@ -83,52 +80,44 @@ const RolesList = () => {
 
   const columns = [
     {
-      header: "Name",
-      accessor: "name",
+      header: 'Name',
+      accessor: 'name',
       cell: (item) => <span>{item.name}</span>,
     },
     {
-      header: "Description",
-      accessor: "description",
-      cell: (item) => (
-        <span className="text-xs font-medium">{item.description}</span>
-      ),
+      header: 'Description',
+      accessor: 'description',
+      cell: (item) => <span className="text-xs font-medium">{item.description}</span>,
     },
 
     {
-      header: "Date Created",
-      accessor: "created_at",
-      cell: (item) => (
-        <span className="text-xs font-medium">
-          {CustomDate(item.created_at)}
-        </span>
-      ),
+      header: 'Date Created',
+      accessor: 'created_at',
+      cell: (item) => <span className="text-xs font-medium">{CustomDate(item.created_at)}</span>,
     },
     {
-      header: "Actions",
-      accessor: "id",
+      header: 'Actions',
+      accessor: 'id',
       cell: (item) => (
         <>
-      
-           <ButtonDropdown>
-                  <button
-                    className="flex items-center space-x-2 "
-                    onClick={() => handleViewDetails(item.id)}
-                  >
-                    <FiEye className="text-lg" />
-                    <span>Edit Permissions</span>
-                  </button>
-                  <button
-                    onClick={() => openDeleteModal(item.id)}
-                    className="flex items-center space-x-2"
-                  >
-                    <LuArchiveX className="text-lg text-red-500" />
-                    <span className="text-red-600">Delete</span>
-                  </button>
-               
-                     <EditRole data={item} refetchData={refetch} />
-                 
-                </ButtonDropdown>
+          <ButtonDropdown>
+            <button
+              className="flex items-center space-x-2 "
+              onClick={() => handleViewDetails(item.id)}
+            >
+              <FiEye className="text-lg" />
+              <span>Edit Permissions</span>
+            </button>
+            <button
+              onClick={() => openDeleteModal(item.id)}
+              className="flex items-center space-x-2"
+            >
+              <LuArchiveX className="text-lg text-red-500" />
+              <span className="text-red-600">Delete</span>
+            </button>
+
+            <EditRole data={item} refetchData={refetch} />
+          </ButtonDropdown>
         </>
       ),
     },
@@ -141,7 +130,7 @@ const RolesList = () => {
           Roles
         </h2> */}
         <div>
-        <CreateRole refetchData={refetch} />
+          <CreateRole refetchData={refetch} />
         </div>
       </div>
 
@@ -151,9 +140,9 @@ const RolesList = () => {
         </div>
       ) : error ? (
         <div className="bg-red-50 p-4 rounded-md text-red-800 text-center">
-          {"status" in error && error.data?.error
+          {'status' in error && error.data?.error
             ? error.data.error
-            : "An error occurred while fetching roles."}
+            : 'An error occurred while fetching roles.'}
         </div>
       ) : rolesData && rolesData.results.length > 0 ? (
         <DataTable

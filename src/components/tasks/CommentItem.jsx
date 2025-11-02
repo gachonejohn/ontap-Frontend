@@ -1,5 +1,5 @@
-import React from "react";
-import { formatDateTime } from "./taskFunctions/dateFormatters";
+import React from 'react';
+import { formatDateTime } from './taskFunctions/dateFormatters';
 
 const CommentItem = ({
   comment,
@@ -10,10 +10,10 @@ const CommentItem = ({
   onSaveComment,
   onDeleteComment,
   onCancelEditComment,
-  onEditCommentContentChange
+  onEditCommentContentChange,
 }) => {
   const isEditing = editingCommentId === comment.id;
-  
+
   // 🔥 FIX: Extract user ID correctly and compare with comment.user
   const userId = currentUser?.user?.id || currentUser?.id;
   const canEditComment = userId === comment.user;
@@ -73,9 +73,7 @@ const CommentItem = ({
               </div>
             )}
           </div>
-          <p className="text-xs text-gray-600 font-normal whitespace-pre-wrap">
-            {comment.content}
-          </p>
+          <p className="text-xs text-gray-600 font-normal whitespace-pre-wrap">{comment.content}</p>
           <div className="text-xs text-gray-500 mt-2">
             {formatDateTime(comment.created_at)}
             {comment.updated_at !== comment.created_at && ' (edited)'}

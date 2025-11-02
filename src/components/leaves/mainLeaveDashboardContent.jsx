@@ -1,31 +1,31 @@
-import React, { useState } from "react";
-import LeaveChartDistribution from "./charts/LeaveChartDistribution";
-import { useGetEmployeeBreaksQuery } from "@store/services/policies/policyService";
-import { CreateBreak } from "@components/attendance/breaks/CreateBreak";
+import React, { useState } from 'react';
+import LeaveChartDistribution from './charts/LeaveChartDistribution';
+import { useGetEmployeeBreaksQuery } from '@store/services/policies/policyService';
+import { CreateBreak } from '@components/attendance/breaks/CreateBreak';
 
-import AttendanceList from "../attendance/Attendance";
-import AttendanceTrendsChart from "./charts/AttendaceTrends";
-import { toast } from "react-toastify";
-import { FiClock } from "react-icons/fi";
-import { formatClockTime, formatHoursWorked } from "../../utils/dates";
+import AttendanceList from '../attendance/Attendance';
+import AttendanceTrendsChart from './charts/AttendaceTrends';
+import { toast } from 'react-toastify';
+import { FiClock } from 'react-icons/fi';
+import { formatClockTime, formatHoursWorked } from '../../utils/dates';
 
 import {
   useGetAttendaceQuery,
   useGetAttendanceTrendsQuery,
-} from "@store/services/attendance/attendanceService";
+} from '@store/services/attendance/attendanceService';
 
 import {
   useGetTodayAttendaceQuery,
   useCheckInMutation,
   useCheckOutMutation,
-} from "@store/services/attendance/attendanceService";
+} from '@store/services/attendance/attendanceService';
 
-import ActionModal from "../common/Modals/ActionModal";
-import { isBreakActive } from "@utils/isBreakActive";
-import Countdown from "react-countdown";
+import ActionModal from '../common/Modals/ActionModal';
+import { isBreakActive } from '@utils/isBreakActive';
+import Countdown from 'react-countdown';
 
 export default function MainLeaveAttendanceDashboardContent() {
-  const [modalType, setModalType] = useState("");
+  const [modalType, setModalType] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const { data, isLoading, error } = useGetAttendanceTrendsQuery(
@@ -44,7 +44,7 @@ export default function MainLeaveAttendanceDashboardContent() {
     error: attendanceError,
     refetch: refetchAttendance,
   } = useGetTodayAttendaceQuery({}, { refetchOnMountOrArgChange: true });
-const {
+  const {
     data: breakData,
     isLoading: loadingBreakData,
     error: breakError,
@@ -60,66 +60,66 @@ const {
   const [leaveRequests, setLeaveRequests] = useState([
     {
       id: 1,
-      name: "Sarah Johnson",
-      department: "Engineering",
-      image: "/images/sarah.png",
-      type: "Annual Leave",
-      from: "2025-12-20",
-      to: "2025-12-24",
+      name: 'Sarah Johnson',
+      department: 'Engineering',
+      image: '/images/sarah.png',
+      type: 'Annual Leave',
+      from: '2025-12-20',
+      to: '2025-12-24',
       days: 5,
-      status: "Pending",
-      applied: "2025-12-01",
+      status: 'Pending',
+      applied: '2025-12-01',
     },
     {
       id: 2,
-      name: "Victor Josh",
-      department: "Design",
-      image: "/images/michael.png",
-      type: "Personal Leave",
-      from: "2025-12-20",
-      to: "2025-12-24",
+      name: 'Victor Josh',
+      department: 'Design',
+      image: '/images/michael.png',
+      type: 'Personal Leave',
+      from: '2025-12-20',
+      to: '2025-12-24',
       days: 5,
-      status: "Approved",
-      applied: "2025-12-01",
+      status: 'Approved',
+      applied: '2025-12-01',
     },
     {
       id: 3,
-      name: "David Wilson",
-      department: "Engineering",
-      image: "/images/david.png",
-      type: "Annual Leave",
-      from: "2025-12-20",
-      to: "2025-12-24",
+      name: 'David Wilson',
+      department: 'Engineering',
+      image: '/images/david.png',
+      type: 'Annual Leave',
+      from: '2025-12-20',
+      to: '2025-12-24',
       days: 5,
-      status: "Pending",
-      applied: "2025-12-01",
+      status: 'Pending',
+      applied: '2025-12-01',
     },
     {
       id: 4,
-      name: "Lisa Anderson",
-      department: "Engineering",
-      image: "/images/lisa.png",
-      type: "Annual Leave",
-      from: "2025-12-20",
-      to: "2025-12-24",
+      name: 'Lisa Anderson',
+      department: 'Engineering',
+      image: '/images/lisa.png',
+      type: 'Annual Leave',
+      from: '2025-12-20',
+      to: '2025-12-24',
       days: 5,
-      status: "Rejected",
-      applied: "2025-12-01",
+      status: 'Rejected',
+      applied: '2025-12-01',
     },
     {
       id: 5,
-      name: "Victor Josh",
-      department: "Design",
-      image: "/images/michael.png",
-      type: "Personal Leave",
-      from: "2025-12-20",
-      to: "2025-12-24",
+      name: 'Victor Josh',
+      department: 'Design',
+      image: '/images/michael.png',
+      type: 'Personal Leave',
+      from: '2025-12-20',
+      to: '2025-12-24',
       days: 5,
-      status: "Approved",
-      applied: "2025-12-01",
+      status: 'Approved',
+      applied: '2025-12-01',
     },
   ]);
-  console.log("data", data);
+  console.log('data', data);
   const [activeActionId, setActiveActionId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 4;
@@ -139,36 +139,36 @@ const {
     setActiveActionId(null);
   };
 
-      const openClockInModal = () => {
-    setModalType("clockIn");
+  const openClockInModal = () => {
+    setModalType('clockIn');
     setIsModalOpen(true);
   };
 
   const openClockOutModal = (id) => {
     setSelectedItem(id);
-    setModalType("clockOut");
+    setModalType('clockOut');
     setIsModalOpen(true);
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
   };
-const refetchInfo = () => {
+  const refetchInfo = () => {
     refetchAttendance();
     refetchBreak();
   };
   const handleClockIn = async () => {
     try {
       const res = await checkIn().unwrap();
-      const msg = res?.message || "Clocked in successfully!";
+      const msg = res?.message || 'Clocked in successfully!';
       toast.success(msg);
     } catch (error) {
-      console.log("error", error);
-      if (error && typeof error === "object" && "data" in error && error.data) {
+      console.log('error', error);
+      if (error && typeof error === 'object' && 'data' in error && error.data) {
         const errorData = error.data;
-        toast.error(errorData.error || "Error clocking in!.");
+        toast.error(errorData.error || 'Error clocking in!.');
       } else {
-        toast.error("Unexpected Error occured. Please try again.");
+        toast.error('Unexpected Error occured. Please try again.');
       }
     } finally {
       closeModal();
@@ -179,16 +179,16 @@ const refetchInfo = () => {
   const handleCheckOut = async () => {
     try {
       const res = await checkOut(selectedItem).unwrap();
-      const msg = res?.message || "Clocked out successfully!";
+      const msg = res?.message || 'Clocked out successfully!';
       toast.success(msg);
       setSelectedItem(null);
     } catch (error) {
-      console.log("error", error);
-      if (error && typeof error === "object" && "data" in error && error.data) {
+      console.log('error', error);
+      if (error && typeof error === 'object' && 'data' in error && error.data) {
         const errorData = error.data;
-        toast.error(errorData.error || "Error clocking out!.");
+        toast.error(errorData.error || 'Error clocking out!.');
       } else {
-        toast.error("Unexpected Error occured. Please try again.");
+        toast.error('Unexpected Error occured. Please try again.');
       }
     } finally {
       closeModal();
@@ -201,26 +201,18 @@ const refetchInfo = () => {
       {/* Header section */}
       <div className="flex justify-between items-center mb-3 py-2">
         <div className="flex flex-col gap-1.5">
-          <div className="text-lg text-neutral-900 font-semibold">
-            Leave & Attendance
-          </div>
+          <div className="text-lg text-neutral-900 font-semibold">Leave & Attendance</div>
           <div className="text-sm text-gray-600 font-normal">
             Manage employee leave requests and attendance records.
           </div>
         </div>
         <button className="flex justify-center items-center gap-2 p-2 rounded-md h-12 bg-teal-500 text-white text-sm hover:bg-teal-600 transition-colors">
-          <img
-            src="/images/new_download.png"
-            alt="Export Report"
-            className="h-5 w-5"
-          />
+          <img src="/images/new_download.png" alt="Export Report" className="h-5 w-5" />
           Export Report
         </button>
       </div>
 
-   
-
-       <div className="grid grid-cols-4 gap-4 w-full items-center">
+      <div className="grid grid-cols-4 gap-4 w-full items-center">
         {/* Today's Status with Sticker */}
         <div className="relative flex items-center p-4 rounded-xl h-[120px] shadow-lg text-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl overflow-hidden">
           {/* Sticker Image as Background */}
@@ -237,13 +229,13 @@ const refetchInfo = () => {
               <div className="flex flex-col">
                 <div className="text-sm font-medium">Today's Status</div>
                 <div className="text-lg font-semibold">
-                  {clockIn
-                    ? `Clocked In: ${formatClockTime(clockIn)}`
-                    : "Not clocked In"}
+                  {clockIn ? `Clocked In: ${formatClockTime(clockIn)}` : 'Not clocked In'}
                 </div>
               </div>
-              <div className="flex items-center justify-center p-1 
-              rounded-2xl h-8 w-8  shadow-sm">
+              <div
+                className="flex items-center justify-center p-1 
+              rounded-2xl h-8 w-8  shadow-sm"
+              >
                 {/* <img
                   width="23"
                   height="23"
@@ -257,18 +249,15 @@ const refetchInfo = () => {
         </div>
 
         {/* Hours Today Card */}
-        <div className="flex flex-col justify-between p-4 rounded-xl h-[120px] 
+        <div
+          className="flex flex-col justify-between p-4 rounded-xl h-[120px] 
         shadow-sm bg-white border
-         transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
+         transition-transform duration-200 hover:-translate-y-1 hover:shadow-md"
+        >
           <div className="flex justify-between items-center">
             <div className="text-sm text-gray-600 font-medium">Hours Today</div>
             <div className="flex items-center justify-center p-1 rounded-2xl h-8 w-8 bg-blue-100 shadow-sm">
-              <img
-                width="20px"
-                height="18px"
-                src="/images/payday.png"
-                alt="Payday icon"
-              />
+              <img width="20px" height="18px" src="/images/payday.png" alt="Payday icon" />
             </div>
           </div>
           <div className="text-lg text-neutral-900 font-semibold">
@@ -277,126 +266,110 @@ const refetchInfo = () => {
         </div>
 
         {/* Status Card */}
-        <div className="flex flex-col justify-between p-4 rounded-xl h-[120px] shadow-sm
+        <div
+          className="flex flex-col justify-between p-4 rounded-xl h-[120px] shadow-sm
          bg-white transition-transform duration-200 hover:-translate-y-1 
-         hover:shadow-md border">
+         hover:shadow-md border"
+        >
           <div className="flex justify-between items-center">
             <div className="text-sm text-gray-600 font-medium">Status</div>
             <div className="flex items-center justify-center p-1 rounded-2xl h-8 w-8 bg-green-100 shadow-sm">
-              <img
-                width="20px"
-                height="18px"
-                src="/images/greenclock.png"
-                alt="Status icon"
-              />
+              <img width="20px" height="18px" src="/images/greenclock.png" alt="Status icon" />
             </div>
           </div>
           <div className="text-lg text-teal-500 font-semibold">
-            {attendanceData?.status || "Unknown"}
+            {attendanceData?.status || 'Unknown'}
           </div>
         </div>
 
-       <div className="flex flex-col justify-center items-center gap-3">
-                {/* If user hasn't clocked in yet */}
-                {!clockIn ? (
-                  <button
-                    onClick={openClockInModal}
-                    className="min-w-[150px] h-[50px] bg-primary text-white rounded-md shadow-md hover:bg-primary-600 transition-colors"
-                  >
-                    Clock In
-                  </button>
-                ) : clockIn && !attendanceData.clock_out ? (
-                  <>
-                    {/* If on break */}
-                    {breakData ? (
-                      isBreakActive(breakData.break_end) ? (
-                        <div className="flex flex-col items-center gap-2 bg-blue-50 rounded-xl p-4 border shadow-sm">
-                          <div className="text-blue-800 font-semibold">
-                            On Break — Ends in:
-                          </div>
-      
-                          <Countdown
-                            key={breakData.id}
-                            date={
-                              new Date(
-                                new Date().setHours(
-                                  ...breakData.break_end.split(":").map(Number)
-                                )
-                              )
-                            }
-                            renderer={({ minutes, seconds, completed }) => {
-                              if (completed) {
-                                return (
-                                  <span className="text-red-600 font-semibold">
-                                    Break ended
-                                  </span>
-                                );
-                              }
-                              return (
-                                <span className="text-lg font-semibold text-blue-700">
-                                  {String(minutes).padStart(2, "0")}:
-                                  {String(seconds).padStart(2, "0")}
-                                </span>
-                              );
-                            }}
-                          />
-      
-                          {/* <button
+        <div className="flex flex-col justify-center items-center gap-3">
+          {/* If user hasn't clocked in yet */}
+          {!clockIn ? (
+            <button
+              onClick={openClockInModal}
+              className="min-w-[150px] h-[50px] bg-primary text-white rounded-md shadow-md hover:bg-primary-600 transition-colors"
+            >
+              Clock In
+            </button>
+          ) : clockIn && !attendanceData.clock_out ? (
+            <>
+              {/* If on break */}
+              {breakData ? (
+                isBreakActive(breakData.break_end) ? (
+                  <div className="flex flex-col items-center gap-2 bg-blue-50 rounded-xl p-4 border shadow-sm">
+                    <div className="text-blue-800 font-semibold">On Break — Ends in:</div>
+
+                    <Countdown
+                      key={breakData.id}
+                      date={
+                        new Date(new Date().setHours(...breakData.break_end.split(':').map(Number)))
+                      }
+                      renderer={({ minutes, seconds, completed }) => {
+                        if (completed) {
+                          return <span className="text-red-600 font-semibold">Break ended</span>;
+                        }
+                        return (
+                          <span className="text-lg font-semibold text-blue-700">
+                            {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
+                          </span>
+                        );
+                      }}
+                    />
+
+                    {/* <button
               // onClick={handleEndBreak}
               className="mt-2 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
             >
               End Break
             </button> */}
-                        </div>
-                      ) : (
-                        <>
-                          <CreateBreak refetchData={refetchInfo} />
-                          <button
-                            onClick={() => openClockOutModal(attendanceData.id)}
-                            className="w-[150px] h-[50px] text-red-500 rounded-md shadow-md hover:bg-red-100 border border-red-500 transition-colors"
-                          >
-                            Clock Out
-                          </button>
-                        </>
-                      )
-                    ) : (
-                      <>
-                        <CreateBreak refetchData={refetchInfo} />
-                        <button
-                          onClick={() => openClockOutModal(attendanceData.id)}
-                          className="w-[150px] h-[50px] text-red-500 rounded-md shadow-md hover:bg-red-100 border border-red-500 transition-colors"
-                        >
-                          Clock Out
-                        </button>
-                      </>
-                    )}
-                  </>
-                ) : (
-                  <div className="flex flex-col items-center gap-2 bg-amber-50 rounded-xl p-4 border shadow-sm">
-                    <span className="text-base text-amber-700 font-medium">
-                      Clocked out at
-                    </span>
-                    <span className="text-2xl font-bold text-amber-700">
-                      {formatClockTime(attendanceData.clock_out)}
-                    </span>
                   </div>
-                )}
-              </div>
+                ) : (
+                  <>
+                    <CreateBreak refetchData={refetchInfo} />
+                    <button
+                      onClick={() => openClockOutModal(attendanceData.id)}
+                      className="w-[150px] h-[50px] text-red-500 rounded-md shadow-md hover:bg-red-100 border border-red-500 transition-colors"
+                    >
+                      Clock Out
+                    </button>
+                  </>
+                )
+              ) : (
+                <>
+                  <CreateBreak refetchData={refetchInfo} />
+                  <button
+                    onClick={() => openClockOutModal(attendanceData.id)}
+                    className="w-[150px] h-[50px] text-red-500 rounded-md shadow-md hover:bg-red-100 border border-red-500 transition-colors"
+                  >
+                    Clock Out
+                  </button>
+                </>
+              )}
+            </>
+          ) : (
+            <div className="flex flex-col items-center gap-2 bg-amber-50 rounded-xl p-4 border shadow-sm">
+              <span className="text-base text-amber-700 font-medium">Clocked out at</span>
+              <span className="text-2xl font-bold text-amber-700">
+                {formatClockTime(attendanceData.clock_out)}
+              </span>
+            </div>
+          )}
+        </div>
       </div>
 
-         {/* Stats Cards */}
+      {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
         {/* Pending Requests Card */}
-        <div className="flex flex-col justify-between p-4 rounded-xl h-[120px]
+        <div
+          className="flex flex-col justify-between p-4 rounded-xl h-[120px]
          shadow-sm border
-         bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
+         bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-md"
+        >
           <div className="flex justify-between items-center">
             <div className="flex flex-col">
-              <div className="text-sm text-gray-600 font-medium">
-                Pending Requests
-              </div>
+              <div className="text-sm text-gray-600 font-medium">Pending Requests</div>
               <div className="mt-2 text-lg text-neutral-900 font-semibold">
-                {leaveRequests.filter((req) => req.status === "Pending").length}
+                {leaveRequests.filter((req) => req.status === 'Pending').length}
               </div>
             </div>
             <div className="flex items-center justify-center p-1 rounded-2xl h-8 w-8 bg-blue-500 shadow-sm">
@@ -410,16 +383,14 @@ const refetchInfo = () => {
         </div>
 
         {/* Approved This Month Card */}
-        <div className="flex flex-col justify-between p-4 rounded-xl h-[120px]  shadow-sm border
-         bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
+        <div
+          className="flex flex-col justify-between p-4 rounded-xl h-[120px]  shadow-sm border
+         bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-md"
+        >
           <div className="flex justify-between items-center">
             <div className="flex flex-col">
-              <div className="text-sm text-gray-600 font-medium">
-                Approved This Month
-              </div>
-              <div className="mt-2 text-lg text-neutral-900 font-semibold">
-                3
-              </div>
+              <div className="text-sm text-gray-600 font-medium">Approved This Month</div>
+              <div className="mt-2 text-lg text-neutral-900 font-semibold">3</div>
             </div>
             <div className="flex items-center justify-center p-1 rounded-2xl h-8 w-8 bg-green-500 shadow-sm">
               <img
@@ -432,16 +403,14 @@ const refetchInfo = () => {
         </div>
 
         {/* Total Days Requested Card */}
-        <div className="flex flex-col justify-between p-4 rounded-xl h-[120px]  shadow-sm border
-         bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
+        <div
+          className="flex flex-col justify-between p-4 rounded-xl h-[120px]  shadow-sm border
+         bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-md"
+        >
           <div className="flex justify-between items-center">
             <div className="flex flex-col">
-              <div className="text-sm text-gray-600 font-medium">
-                Total Days Requested
-              </div>
-              <div className="mt-2 text-lg text-neutral-900 font-semibold">
-                36
-              </div>
+              <div className="text-sm text-gray-600 font-medium">Total Days Requested</div>
+              <div className="mt-2 text-lg text-neutral-900 font-semibold">36</div>
             </div>
             <div className="flex items-center justify-center p-1 rounded-2xl h-8 w-8 bg-purple-500 shadow-sm">
               <img
@@ -454,13 +423,13 @@ const refetchInfo = () => {
         </div>
 
         {/* Average Attendance Card */}
-        <div className="flex flex-col justify-between p-4 rounded-xl h-[120px]  shadow-sm border
-         bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
+        <div
+          className="flex flex-col justify-between p-4 rounded-xl h-[120px]  shadow-sm border
+         bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-md"
+        >
           <div className="flex justify-between items-center">
             <div className="flex flex-col">
-              <div className="text-sm text-gray-600 font-medium">
-                Avg. Attendance
-              </div>
+              <div className="text-sm text-gray-600 font-medium">Avg. Attendance</div>
               <div className="mt-2 text-lg text-neutral-900 font-semibold">
                 {attendance?.average_attendance_percent ?? 0} %
               </div>
@@ -495,12 +464,7 @@ const refetchInfo = () => {
       <div className="flex flex-col lg:flex-row justify-between items-center gap-4">
         <div className="flex items-center gap-2 p-2 rounded-lg border border-slate-100 h-10 shadow-md bg-white flex-1">
           <div className="flex justify-center items-center h-5">
-            <img
-              width="16.5px"
-              height="16.5px"
-              src="/images/search.png"
-              alt="Search icon"
-            />
+            <img width="16.5px" height="16.5px" src="/images/search.png" alt="Search icon" />
           </div>
           <input
             type="text"
@@ -511,30 +475,16 @@ const refetchInfo = () => {
 
         <div className="flex flex-row justify-center items-center gap-2">
           <div className="flex flex-row justify-center items-center gap-2 p-2 rounded-lg border border-neutral-200 w-[120px] h-10 bg-white cursor-pointer hover:bg-gray-50 transition-colors">
-            <div className="text-xs text-neutral-900 font-semibold">
-              All Status
-            </div>
+            <div className="text-xs text-neutral-900 font-semibold">All Status</div>
             <div className="flex flex-col justify-center items-center w-4 h-4">
-              <img
-                width="9.5px"
-                height="5.1px"
-                src="/images/dropdown.png"
-                alt="Dropdown icon"
-              />
+              <img width="9.5px" height="5.1px" src="/images/dropdown.png" alt="Dropdown icon" />
             </div>
           </div>
 
           <div className="flex flex-row justify-center items-center gap-2 p-2 rounded-lg border border-neutral-200 w-[120px] h-10 bg-white cursor-pointer hover:bg-gray-50 transition-colors">
-            <div className="text-xs text-neutral-900 font-semibold">
-              All Types
-            </div>
+            <div className="text-xs text-neutral-900 font-semibold">All Types</div>
             <div className="flex flex-col justify-center items-center w-4 h-4">
-              <img
-                width="9.5px"
-                height="5.1px"
-                src="/images/dropdown.png"
-                alt="Dropdown icon"
-              />
+              <img width="9.5px" height="5.1px" src="/images/dropdown.png" alt="Dropdown icon" />
             </div>
           </div>
         </div>
@@ -563,10 +513,7 @@ const refetchInfo = () => {
             </thead>
             <tbody>
               {leaveRequests
-                .slice(
-                  (currentPage - 1) * itemsPerPage,
-                  currentPage * itemsPerPage
-                )
+                .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
                 .map((request) => (
                   <tr key={request.id} className="border-b">
                     <td className="flex items-center gap-3 py-4">
@@ -576,12 +523,8 @@ const refetchInfo = () => {
                         className="w-10 h-10 rounded-full object-cover"
                       />
                       <div>
-                        <div className="text-sm text-neutral-900 font-medium">
-                          {request.name}
-                        </div>
-                        <div className="text-xs text-gray-600">
-                          {request.department}
-                        </div>
+                        <div className="text-sm text-neutral-900 font-medium">{request.name}</div>
+                        <div className="text-xs text-gray-600">{request.department}</div>
                       </div>
                     </td>
                     <td className="text-sm text-gray-600">{request.type}</td>
@@ -590,11 +533,11 @@ const refetchInfo = () => {
                     <td>
                       <span
                         className={`text-xs px-3 py-1 rounded-full ${
-                          request.status === "Pending"
-                            ? "bg-gray-100 text-gray-800"
-                            : request.status === "Approved"
-                            ? "bg-teal-100 text-teal-800"
-                            : "bg-red-100 text-red-800"
+                          request.status === 'Pending'
+                            ? 'bg-gray-100 text-gray-800'
+                            : request.status === 'Approved'
+                              ? 'bg-teal-100 text-teal-800'
+                              : 'bg-red-100 text-red-800'
                         }`}
                       >
                         {request.status}
@@ -619,39 +562,23 @@ const refetchInfo = () => {
                               setActiveActionId(null);
                             }}
                           >
-                            <img
-                              src="/images/eye_icon.png"
-                              alt="View"
-                              className="w-4 h-4"
-                            />
+                            <img src="/images/eye_icon.png" alt="View" className="w-4 h-4" />
                             View
                           </button>
 
                           <button
                             className="flex items-center gap-2 w-full px-4 py-2 text-sm text-white bg-green-500 hover:bg-green-600"
-                            onClick={() =>
-                              handleStatusChange(request.id, "Approved")
-                            }
+                            onClick={() => handleStatusChange(request.id, 'Approved')}
                           >
-                            <img
-                              src="/images/approve.png"
-                              alt="Approve"
-                              className="w-4 h-4"
-                            />
+                            <img src="/images/approve.png" alt="Approve" className="w-4 h-4" />
                             Accept
                           </button>
 
                           <button
                             className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 border border-red-500 hover:bg-red-50"
-                            onClick={() =>
-                              handleStatusChange(request.id, "Rejected")
-                            }
+                            onClick={() => handleStatusChange(request.id, 'Rejected')}
                           >
-                            <img
-                              src="/images/reject.png"
-                              alt="Reject"
-                              className="w-4 h-4"
-                            />
+                            <img src="/images/reject.png" alt="Reject" className="w-4 h-4" />
                             Reject
                           </button>
                         </div>
@@ -666,58 +593,49 @@ const refetchInfo = () => {
         {/* Pagination */}
         <div className="flex justify-between items-center text-sm text-gray-600">
           <div>
-            Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
-            {Math.min(currentPage * itemsPerPage, leaveRequests.length)} of{" "}
-            {leaveRequests.length} entries
+            Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
+            {Math.min(currentPage * itemsPerPage, leaveRequests.length)} of {leaveRequests.length}{' '}
+            entries
           </div>
           <div className="flex gap-2">
             <button
               onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
               className={`px-3 py-1 rounded-lg border border-gray-200 ${
-                currentPage === 1
-                  ? "opacity-50 cursor-not-allowed"
-                  : "hover:bg-gray-50"
+                currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-50'
               }`}
             >
               Previous
             </button>
 
-            {Array.from(
-              { length: Math.ceil(leaveRequests.length / itemsPerPage) },
-              (_, index) => {
-                const pageNum = index + 1;
-                return (
-                  <button
-                    key={pageNum}
-                    onClick={() => setCurrentPage(pageNum)}
-                    className={`px-3 py-1 rounded-lg ${
-                      currentPage === pageNum
-                        ? "bg-teal-500 text-white"
-                        : "border border-gray-200 hover:bg-gray-50"
-                    }`}
-                  >
-                    {pageNum}
-                  </button>
-                );
-              }
-            )}
+            {Array.from({ length: Math.ceil(leaveRequests.length / itemsPerPage) }, (_, index) => {
+              const pageNum = index + 1;
+              return (
+                <button
+                  key={pageNum}
+                  onClick={() => setCurrentPage(pageNum)}
+                  className={`px-3 py-1 rounded-lg ${
+                    currentPage === pageNum
+                      ? 'bg-teal-500 text-white'
+                      : 'border border-gray-200 hover:bg-gray-50'
+                  }`}
+                >
+                  {pageNum}
+                </button>
+              );
+            })}
 
             <button
               onClick={() =>
                 setCurrentPage((prev) =>
-                  prev < Math.ceil(leaveRequests.length / itemsPerPage)
-                    ? prev + 1
-                    : prev
+                  prev < Math.ceil(leaveRequests.length / itemsPerPage) ? prev + 1 : prev
                 )
               }
-              disabled={
-                currentPage >= Math.ceil(leaveRequests.length / itemsPerPage)
-              }
+              disabled={currentPage >= Math.ceil(leaveRequests.length / itemsPerPage)}
               className={`px-3 py-1 rounded-lg border border-gray-200 ${
                 currentPage >= Math.ceil(leaveRequests.length / itemsPerPage)
-                  ? "opacity-50 cursor-not-allowed"
-                  : "hover:bg-gray-50"
+                  ? 'opacity-50 cursor-not-allowed'
+                  : 'hover:bg-gray-50'
               }`}
             >
               Next
@@ -725,32 +643,30 @@ const refetchInfo = () => {
           </div>
         </div>
       </div>
-            <ActionModal
+      <ActionModal
         isOpen={isModalOpen}
         onClose={closeModal}
-        actionType={modalType === "clockIn" ? "submit" : "delete"}
-        onDelete={modalType === "clockIn" ? handleClockIn : handleCheckOut}
+        actionType={modalType === 'clockIn' ? 'submit' : 'delete'}
+        onDelete={modalType === 'clockIn' ? handleClockIn : handleCheckOut}
         isDeleting={isClockingIn || isClockingOut}
-        title={
-          modalType === "clockIn" ? "Confirm Clock In" : "Confirm Clock Out"
-        }
+        title={modalType === 'clockIn' ? 'Confirm Clock In' : 'Confirm Clock Out'}
         confirmationMessage={
-          modalType === "clockIn"
-            ? "Are you sure you want to clock in now?"
-            : "Are you sure you want to clock out now?"
+          modalType === 'clockIn'
+            ? 'Are you sure you want to clock in now?'
+            : 'Are you sure you want to clock out now?'
         }
         extraInfo={
-    modalType === "clockOut"
-      ? {
-          pending: attendanceData?.pending_tasks ?? 0,
-          inProgress: attendanceData?.in_progress_tasks ?? 0,
-          link: "/dashboard/tasks",
-          linkText: "Go to Tasks Dashboard"
+          modalType === 'clockOut'
+            ? {
+                pending: attendanceData?.pending_tasks ?? 0,
+                inProgress: attendanceData?.in_progress_tasks ?? 0,
+                link: '/dashboard/tasks',
+                linkText: 'Go to Tasks Dashboard',
+              }
+            : null
         }
-      : null
-  }
         deleteMessage="This action will update your attendance records."
-        actionText={modalType === "clockIn" ? "Clock In" : "Clock Out"}
+        actionText={modalType === 'clockIn' ? 'Clock In' : 'Clock Out'}
       />
     </div>
   );

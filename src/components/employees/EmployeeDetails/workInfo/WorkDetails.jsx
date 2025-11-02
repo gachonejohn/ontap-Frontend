@@ -1,5 +1,5 @@
-import { FiBriefcase } from "react-icons/fi";
-import { EditWorkInfo } from "./EditWorkInfo";
+import { FiBriefcase } from 'react-icons/fi';
+import { EditWorkInfo } from './EditWorkInfo';
 
 export const WorkDetails = ({ data: employeeData, refetch }) => {
   // Check if any work info exists
@@ -26,30 +26,22 @@ export const WorkDetails = ({ data: employeeData, refetch }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm text-gray-600 mb-1">Job Title</label>
-              <p className="text-gray-900">
-                {employeeData?.position?.title || "Not specified"}
-              </p>
+              <p className="text-gray-900">{employeeData?.position?.title || 'Not specified'}</p>
             </div>
 
             <div>
               <label className="block text-sm text-gray-600 mb-1">Department</label>
-              <p className="text-gray-900">
-                {employeeData?.department?.name || "Not specified"}
-              </p>
+              <p className="text-gray-900">{employeeData?.department?.name || 'Not specified'}</p>
             </div>
 
             <div>
               <label className="block text-sm text-gray-600 mb-1">Role</label>
-              <p className="text-gray-900">
-                {employeeData?.role?.name || "Not specified"}
-              </p>
+              <p className="text-gray-900">{employeeData?.role?.name || 'Not specified'}</p>
             </div>
 
             <div>
               <label className="block text-sm text-gray-600 mb-1">Status</label>
-              <p className="text-gray-900">
-                {employeeData?.status || "Not specified"}
-              </p>
+              <p className="text-gray-900">{employeeData?.status || 'Not specified'}</p>
             </div>
           </div>
         </div>

@@ -1,24 +1,27 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useRef, useState } from "react";
-import { useForm } from "react-hook-form";
-import { FiCheckCircle, FiUploadCloud, FiX } from "react-icons/fi";
-import { IoCloseOutline } from "react-icons/io5";
-import { MdOutlineCloudUpload } from "react-icons/md";
-import { PiSpinnerGap } from "react-icons/pi";
-import Select from "react-select";
-import { toast } from "react-toastify";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useRef, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { FiCheckCircle, FiUploadCloud, FiX } from 'react-icons/fi';
+import { IoCloseOutline } from 'react-icons/io5';
+import { MdOutlineCloudUpload } from 'react-icons/md';
+import { PiSpinnerGap } from 'react-icons/pi';
+import Select from 'react-select';
+import { toast } from 'react-toastify';
 
-import { CreateEmployeeDocumentSchema } from "@schemas/employees/documentsSchema";
-import { useGetDocumentTypesQuery } from "@store/services/companies/documentsService";
-import { useUploadDocumentMutation } from "@store/services/employees/employeesService";
+import { CreateEmployeeDocumentSchema } from '@schemas/employees/documentsSchema';
+import { useGetDocumentTypesQuery } from '@store/services/companies/documentsService';
+import { useUploadDocumentMutation } from '@store/services/employees/employeesService';
 
-const AddDocument = ({ refetchData,data:employeeData }) => {
+const AddDocument = ({ refetchData, data: employeeData }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [uploadDocument, { isLoading: isUploading }] = useUploadDocumentMutation();
   const [file, setFile] = useState(null);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const fileInputRef = useRef(null);
-const {data:documentTypeData} = useGetDocumentTypesQuery({},{refetchOnMountOrArgChange:true})
+  const { data: documentTypeData } = useGetDocumentTypesQuery(
+    {},
+    { refetchOnMountOrArgChange: true }
+  );
   const {
     handleSubmit,
     setValue,
@@ -37,15 +40,14 @@ const {data:documentTypeData} = useGetDocumentTypesQuery({},{refetchOnMountOrArg
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files?.[0];
-    setError("");
+    setError('');
     if (!selectedFile) return;
     setFile(selectedFile);
-    setValue("file", selectedFile, {
+    setValue('file', selectedFile, {
       shouldValidate: true,
       shouldDirty: true,
     });
   };
-
 
   const triggerFileInput = () => {
     if (fileInputRef.current) fileInputRef.current.click();
@@ -53,43 +55,43 @@ const {data:documentTypeData} = useGetDocumentTypesQuery({},{refetchOnMountOrArg
 
   const onDrop = (e) => {
     e.preventDefault();
-    setError("");
+    setError('');
     const selectedFile = e.dataTransfer.files[0];
     if (!selectedFile) return;
     setFile(selectedFile);
-    setValue("file", selectedFile, { shouldValidate: true, shouldDirty: true });
+    setValue('file', selectedFile, { shouldValidate: true, shouldDirty: true });
   };
 
   const onDragOver = (e) => e.preventDefault();
-const handleDocumentTypeChange = (selected) => {
+  const handleDocumentTypeChange = (selected) => {
     if (selected) {
       const item_id = Number(selected.value);
-      setValue("document_type", item_id);
+      setValue('document_type', item_id);
     }
   };
   const onSubmit = async (data) => {
     if (!file) {
-      setError("Please select a file to upload");
+      setError('Please select a file to upload');
       return;
     }
 
     const formData = new FormData();
-    formData.append("document_type", data.document_type);
-    if (data.description) formData.append("description", data.description);
-    if (data.expiry_date) formData.append("expiry_date", data.expiry_date);
-    formData.append("file", file);
-    formData.append("employee", employeeData.id);
+    formData.append('document_type', data.document_type);
+    if (data.description) formData.append('description', data.description);
+    if (data.expiry_date) formData.append('expiry_date', data.expiry_date);
+    formData.append('file', file);
+    formData.append('employee', employeeData.id);
 
     try {
       const response = await uploadDocument(formData).unwrap();
-      toast.success(response.message || "Document uploaded successfully");
+      toast.success(response.message || 'Document uploaded successfully');
 
-      console.log("Submitting document", Object.fromEntries(formData));
-      
+      console.log('Submitting document', Object.fromEntries(formData));
+
       refetchData();
       closeModal();
     } catch (err) {
-      toast.error("Failed to upload document. Please try again.");
+      toast.error('Failed to upload document. Please try again.');
       console.error(err);
     }
   };
@@ -128,24 +130,24 @@ const handleDocumentTypeChange = (selected) => {
                     Document Type <span className="text-red-500">*</span>
                   </label>
                   <Select
-                     options={documentTypeData?.map((item) => ({
-                          value: item.id,
-                          label: `${item.name} `,
-                        }))}
+                    options={documentTypeData?.map((item) => ({
+                      value: item.id,
+                      label: `${item.name} `,
+                    }))}
                     menuPortalTarget={document.body}
                     menuPlacement="auto"
                     styles={{
                       menuPortal: (base) => ({ ...base, zIndex: 9999 }),
                       control: (base) => ({
                         ...base,
-                        minHeight: "44px",
-                        borderColor: "#d1d5db",
-                        boxShadow: "none",
-                        "&:hover": { borderColor: "#9ca3af" },
-                        "&:focus-within": { borderColor: "#9ca3af", boxShadow: "none" },
+                        minHeight: '44px',
+                        borderColor: '#d1d5db',
+                        boxShadow: 'none',
+                        '&:hover': { borderColor: '#9ca3af' },
+                        '&:focus-within': { borderColor: '#9ca3af', boxShadow: 'none' },
                       }),
                     }}
-                   onChange={handleDocumentTypeChange}
+                    onChange={handleDocumentTypeChange}
                   />
                   {errors.document_type && (
                     <p className="text-red-500 text-sm mt-1">{errors.document_type.message}</p>
@@ -163,17 +165,16 @@ const handleDocumentTypeChange = (selected) => {
                 </div> */}
 
                 {/* Expiry Date */}
-               
 
                 {/* File Upload */}
                 <div
                   className={`border-2 border-dashed rounded-lg p-8 flex flex-col items-center justify-center cursor-pointer mb-6
                     ${
                       file
-                        ? "border-primary bg-primary-50"
+                        ? 'border-primary bg-primary-50'
                         : error
-                        ? "border-red-400 bg-red-50"
-                        : "border-gray-300 hover:border-blue-400 hover:bg-blue-50"
+                          ? 'border-red-400 bg-red-50'
+                          : 'border-gray-300 hover:border-blue-400 hover:bg-blue-50'
                     }`}
                   onClick={triggerFileInput}
                   onDrop={onDrop}
@@ -206,8 +207,8 @@ const handleDocumentTypeChange = (selected) => {
                     </div>
                   ) : (
                     <>
-                      <MdOutlineCloudUpload 
-                        className={`text-4xl mb-3 ${error ? "text-red-500" : "text-primary"}`}
+                      <MdOutlineCloudUpload
+                        className={`text-4xl mb-3 ${error ? 'text-red-500' : 'text-primary'}`}
                       />
                       <p className="text-gray-700 font-medium">
                         Click to select or drag a file here
@@ -222,13 +223,13 @@ const handleDocumentTypeChange = (selected) => {
                     {error}
                   </div>
                 )}
- <div>
+                <div>
                   <label className="block text-sm font-medium mb-2">Expiry Date</label>
                   <input
                     type="date"
                     className="w-full border focus:border-primary 
                     focus:ring-none focus:outline-none rounded-md p-2 text-sm"
-                    onChange={(e) => setValue("expiry_date", e.target.value)}
+                    onChange={(e) => setValue('expiry_date', e.target.value)}
                   />
                 </div>
                 {/* Buttons */}
@@ -244,11 +245,7 @@ const handleDocumentTypeChange = (selected) => {
                     type="submit"
                     disabled={!file || isSubmitting}
                     className={`px-4 py-2 rounded-md text-white font-medium flex items-center gap-2
-                      ${
-                        !file || isSubmitting
-                          ? "bg-gray-400 cursor-not-allowed"
-                          : "bg-primary"
-                      }`}
+                      ${!file || isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-primary'}`}
                   >
                     {isSubmitting ? (
                       <>

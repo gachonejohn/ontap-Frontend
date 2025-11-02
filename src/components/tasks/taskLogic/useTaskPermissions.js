@@ -1,5 +1,5 @@
-import React from "react";
-import { useSelector } from "react-redux";
+import React from 'react';
+import { useSelector } from 'react-redux';
 
 export const useTaskPermissions = (task) => {
   const currentUser = useSelector((state) => state.auth.user);
@@ -7,13 +7,17 @@ export const useTaskPermissions = (task) => {
   const taskPermissions = useSelector((state) => {
     const permissions = state.auth.user?.role?.permissions;
     return permissions?.find(
-      (p) => p.feature_code === "task" || p.feature_code === "task_management"
+      (p) => p.feature_code === 'task' || p.feature_code === 'task_management'
     );
   });
 
   const canEditTask = taskPermissions?.can_edit;
   const canDeleteTask = taskPermissions?.can_delete;
   const canViewAll = taskPermissions?.can_view_all || false;
+<<<<<<< HEAD
+
+  // 🔥 FIX: Use the extracted userId for comparisons
+=======
   
   // 🔥 FIX: Extract user ID correctly and check both single assignee and multiple assignees
   const userId = currentUser?.user?.id || currentUser?.id;
@@ -29,10 +33,23 @@ export const useTaskPermissions = (task) => {
   // User is assignee if they're in either system
   const isAssignee = isInAssignees || isSingleAssignee;
   
+>>>>>>> main
   const isCreator = userId === task?.created_by;
 
   // DEBUGGING BLOCK - Updated with new logic
   React.useEffect(() => {
+<<<<<<< HEAD
+    console.group('🔎 TaskModal Permission Debug');
+    console.log('Current User:', currentUser);
+    console.log('Extracted User ID:', userId); // This is the important one!
+    console.log('Task:', task);
+    console.log('task.created_by:', task?.created_by);
+    console.log('task.assignee:', task?.assignee);
+    console.log('isCreator:', isCreator);
+    console.log('isAssignee:', isAssignee);
+    console.log('taskPermissions:', taskPermissions);
+    console.log('canEditTask:', canEditTask);
+=======
     console.group("🔎 TaskModal Permission Debug - UPDATED");
     console.log("Current User ID:", userId);
     console.log("Task Assignees:", task?.assignees);
@@ -44,6 +61,7 @@ export const useTaskPermissions = (task) => {
     console.log("taskPermissions:", taskPermissions);
     console.log("canEditTask:", canEditTask);
     console.log("canViewAll:", canViewAll);
+>>>>>>> main
     console.groupEnd();
   }, [currentUser, task, userId, isInAssignees, isSingleAssignee, isAssignee, isCreator]);
 
@@ -60,7 +78,7 @@ export const useTaskPermissions = (task) => {
     canEditStatus: canEditTask && (isCreator || isAssignee || canViewAll),
     canViewAll,
     isCreator,
-    isAssignee
+    isAssignee,
   };
 
   const hasAnyEditPermission = Object.values(fieldPermissions).some(Boolean);
@@ -69,6 +87,6 @@ export const useTaskPermissions = (task) => {
     hasAnyEditPermission,
     canDeleteTask,
     fieldPermissions,
-    currentUser
+    currentUser,
   };
 };

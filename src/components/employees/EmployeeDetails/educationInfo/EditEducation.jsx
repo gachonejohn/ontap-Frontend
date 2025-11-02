@@ -1,32 +1,29 @@
-import SubmitCancelButtons from "@components/common/Buttons/ActionButton";
-import CreateUpdateButton from "@components/common/Buttons/CreateUpdateButton";
-import { educationLevelOptions } from "@constants/constants";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { CreateEmployeeEducationSchema } from "@schemas/employees/employeeSchema";
-import { useGetDocumentTypesQuery } from "@store/services/companies/documentsService";
-import {
-    useEditEducationInfoMutation
-} from "@store/services/employees/employeesService";
-import { getApiErrorMessage } from "@utils/errorHandler";
-import { useRef, useState } from "react";
-import { useForm } from "react-hook-form";
-import { FiCheckCircle, FiEdit, FiX } from "react-icons/fi";
-import { IoCloseOutline } from "react-icons/io5";
-import { MdOutlineCloudUpload } from "react-icons/md";
-import Select from "react-select";
-import { toast } from "react-toastify";
+import SubmitCancelButtons from '@components/common/Buttons/ActionButton';
+import CreateUpdateButton from '@components/common/Buttons/CreateUpdateButton';
+import { educationLevelOptions } from '@constants/constants';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { CreateEmployeeEducationSchema } from '@schemas/employees/employeeSchema';
+import { useGetDocumentTypesQuery } from '@store/services/companies/documentsService';
+import { useEditEducationInfoMutation } from '@store/services/employees/employeesService';
+import { getApiErrorMessage } from '@utils/errorHandler';
+import { useRef, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { FiCheckCircle, FiEdit, FiX } from 'react-icons/fi';
+import { IoCloseOutline } from 'react-icons/io5';
+import { MdOutlineCloudUpload } from 'react-icons/md';
+import Select from 'react-select';
+import { toast } from 'react-toastify';
 export const EditEducationInfo = ({ refetchData, data: employeeData }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [file, setFile] = useState(null);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const fileInputRef = useRef(null);
-  const [editEducationInfo, { isLoading: isCreating }] =
-    useEditEducationInfoMutation();
+  const [editEducationInfo, { isLoading: isCreating }] = useEditEducationInfoMutation();
   const { data: documentTypesData } = useGetDocumentTypesQuery(
     {},
     { refetchOnMountOrArgChange: true }
   );
-  console.log("documentTypesData", documentTypesData);
+  console.log('documentTypesData', documentTypesData);
   const {
     register,
     handleSubmit,
@@ -36,23 +33,22 @@ export const EditEducationInfo = ({ refetchData, data: employeeData }) => {
   } = useForm({
     resolver: zodResolver(CreateEmployeeEducationSchema),
     defaultValues: {
-      level: employeeData?.level ?? "",
-      institution: employeeData?.institution ?? "",
-      specialization: employeeData?.specialization ?? "",
-      grade: employeeData?.grade ?? "",
-      start_date: employeeData?.start_date ?? "",
-      end_date: employeeData?.end_date ?? "",
+      level: employeeData?.level ?? '',
+      institution: employeeData?.institution ?? '',
+      specialization: employeeData?.specialization ?? '',
+      grade: employeeData?.grade ?? '',
+      start_date: employeeData?.start_date ?? '',
+      end_date: employeeData?.end_date ?? '',
       document_type: employeeData?.document_type?.id ?? undefined,
-    
     },
   });
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files?.[0];
-    setError("");
+    setError('');
     if (!selectedFile) return;
     setFile(selectedFile);
-    setValue("file", selectedFile, {
+    setValue('file', selectedFile, {
       shouldValidate: true,
       shouldDirty: true,
     });
@@ -64,43 +60,41 @@ export const EditEducationInfo = ({ refetchData, data: employeeData }) => {
 
   const onDrop = (e) => {
     e.preventDefault();
-    setError("");
+    setError('');
     const selectedFile = e.dataTransfer.files[0];
     if (!selectedFile) return;
     setFile(selectedFile);
-    setValue("file", selectedFile, { shouldValidate: true, shouldDirty: true });
+    setValue('file', selectedFile, { shouldValidate: true, shouldDirty: true });
   };
   const existingFile = employeeData?.file;
   const onDragOver = (e) => e.preventDefault();
   const onSubmit = async (data) => {
     const formData = new FormData();
 
-    if (data.document_type)
-      formData.append("document_type", data.document_type);
-    if (data.institution) formData.append("institution", data.institution);
-    if (data.level) formData.append("level", data.level);
-    if (data.grade) formData.append("grade", data.grade);
-    if (data.specialization)
-      formData.append("specialization", data.specialization);
-    if (data.start_date) formData.append("start_date", data.start_date);
-    if (data.end_date) formData.append("end_date", data.end_date);
+    if (data.document_type) formData.append('document_type', data.document_type);
+    if (data.institution) formData.append('institution', data.institution);
+    if (data.level) formData.append('level', data.level);
+    if (data.grade) formData.append('grade', data.grade);
+    if (data.specialization) formData.append('specialization', data.specialization);
+    if (data.start_date) formData.append('start_date', data.start_date);
+    if (data.end_date) formData.append('end_date', data.end_date);
     // formData.append("employee", employeeData.id);
 
     // file is optional now
-  if (file) {
-    formData.append("file", file);
-  }
+    if (file) {
+      formData.append('file', file);
+    }
 
     try {
       const response = await editEducationInfo({
-        id:employeeData.id,
+        id: employeeData.id,
         data: formData,
       }).unwrap();
-      toast.success(response.message || "Info saved successfully!");
+      toast.success(response.message || 'Info saved successfully!');
       refetchData();
       handleCloseModal();
     } catch (err) {
-      const message = getApiErrorMessage(err, "Error saving info!.");
+      const message = getApiErrorMessage(err, 'Error saving info!.');
       toast.error(message);
     }
   };
@@ -114,12 +108,12 @@ export const EditEducationInfo = ({ refetchData, data: employeeData }) => {
   const handleDocumentTypeChange = (selected) => {
     if (selected) {
       const item_id = Number(selected.value);
-      setValue("document_type", item_id);
+      setValue('document_type', item_id);
     }
   };
   const handleLevelChange = (selected) => {
     if (selected) {
-      setValue("level", selected.value);
+      setValue('level', selected.value);
     }
   };
   return (
@@ -169,17 +163,10 @@ export const EditEducationInfo = ({ refetchData, data: employeeData }) => {
                 <p className="text-sm md:text-lg lg:text-lg font-semibold">
                   Edit Education History
                 </p>
-                <IoCloseOutline
-                  size={20}
-                  className="cursor-pointer"
-                  onClick={handleCloseModal}
-                />
+                <IoCloseOutline size={20} className="cursor-pointer" onClick={handleCloseModal} />
               </div>
 
-              <form
-                onSubmit={handleSubmit(onSubmit)}
-                className="space-y-4 font-inter p-4"
-              >
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 font-inter p-4">
                 {/* Name */}
                 <div>
                   <label className="block text-sm font-medium mb-2">
@@ -189,13 +176,11 @@ export const EditEducationInfo = ({ refetchData, data: employeeData }) => {
                   <input
                     type="text"
                     placeholder="E.g Masinde Muliro University Of Science and Technology "
-                    {...register("institution")}
+                    {...register('institution')}
                     className="w-full py-2 px-4 rounded-md border border-gray-400 focus:outline-none focus:border-[#1E9FF2] focus:bg-white placeholder:text-sm"
                   />
                   {errors.institution && (
-                    <p className="text-red-500 text-sm">
-                      {errors.institution.message}
-                    </p>
+                    <p className="text-red-500 text-sm">{errors.institution.message}</p>
                   )}
                 </div>
 
@@ -208,13 +193,11 @@ export const EditEducationInfo = ({ refetchData, data: employeeData }) => {
                     <input
                       type="text"
                       placeholder="E.g Software Engineering "
-                      {...register("specialization")}
+                      {...register('specialization')}
                       className="w-full py-2 px-4 rounded-md border border-gray-400 focus:outline-none focus:border-[#1E9FF2] focus:bg-white placeholder:text-sm"
                     />
                     {errors.specialization && (
-                      <p className="text-red-500 text-sm">
-                        {errors.specialization.message}
-                      </p>
+                      <p className="text-red-500 text-sm">{errors.specialization.message}</p>
                     )}
                   </div>
                   <div>
@@ -225,14 +208,10 @@ export const EditEducationInfo = ({ refetchData, data: employeeData }) => {
                     <input
                       type="text"
                       placeholder="E.g A, first class etc "
-                      {...register("grade")}
+                      {...register('grade')}
                       className="w-full py-2 px-4 rounded-md border border-gray-400 focus:outline-none focus:border-[#1E9FF2] focus:bg-white placeholder:text-sm"
                     />
-                    {errors.grade && (
-                      <p className="text-red-500 text-sm">
-                        {errors.grade.message}
-                      </p>
-                    )}
+                    {errors.grade && <p className="text-red-500 text-sm">{errors.grade.message}</p>}
                   </div>
 
                   <div>
@@ -242,13 +221,11 @@ export const EditEducationInfo = ({ refetchData, data: employeeData }) => {
                     <input
                       type="date"
                       placeholder="Start Date"
-                      {...register("start_date")}
+                      {...register('start_date')}
                       className="w-full py-2 px-4 rounded-md border bg-slate-50 focus:outline-none focus:border-primary focus:bg-white placeholder:text-[12px]"
                     />
                     {errors.start_date && (
-                      <p className="text-red-500 text-sm mt-1">
-                        {errors.start_date.message}
-                      </p>
+                      <p className="text-red-500 text-sm mt-1">{errors.start_date.message}</p>
                     )}
                   </div>
                   <div>
@@ -258,25 +235,21 @@ export const EditEducationInfo = ({ refetchData, data: employeeData }) => {
                     <input
                       type="date"
                       placeholder="End Date"
-                      {...register("end_date")}
+                      {...register('end_date')}
                       className="w-full py-2 px-4 rounded-md border bg-slate-50 focus:outline-none focus:border-primary focus:bg-white placeholder:text-[12px]"
                     />
                     {errors.start_date && (
-                      <p className="text-red-500 text-sm mt-1">
-                        {errors.start_date.message}
-                      </p>
+                      <p className="text-red-500 text-sm mt-1">{errors.start_date.message}</p>
                     )}
                   </div>
                 </div>
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium mb-2">
-                    Level
-                  </label>
+                  <label className="block text-sm font-medium mb-2">Level</label>
                   <Select
                     options={educationLevelOptions}
                     defaultValue={{
-                        label: `${employeeData?.level}`,
-                        value: `${employeeData?.level}`
+                      label: `${employeeData?.level}`,
+                      value: `${employeeData?.level}`,
                     }}
                     menuPortalTarget={document.body}
                     menuPlacement="auto"
@@ -287,42 +260,38 @@ export const EditEducationInfo = ({ refetchData, data: employeeData }) => {
                       }),
                       control: (base) => ({
                         ...base,
-                        minHeight: "40px",
-                        borderColor: "#d1d5db",
-                        boxShadow: "none",
-                        "&:hover": {
-                          borderColor: "#9ca3af",
+                        minHeight: '40px',
+                        borderColor: '#d1d5db',
+                        boxShadow: 'none',
+                        '&:hover': {
+                          borderColor: '#9ca3af',
                         },
-                        "&:focus-within": {
-                          borderColor: "#9ca3af",
-                          boxShadow: "none",
+                        '&:focus-within': {
+                          borderColor: '#9ca3af',
+                          boxShadow: 'none',
                         },
-                        backgroundColor: "#F8FAFC",
+                        backgroundColor: '#F8FAFC',
                       }),
                     }}
                     onChange={handleLevelChange}
                   />
                   {errors.level && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {errors.level.message}
-                    </p>
+                    <p className="text-red-500 text-sm mt-1">{errors.level.message}</p>
                   )}
                 </div>
                 <div className="mt-3 border-b pb-2">
                   <h3 className="font-medium">Attach Certificate(optional)</h3>
                 </div>
                 <div className="">
-                  <label className="block text-sm font-medium mb-2">
-                    Document Type
-                  </label>
+                  <label className="block text-sm font-medium mb-2">Document Type</label>
                   <Select
                     options={documentTypesData?.map((item) => ({
                       value: item.id,
                       label: `${item.name}`,
                     }))}
                     defaultValue={{
-                        label: `${employeeData?.document_type?.name}`,
-                        value: employeeData?.document_type?.id 
+                      label: `${employeeData?.document_type?.name}`,
+                      value: employeeData?.document_type?.id,
                     }}
                     menuPortalTarget={document.body}
                     menuPlacement="auto"
@@ -333,35 +302,33 @@ export const EditEducationInfo = ({ refetchData, data: employeeData }) => {
                       }),
                       control: (base) => ({
                         ...base,
-                        minHeight: "40px",
-                        borderColor: "#d1d5db",
-                        boxShadow: "none",
-                        "&:hover": {
-                          borderColor: "#9ca3af",
+                        minHeight: '40px',
+                        borderColor: '#d1d5db',
+                        boxShadow: 'none',
+                        '&:hover': {
+                          borderColor: '#9ca3af',
                         },
-                        "&:focus-within": {
-                          borderColor: "#9ca3af",
-                          boxShadow: "none",
+                        '&:focus-within': {
+                          borderColor: '#9ca3af',
+                          boxShadow: 'none',
                         },
-                        backgroundColor: "#F8FAFC",
+                        backgroundColor: '#F8FAFC',
                       }),
                     }}
                     onChange={handleDocumentTypeChange}
                   />
                   {errors.document_type && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {errors.document_type.message}
-                    </p>
+                    <p className="text-red-500 text-sm mt-1">{errors.document_type.message}</p>
                   )}
                 </div>
                 <div
                   className={`border-2 border-dashed rounded-lg p-8 flex flex-col items-center justify-center cursor-pointer mb-6
     ${
       file
-        ? "border-primary bg-primary-50"
+        ? 'border-primary bg-primary-50'
         : error
-        ? "border-red-400 bg-red-50"
-        : "border-gray-300 hover:border-blue-400 hover:bg-blue-50"
+          ? 'border-red-400 bg-red-50'
+          : 'border-gray-300 hover:border-blue-400 hover:bg-blue-50'
     }`}
                   onClick={triggerFileInput}
                   onDrop={onDrop}
@@ -404,7 +371,7 @@ export const EditEducationInfo = ({ refetchData, data: employeeData }) => {
                         rel="noopener noreferrer"
                         className="text-blue-600 underline text-sm break-words"
                       >
-                        {existingFile.split("/").pop()}
+                        {existingFile.split('/').pop()}
                       </a>
                       <p className="text-gray-500 text-xs mt-1">
                         Click to replace with another file
@@ -414,16 +381,12 @@ export const EditEducationInfo = ({ refetchData, data: employeeData }) => {
                     /* Nothing selected yet */
                     <>
                       <MdOutlineCloudUpload
-                        className={`text-4xl mb-3 ${
-                          error ? "text-red-500" : "text-primary"
-                        }`}
+                        className={`text-4xl mb-3 ${error ? 'text-red-500' : 'text-primary'}`}
                       />
                       <p className="text-gray-700 font-medium">
                         Click to select or drag a file here
                       </p>
-                      <p className="text-gray-500 text-sm mt-1">
-                        Supported formats: PDF
-                      </p>
+                      <p className="text-gray-500 text-sm mt-1">Supported formats: PDF</p>
                     </>
                   )}
                 </div>

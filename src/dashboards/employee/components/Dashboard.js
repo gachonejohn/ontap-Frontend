@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-import LeaveModal from "./LeaveModal.js";
-import LogTaskModal from "./LogTaskModal.js";
-import ViewProfileModal from "./ViewProfileModal.js";
-import DropdownAuthenticationModal from "./DropdownAuthenticationModal.js";
+import React, { useState } from 'react';
+import LeaveModal from './LeaveModal.js';
+import LogTaskModal from './LogTaskModal.js';
+import ViewProfileModal from './ViewProfileModal.js';
+import DropdownAuthenticationModal from './DropdownAuthenticationModal.js';
 
 const Dashboard = () => {
   const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
@@ -11,8 +11,8 @@ const Dashboard = () => {
   const [isAmountVisible, setIsAmountVisible] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [password, setPassword] = useState("");
-  const [actualAmount, setActualAmount] = useState("$1,250.00");
+  const [password, setPassword] = useState('');
+  const [actualAmount, setActualAmount] = useState('$1,250.00');
   const [eyeIconPosition, setEyeIconPosition] = useState({ top: 0, right: 0 });
 
   const toggleAmountVisibility = () => {
@@ -25,7 +25,7 @@ const Dashboard = () => {
       setIsAuthModalOpen(false);
       setIsAmountVisible(true);
     } else {
-      alert("Password must be at least 5 characters long. Please try again.");
+      alert('Password must be at least 5 characters long. Please try again.');
     }
   };
 
@@ -36,18 +36,18 @@ const Dashboard = () => {
       const rect = e.target.getBoundingClientRect();
       setEyeIconPosition({
         top: rect.top,
-        right: rect.right
+        right: rect.right,
       });
       setIsAuthModalOpen(true);
     }
   };
 
   const handleLeaveSubmit = (formData) => {
-    console.log("Leave application submitted:", formData);
+    console.log('Leave application submitted:', formData);
   };
 
   const handleLogTaskSubmit = (formData) => {
-    console.log("New task submitted:", formData);
+    console.log('New task submitted:', formData);
   };
 
   return (
@@ -72,12 +72,7 @@ const Dashboard = () => {
                 <div className="mt-2 text-lg font-semibold">Clocked In: 9:05 AM</div>
               </div>
               <div className="flex items-center justify-center p-1 rounded-2xl h-8 w-8 bg-white">
-                <img
-                  width="23"
-                  height="23"
-                  src="/images/clock.png"
-                  alt="Clock Icon"
-                />
+                <img width="23" height="23" src="/images/clock.png" alt="Clock Icon" />
               </div>
             </div>
           </div>
@@ -97,19 +92,14 @@ const Dashboard = () => {
                 </div>
               </div>
               <div className="flex items-center justify-center p-1 rounded-2xl h-7 w-7 bg-blue-100">
-                <img
-                  width="20px"
-                  height="18px"
-                  src="/images/payday.png"
-                  alt="Payday icon"
-                />
+                <img width="20px" height="18px" src="/images/payday.png" alt="Payday icon" />
               </div>
             </div>
 
             {/* Bottom Row: Amount + View Button */}
             <div className="flex flex-row justify-between items-center w-full mt-2">
               <div className="font-inter text-lg text-neutral-900 leading-tight font-semibold">
-                {isAmountVisible ? actualAmount : "*****"}
+                {isAmountVisible ? actualAmount : '*****'}
               </div>
               <div
                 className="flex items-center justify-center h-4 cursor-pointer"
@@ -118,8 +108,8 @@ const Dashboard = () => {
                 <img
                   width="20px"
                   height="20px"
-                  src={isAmountVisible ? "/images/eye-slash.png" : "/images/eye.png"}
-                  alt={isAmountVisible ? "Hide amount" : "Show amount"}
+                  src={isAmountVisible ? '/images/eye-slash.png' : '/images/eye.png'}
+                  alt={isAmountVisible ? 'Hide amount' : 'Show amount'}
                 />
               </div>
             </div>
@@ -140,12 +130,7 @@ const Dashboard = () => {
                 <div className="text-[10px] text-teal-100 font-medium">Employee ID</div>
               </div>
               <div className="flex justify-center items-center rounded-md w-7 h-7 bg-white/40 hover:bg-white/60 transition-colors duration-200">
-                <img
-                  width="18px"
-                  height="18px"
-                  src="/images/qrcode.png"
-                  alt="QR Code icon"
-                />
+                <img width="18px" height="18px" src="/images/qrcode.png" alt="QR Code icon" />
               </div>
             </div>
 
@@ -241,7 +226,9 @@ const Dashboard = () => {
               {/* Task 2 */}
               <div className="flex flex-col gap-3 p-4 rounded-xl bg-slate-50/80 cursor-pointer hover:bg-slate-100/80 transition-colors">
                 <div className="flex justify-between items-start">
-                  <div className="text-sm text-neutral-900 font-medium">Design Review for Ontap</div>
+                  <div className="text-sm text-neutral-900 font-medium">
+                    Design Review for Ontap
+                  </div>
                   <img width="16.5" height="16.3" src="/images/greenflag.png" alt="Green flag" />
                 </div>
                 <div className="text-xs text-neutral-900 font-normal">
@@ -283,7 +270,9 @@ const Dashboard = () => {
               {/* Task 1 */}
               <div className="flex flex-col gap-3 p-4 rounded-xl bg-slate-50/80 cursor-pointer hover:bg-slate-100/80 transition-colors">
                 <div className="flex justify-between items-start">
-                  <div className="text-sm text-neutral-900 font-medium">Update User Documentation</div>
+                  <div className="text-sm text-neutral-900 font-medium">
+                    Update User Documentation
+                  </div>
                   <img width="16.5" height="16.3" src="/images/redflag.png" alt="Red flag" />
                 </div>
                 <div className="text-xs text-neutral-900 font-normal">
@@ -301,7 +290,9 @@ const Dashboard = () => {
                 <div className="pt-2 border-t border-neutral-200">
                   <div className="flex items-center gap-1">
                     <img width="11.5" height="12.8" src="/images/assignee.png" alt="Assignee" />
-                    <div className="text-[10px] text-gray-600 font-medium">Assigned by Thaddeus</div>
+                    <div className="text-[10px] text-gray-600 font-medium">
+                      Assigned by Thaddeus
+                    </div>
                   </div>
                 </div>
               </div>
@@ -309,7 +300,9 @@ const Dashboard = () => {
               {/* Task 2 */}
               <div className="flex flex-col gap-3 p-4 rounded-xl bg-slate-50/80 cursor-pointer hover:bg-slate-100/80 transition-colors">
                 <div className="flex justify-between items-start">
-                  <div className="text-sm text-neutral-900 font-medium">Design Review for Ontap</div>
+                  <div className="text-sm text-neutral-900 font-medium">
+                    Design Review for Ontap
+                  </div>
                   <img width="16.5" height="16.3" src="/images/greenflag.png" alt="Green flag" />
                 </div>
                 <div className="text-xs text-neutral-900 font-normal">
@@ -351,7 +344,9 @@ const Dashboard = () => {
               {/* Task 1 */}
               <div className="flex flex-col gap-3 p-4 rounded-xl bg-slate-50/80 cursor-pointer hover:bg-slate-100/80 transition-colors">
                 <div className="flex justify-between items-start">
-                  <div className="text-sm text-neutral-900 font-medium">Team Meeting Preparation</div>
+                  <div className="text-sm text-neutral-900 font-medium">
+                    Team Meeting Preparation
+                  </div>
                   <img width="16.5" height="16.3" src="/images/redflag.png" alt="Red flag" />
                 </div>
                 <div className="text-xs text-neutral-900 font-normal">
@@ -382,38 +377,26 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
         {/* Announcements */}
         <div className="flex flex-col gap-4 p-4 rounded-xl shadow-lg bg-white">
-          <div className="text-lg text-neutral-900 font-semibold">
-            Announcements
-          </div>
+          <div className="text-lg text-neutral-900 font-semibold">Announcements</div>
           <div className="flex flex-col gap-3">
             <div className="flex items-center p-3 rounded bg-gray-50">
               <div className="flex flex-col">
                 <div className="text-sm text-neutral-900 font-medium">
                   Company Holiday: Labor Day Schedule
                 </div>
-                <div className="text-[10px] text-gray-600 font-medium">
-                  Aug 26, 2025
-                </div>
+                <div className="text-[10px] text-gray-600 font-medium">Aug 26, 2025</div>
               </div>
             </div>
             <div className="flex items-center p-3 rounded bg-gray-50">
               <div className="flex flex-col">
-                <div className="text-sm text-neutral-900 font-medium">
-                  Office Relocation Update
-                </div>
-                <div className="text-[10px] text-gray-600 font-medium">
-                  Aug 28, 2025
-                </div>
+                <div className="text-sm text-neutral-900 font-medium">Office Relocation Update</div>
+                <div className="text-[10px] text-gray-600 font-medium">Aug 28, 2025</div>
               </div>
             </div>
             <div className="flex items-center p-3 rounded bg-gray-50">
               <div className="flex flex-col">
-                <div className="text-sm text-neutral-900 font-medium">
-                  New Remote Work Policy
-                </div>
-                <div className="text-[10px] text-gray-600 font-medium">
-                  Aug 28, 2025
-                </div>
+                <div className="text-sm text-neutral-900 font-medium">New Remote Work Policy</div>
+                <div className="text-[10px] text-gray-600 font-medium">Aug 28, 2025</div>
               </div>
             </div>
           </div>
@@ -421,18 +404,14 @@ const Dashboard = () => {
 
         {/* Trainings */}
         <div className="flex flex-col gap-4 p-4 rounded-xl shadow-lg bg-white">
-          <div className="text-lg text-neutral-900 font-semibold">
-            Trainings
-          </div>
+          <div className="text-lg text-neutral-900 font-semibold">Trainings</div>
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">
               <div className="flex justify-between items-center">
                 <div className="text-sm text-neutral-900 font-medium">
                   Effective Communication Skills
                 </div>
-                <div className="text-xs text-neutral-900 font-normal">
-                  65%
-                </div>
+                <div className="text-xs text-neutral-900 font-normal">65%</div>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
                 <div className="bg-teal-500 h-2 rounded-full" style={{ width: '65%' }}></div>
@@ -440,12 +419,8 @@ const Dashboard = () => {
             </div>
             <div className="flex flex-col gap-2">
               <div className="flex justify-between items-center">
-                <div className="text-sm text-neutral-900 font-medium">
-                  Hands-on Manager
-                </div>
-                <div className="text-xs text-neutral-900 font-normal">
-                  83%
-                </div>
+                <div className="text-sm text-neutral-900 font-medium">Hands-on Manager</div>
+                <div className="text-xs text-neutral-900 font-normal">83%</div>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
                 <div className="bg-teal-500 h-2 rounded-full" style={{ width: '83%' }}></div>
@@ -453,12 +428,8 @@ const Dashboard = () => {
             </div>
             <div className="flex flex-col gap-2">
               <div className="flex justify-between items-center">
-                <div className="text-sm text-neutral-900 font-medium">
-                  New Staff Onboarding
-                </div>
-                <div className="text-xs text-neutral-900 font-normal">
-                  95%
-                </div>
+                <div className="text-sm text-neutral-900 font-medium">New Staff Onboarding</div>
+                <div className="text-xs text-neutral-900 font-normal">95%</div>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
                 <div className="bg-teal-500 h-2 rounded-full" style={{ width: '95%' }}></div>

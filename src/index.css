@@ -1,16 +1,15 @@
 /* Global reset */
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell',
+    'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
 /* Tailwind directives */
@@ -26,9 +25,8 @@ code {
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: #17AE9E transparent;
+  scrollbar-color: #17ae9e transparent;
 }
-
 
 *::-webkit-scrollbar {
   width: 2px;
@@ -36,54 +34,52 @@ code {
 }
 
 *::-webkit-scrollbar-track {
-  background: transparent; 
+  background: transparent;
 }
 
 *::-webkit-scrollbar-thumb {
-  background-color: #3B82F6; 
+  background-color: #3b82f6;
   border-radius: 10px;
   border: 2px solid transparent;
   background-clip: content-box;
 }
 
+.scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #17ae9e transparent;
+}
 
- .scrollbar {
-    scrollbar-width: thin;
-    scrollbar-color: #17AE9E transparent;
-  }
+.scrollbar::-webkit-scrollbar {
+  width: 2px;
+  height: 2px;
+}
 
-  .scrollbar::-webkit-scrollbar {
-    width: 2px;
-    height: 2px;
-  }
+.scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
 
-  .scrollbar::-webkit-scrollbar-track {
-    background: transparent;
-  }
+.scrollbar::-webkit-scrollbar-thumb {
+  background-color: #ffffff;
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+  transition: background-color 0.3s ease;
+}
 
-  .scrollbar::-webkit-scrollbar-thumb {
-    background-color: #ffffff;
-    border-radius: 10px;
-    border: 2px solid transparent;
-    background-clip: content-box;
-    transition: background-color 0.3s ease;
-  }
+.scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #ffffff !important; /* white on hover */
+}
 
-  .scrollbar::-webkit-scrollbar-thumb:hover {
-    background-color: #ffffff !important; /* white on hover */
-  }
-
-  .scrollbar::-webkit-scrollbar-thumb:active {
-    background-color: #ffffff !important; /* white when scrolling */
-  }
-
+.scrollbar::-webkit-scrollbar-thumb:active {
+  background-color: #ffffff !important; /* white when scrolling */
+}
 
 /* index.css */
 
 /* 🔹 Size for all toast icons */
 .Toastify__toast-icon svg,
 .Toastify__close-button svg {
-  width: 1.25rem;  /* 20px */
+  width: 1.25rem; /* 20px */
   height: 1.25rem; /* 20px */
 }
 
@@ -121,4 +117,3 @@ code {
   fill: #6b7280; /* gray-500 */
   color: #6b7280;
 }
-

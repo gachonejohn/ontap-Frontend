@@ -1,18 +1,17 @@
-import CreateUpdateButton from "@components/common/Buttons/CreateUpdateButton";
-import SubmitSpinner from "@components/common/spinners/submitSpinner";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { CreateBreakRuleSchema } from "@schemas/companies/policies/breaksPolicySchema";
-import { useUpdateBreakRuleMutation } from "@store/services/policies/policyService";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { FiEdit } from "react-icons/fi";
-import { IoCloseOutline } from "react-icons/io5";
-import { toast } from "react-toastify";
+import CreateUpdateButton from '@components/common/Buttons/CreateUpdateButton';
+import SubmitSpinner from '@components/common/spinners/submitSpinner';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { CreateBreakRuleSchema } from '@schemas/companies/policies/breaksPolicySchema';
+import { useUpdateBreakRuleMutation } from '@store/services/policies/policyService';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { FiEdit } from 'react-icons/fi';
+import { IoCloseOutline } from 'react-icons/io5';
+import { toast } from 'react-toastify';
 
 export const EditBreakRule = ({ data, refetchData }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [updateBreakRule, { isLoading: isCreating }] =
-    useUpdateBreakRuleMutation();
+  const [updateBreakRule, { isLoading: isCreating }] = useUpdateBreakRuleMutation();
 
   const {
     register,
@@ -22,7 +21,7 @@ export const EditBreakRule = ({ data, refetchData }) => {
   } = useForm({
     resolver: zodResolver(CreateBreakRuleSchema),
     defaultValues: {
-      name: data?.name ?? "",
+      name: data?.name ?? '',
       max_breaks_per_day: data?.max_breaks_per_day ?? 0,
       max_total_break_minutes: data?.max_total_break_minutes ?? 0,
       default_max_duration_minutes: data?.default_max_duration_minutes ?? 0,
@@ -34,15 +33,15 @@ export const EditBreakRule = ({ data, refetchData }) => {
   const onSubmit = async (formData) => {
     try {
       await updateBreakRule({
-        id:data.id,
-        data:formData
+        id: data.id,
+        data: formData,
       }).unwrap();
-      toast.success("Break Policy updated successfully!");
+      toast.success('Break Policy updated successfully!');
       handleCloseModal();
       refetchData();
     } catch (error) {
-      console.error("Error:", error);
-      toast.error(error?.data?.error || "An error occurred. Please try again.");
+      console.error('Error:', error);
+      toast.error(error?.data?.error || 'An error occurred. Please try again.');
     } finally {
       refetchData();
     }
@@ -56,12 +55,12 @@ export const EditBreakRule = ({ data, refetchData }) => {
 
   return (
     <>
-     <CreateUpdateButton
-             onClick={handleOpenModal}
-             label="Edit"
-             icon={<FiEdit className="w-4 h-4 text-amber-500" />}
-             className="px-4 py-2 w-full focus:outline-none focus:border-none ffocus:ring-none"
-           />
+      <CreateUpdateButton
+        onClick={handleOpenModal}
+        label="Edit"
+        icon={<FiEdit className="w-4 h-4 text-amber-500" />}
+        className="px-4 py-2 w-full focus:outline-none focus:border-none ffocus:ring-none"
+      />
 
       {isOpen && (
         <div
@@ -83,14 +82,8 @@ export const EditBreakRule = ({ data, refetchData }) => {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="sticky top-0 bg-white z-40 flex px-4 justify-between items-center py-4 border-b">
-                <p className="text-sm md:text-lg font-semibold">
-                  Add New Break Policy
-                </p>
-                <IoCloseOutline
-                  size={20}
-                  className="cursor-pointer"
-                  onClick={handleCloseModal}
-                />
+                <p className="text-sm md:text-lg font-semibold">Add New Break Policy</p>
+                <IoCloseOutline size={20} className="cursor-pointer" onClick={handleCloseModal} />
               </div>
 
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 p-4">
@@ -102,49 +95,37 @@ export const EditBreakRule = ({ data, refetchData }) => {
                   <input
                     type="text"
                     placeholder="E.g. Lunch Break"
-                    {...register("name")}
+                    {...register('name')}
                     className="w-full py-2 px-4 rounded-md border border-gray-400 focus:outline-none focus:border-primary focus:bg-white placeholder:text-sm"
                   />
-                  {errors.name && (
-                    <p className="text-red-500 text-sm">
-                      {errors.name.message}
-                    </p>
-                  )}
+                  {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
                 </div>
 
                 {/* Max Breaks per Day */}
                 <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Max Breaks per Day
-                  </label>
+                  <label className="block text-sm font-medium mb-2">Max Breaks per Day</label>
                   <input
                     type="number"
                     min="1"
-                    {...register("max_breaks_per_day", { valueAsNumber: true })}
+                    {...register('max_breaks_per_day', { valueAsNumber: true })}
                     className="w-full py-2 px-4 rounded-md border border-gray-400 focus:outline-none focus:border-primary focus:bg-white placeholder:text-sm"
                   />
                   {errors.max_breaks_per_day && (
-                    <p className="text-red-500 text-sm">
-                      {errors.max_breaks_per_day.message}
-                    </p>
+                    <p className="text-red-500 text-sm">{errors.max_breaks_per_day.message}</p>
                   )}
                 </div>
 
                 {/* Max Total Break Minutes */}
                 <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Max Total Break Minutes
-                  </label>
+                  <label className="block text-sm font-medium mb-2">Max Total Break Minutes</label>
                   <input
                     type="number"
                     min="1"
-                    {...register("max_total_break_minutes", { valueAsNumber: true })}
+                    {...register('max_total_break_minutes', { valueAsNumber: true })}
                     className="w-full py-2 px-4 rounded-md border border-gray-400 focus:outline-none focus:border-primary focus:bg-white placeholder:text-sm"
                   />
                   {errors.max_total_break_minutes && (
-                    <p className="text-red-500 text-sm">
-                      {errors.max_total_break_minutes.message}
-                    </p>
+                    <p className="text-red-500 text-sm">{errors.max_total_break_minutes.message}</p>
                   )}
                 </div>
 
@@ -156,7 +137,7 @@ export const EditBreakRule = ({ data, refetchData }) => {
                   <input
                     type="number"
                     min="1"
-                    {...register("default_max_duration_minutes", {
+                    {...register('default_max_duration_minutes', {
                       valueAsNumber: true,
                     })}
                     className="w-full py-2 px-4 rounded-md border border-gray-400 focus:outline-none focus:border-primary focus:bg-white placeholder:text-sm"
@@ -176,7 +157,7 @@ export const EditBreakRule = ({ data, refetchData }) => {
                   <input
                     type="number"
                     min="0"
-                    {...register("default_grace_period_minutes", {
+                    {...register('default_grace_period_minutes', {
                       valueAsNumber: true,
                     })}
                     className="w-full py-2 px-4 rounded-md border border-gray-400 focus:outline-none focus:border-primary focus:bg-white placeholder:text-sm"
@@ -193,7 +174,7 @@ export const EditBreakRule = ({ data, refetchData }) => {
                   <input
                     type="checkbox"
                     id="enforce_strictly"
-                    {...register("enforce_strictly")}
+                    {...register('enforce_strictly')}
                     className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
                   />
                   <label
@@ -224,7 +205,7 @@ export const EditBreakRule = ({ data, refetchData }) => {
                         <span>Submitting...</span>
                       </span>
                     ) : (
-                      "Submit"
+                      'Submit'
                     )}
                   </button>
                 </div>

@@ -1,9 +1,7 @@
-
-import { apiSlice } from "../../api/apiSlice";
+import { apiSlice } from '../../api/apiSlice';
 
 export const employeesApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-
     getEmployees: builder.query({
       query: ({ page, page_size, search, status, department } = {}) => {
         const queryParams = {};
@@ -14,35 +12,32 @@ export const employeesApi = apiSlice.injectEndpoints({
         if (department) queryParams.department = department;
         return {
           url: `employees/`,
-          method: "GET",
+          method: 'GET',
           params: queryParams,
         };
       },
     }),
 
-
     getEmployeeDetails: builder.query({
       query: (id) => ({
         url: `employees/staff/${id}/`,
-        method: "GET",
+        method: 'GET',
       }),
     }),
 
-    
     getEmployeeByUser: builder.query({
       query: (userId) => ({
         url: `employees/`,
-        method: "GET",
-        params: { user: userId }, 
+        method: 'GET',
+        params: { user: userId },
       }),
       transformResponse: (response) => {
         if (response?.results?.length > 0) {
-          return response.results[0]; 
+          return response.results[0];
         }
         return null;
       },
     }),
-
 
     getTodayAttendace: builder.query({
       query: ({ page, page_size, search } = {}) => {
@@ -52,7 +47,7 @@ export const employeesApi = apiSlice.injectEndpoints({
         if (search) queryParams.search = search;
         return {
           url: `attendance/today/`,
-          method: "GET",
+          method: 'GET',
           params: queryParams,
         };
       },
@@ -65,222 +60,214 @@ export const employeesApi = apiSlice.injectEndpoints({
         if (search) queryParams.search = search;
         return {
           url: `users/timezone-choices/`,
-          method: "GET",
+          method: 'GET',
           params: queryParams,
         };
       },
     }),
     getProfileInfo: builder.query({
       query: () => {
-    
         return {
           url: `users/profile/`,
-          method: "GET"
+          method: 'GET',
         };
       },
     }),
 
-  
     setTimezone: builder.mutation({
       query: (data) => ({
         url: `users/update-timezone/`,
-        method: "POST",
+        method: 'POST',
         body: data,
       }),
     }),
     createEmployee: builder.mutation({
       query: (data) => ({
         url: `employees/staff/create/`,
-        method: "POST",
+        method: 'POST',
         body: data,
       }),
     }),
     deleteEmployee: builder.mutation({
       query: (id) => ({
         url: `employees/staff/${id}/`,
-        method: "DELETE",
+        method: 'DELETE',
       }),
     }),
 
-    
     createContract: builder.mutation({
       query: (data) => ({
         url: `employees/employee-contracts/create/`,
-        method: "POST",
+        method: 'POST',
         body: data,
       }),
     }),
     updateContract: builder.mutation({
       query: ({ id, data }) => ({
         url: `employees/employee-contracts/${id}/`,
-        method: "PATCH",
+        method: 'PATCH',
         body: data,
       }),
     }),
     deleteContract: builder.mutation({
       query: (id) => ({
         url: `employees/employee-contracts/${id}/`,
-        method: "DELETE",
+        method: 'DELETE',
       }),
     }),
 
     uploadDocument: builder.mutation({
       query: (data) => ({
         url: `employees/staff/documents/create/`,
-        method: "POST",
+        method: 'POST',
         body: data,
       }),
     }),
     deleteDocument: builder.mutation({
       query: (id) => ({
         url: `employees/staff/documents/${id}/`,
-        method: "DELETE",
+        method: 'DELETE',
       }),
     }),
 
-    
     createPaymentMethod: builder.mutation({
       query: (data) => ({
         url: `employees/employee-payment-methods/create/`,
-        method: "POST",
+        method: 'POST',
         body: data,
       }),
     }),
     updatePaymentMethod: builder.mutation({
       query: ({ id, data }) => ({
         url: `employees/employee-payment-methods/${id}/`,
-        method: "PATCH",
+        method: 'PATCH',
         body: data,
       }),
     }),
     deletePaymentMethod: builder.mutation({
       query: (id) => ({
         url: `employees/employee-payment-methods/${id}/`,
-        method: "DELETE",
+        method: 'DELETE',
       }),
     }),
 
-   
     createEmergencyContact: builder.mutation({
       query: (data) => ({
         url: `employees/employee-emergency-contacts/create/`,
-        method: "POST",
+        method: 'POST',
         body: data,
       }),
     }),
     updateEmergencyContact: builder.mutation({
       query: ({ id, data }) => ({
         url: `employees/employee-emergency-contacts/${id}/`,
-        method: "PATCH",
+        method: 'PATCH',
         body: data,
       }),
     }),
     deleteEmergencyContact: builder.mutation({
       query: (id) => ({
         url: `employees/employee-emergency-contacts/${id}/`,
-        method: "DELETE",
+        method: 'DELETE',
       }),
     }),
 
-  
     updateUserInfo: builder.mutation({
       query: ({ id, data }) => ({
         url: `users/${id}/info/`,
-        method: "PATCH",
+        method: 'PATCH',
         body: data,
       }),
     }),
     updateProfilePic: builder.mutation({
       query: ({ id, data }) => ({
         url: `users/${id}/profile-picture/`,
-        method: "PATCH",
+        method: 'PATCH',
         body: data,
       }),
     }),
     removeProfilePic: builder.mutation({
       query: ({ id, data }) => ({
         url: `users/${id}/profile-picture/`,
-        method: "DELETE",
+        method: 'DELETE',
         body: data,
       }),
     }),
 
-  
     updateWorkInfo: builder.mutation({
       query: ({ id, data }) => ({
         url: `employees/staff/${id}/update/`,
-        method: "PATCH",
+        method: 'PATCH',
         body: data,
       }),
     }),
-     createStatutoryInfo: builder.mutation({
+    createStatutoryInfo: builder.mutation({
       query: (data) => ({
         url: `employees/statutory-info/create/`,
-        method: "POST",
+        method: 'POST',
         body: data,
       }),
     }),
-     editStatutoryInfo: builder.mutation({
-      query: ({id, data}) => ({
+    editStatutoryInfo: builder.mutation({
+      query: ({ id, data }) => ({
         url: `employees/statutory-info/${id}/`,
-        method: "PATCH",
+        method: 'PATCH',
         body: data,
       }),
     }),
-     deleteStatutoryInfo: builder.mutation({
+    deleteStatutoryInfo: builder.mutation({
       query: (id) => ({
         url: `employees/statutory-info/${id}/`,
-        method: "DELETE",
+        method: 'DELETE',
       }),
     }),
-     createEducationInfo: builder.mutation({
+    createEducationInfo: builder.mutation({
       query: (data) => ({
         url: `employees/education/create/`,
-        method: "POST",
+        method: 'POST',
         body: data,
       }),
     }),
-     editEducationInfo: builder.mutation({
-      query: ({id, data}) => ({
+    editEducationInfo: builder.mutation({
+      query: ({ id, data }) => ({
         url: `employees/education/${id}/`,
-        method: "PATCH",
+        method: 'PATCH',
         body: data,
       }),
     }),
-     deleteEducationInfo: builder.mutation({
+    deleteEducationInfo: builder.mutation({
       query: (id) => ({
         url: `employees/education/${id}/`,
-        method: "DELETE",
+        method: 'DELETE',
       }),
     }),
-     createEmployeeRole: builder.mutation({
+    createEmployeeRole: builder.mutation({
       query: (data) => ({
         url: `employees/employee-roles/create/`,
-        method: "POST",
+        method: 'POST',
         body: data,
       }),
     }),
-     updateEmployeeRole: builder.mutation({
-      query: ({id, data}) => ({
+    updateEmployeeRole: builder.mutation({
+      query: ({ id, data }) => ({
         url: `employees/employee-roles/${id}/`,
-        method: "PATCH",
+        method: 'PATCH',
         body: data,
       }),
     }),
-     removeEmployeeRole: builder.mutation({
+    removeEmployeeRole: builder.mutation({
       query: (id) => ({
         url: `employees/employee-roles/${id}/`,
-        method: "DELETE",
+        method: 'DELETE',
       }),
     }),
-
   }),
 });
 
 export const {
   useGetEmployeesQuery,
   useGetEmployeeDetailsQuery,
-  useGetEmployeeByUserQuery,   
+  useGetEmployeeByUserQuery,
   useGetTodayAttendaceQuery,
   useCreateEmployeeMutation,
   useDeleteEmployeeMutation,

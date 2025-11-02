@@ -1,6 +1,5 @@
-
-import RolesDetails from "../../components/roles/RoleDetails";
-import React from "react";
+import RolesDetails from '../../components/roles/RoleDetails';
+import React from 'react';
 
 const RolesDetailsPage = () => <RolesDetails />;
 

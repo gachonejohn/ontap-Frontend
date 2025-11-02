@@ -1,7 +1,7 @@
-import React, { useState } from "react";
-import { useSelector } from "react-redux";
-import { toast } from "react-toastify";
-import ActionModal from "../common/Modals/ActionModal";
+import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
+import ActionModal from '../common/Modals/ActionModal';
 
 import { useTaskPermissions } from "./taskLogic/useTaskPermissions";
 import { useTaskOperations } from "./taskLogic/useTaskOperations";
@@ -19,10 +19,9 @@ const TaskModal = ({ isOpen, onClose, task, refetch, onSubmit }) => {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [isAddSubtaskModalOpen, setIsAddSubtaskModalOpen] = useState(false); 
 
-    const currentUser = useSelector((state) => state.auth.user);
+  const currentUser = useSelector((state) => state.auth.user);
 
-    const { hasAnyEditPermission, canDeleteTask, fieldPermissions } =
-        useTaskPermissions(task);
+  const { hasAnyEditPermission, canDeleteTask, fieldPermissions } = useTaskPermissions(task);
 
     React.useEffect(() => {
         if (isOpen && task) {
@@ -49,12 +48,9 @@ const TaskModal = ({ isOpen, onClose, task, refetch, onSubmit }) => {
         setEditCommentContent,
     } = useTaskOperations(task, refetch);
 
-    const { formData, updateFormData, comments, refetchComments } = useTaskData(
-        task,
-        isEditingMode
-    );
+  const { formData, updateFormData, comments, refetchComments } = useTaskData(task, isEditingMode);
 
-    if (!isOpen || !task) return null;
+  if (!isOpen || !task) return null;
 
     const userId = currentUser?.user?.id || currentUser?.id;
 
@@ -147,7 +143,7 @@ const TaskModal = ({ isOpen, onClose, task, refetch, onSubmit }) => {
             console.error("Failed to update priority:", error);
             toast.error("Failed to update priority");
         }
-    };
+      }
 
     // 🔥 NEW: Handle subtask creation
     const handleCreateSubtask = async (subtaskFormData) => {

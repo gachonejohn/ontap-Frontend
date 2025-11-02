@@ -1,26 +1,28 @@
-import { SetTimezone } from "@components/settings/timezone/EditTimezone";
-import { useAppSelector } from "@store/hooks";
-import { useGetProfileInfoQuery } from "@store/services/employees/employeesService";
-import { useEffect, useState } from "react";
-import { FiMenu } from "react-icons/fi";
-import AccountMenu from "./ProfileMenu";
+import { SetTimezone } from '@components/settings/timezone/EditTimezone';
+import { useAppSelector } from '@store/hooks';
+import { useGetProfileInfoQuery } from '@store/services/employees/employeesService';
+import { useEffect, useState } from 'react';
+import { FiMenu } from 'react-icons/fi';
+import AccountMenu from './ProfileMenu';
 
 export default function Header({ sidebarOpen, setSidebarOpen }) {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
-  const [greeting, setGreeting] = useState("Good Morning");
+  const [greeting, setGreeting] = useState('Good Morning');
 
   const { user } = useAppSelector((state) => state.auth);
 
-  const { data: profileInfo, refetch } = useGetProfileInfoQuery({}, {refetchOnMountOrArgChange: true});
- 
+  const { data: profileInfo, refetch } = useGetProfileInfoQuery(
+    {},
+    { refetchOnMountOrArgChange: true }
+  );
 
-  console.log("profileInfo================:", profileInfo);
+  console.log('profileInfo================:', profileInfo);
   const getGreeting = () => {
     const hour = new Date().getHours();
-    if (hour >= 5 && hour < 12) return "Good Morning";
-    if (hour >= 12 && hour < 17) return "Good Afternoon";
-    if (hour >= 17 && hour < 22) return "Good Evening";
-    return "Good Night";
+    if (hour >= 5 && hour < 12) return 'Good Morning';
+    if (hour >= 12 && hour < 17) return 'Good Afternoon';
+    if (hour >= 17 && hour < 22) return 'Good Evening';
+    return 'Good Night';
   };
 
   useEffect(() => {
@@ -30,11 +32,11 @@ export default function Header({ sidebarOpen, setSidebarOpen }) {
     return () => clearInterval(interval);
   }, []);
 
-  const defaultProfile = "/images/avatar/default-avatar.jpg";
+  const defaultProfile = '/images/avatar/default-avatar.jpg';
   const API_BASE_URL = process.env.REACT_APP_SERVER_URI;
   let profilePic = user?.profile_picture;
 
-  if (profilePic && !profilePic.startsWith("http")) {
+  if (profilePic && !profilePic.startsWith('http')) {
     profilePic = `${API_BASE_URL}${profilePic}`;
   }
   if (!profilePic) {
@@ -45,7 +47,7 @@ export default function Header({ sidebarOpen, setSidebarOpen }) {
     <div
       className={`fixed top-0 right-0 flex font-inter justify-between border-b shadow-sm items-center 
         px-5 py-2 bg-white z-50 transition-all duration-300
-        ${sidebarOpen ? "left-[272px]" : "left-[64px]"}
+        ${sidebarOpen ? 'left-[272px]' : 'left-[64px]'}
       `}
     >
       <div className="flex items-center gap-4 w-96">
@@ -58,10 +60,11 @@ export default function Header({ sidebarOpen, setSidebarOpen }) {
 
         <div className="flex flex-col gap-1">
           <div className="text-md  font-semibold">
-            {greeting}, {profileInfo?.first_name || "Guest"  }!
+            {greeting}, {profileInfo?.first_name || 'Guest'}!
           </div>
           <div className="text-xs  font-light">
-            {profileInfo?.employee_profile?.department_name || "General"} · {profileInfo?.employee_profile?.position?.title || "—"}
+            {profileInfo?.employee_profile?.department_name || 'General'} ·{' '}
+            {profileInfo?.employee_profile?.position?.title || '—'}
           </div>
         </div>
       </div>
@@ -75,20 +78,15 @@ export default function Header({ sidebarOpen, setSidebarOpen }) {
           </div>
         </div> */}
         <div>
-        <SetTimezone refetchData={refetch} buttonText={profileInfo?.timezone || "Set Timezone"} />
+          <SetTimezone refetchData={refetch} buttonText={profileInfo?.timezone || 'Set Timezone'} />
         </div>
 
         <div className="flex items-center gap-2 p-2 pl-3 rounded-lg border border-neutral-200 h-8 min-w-[88px] cursor-pointer hover:bg-gray-100 transition-colors">
-          <img
-            width="13"
-            height="14"
-            src="/images/calendar.png"
-            alt="Calendar icon"
-          />
+          <img width="13" height="14" src="/images/calendar.png" alt="Calendar icon" />
           <div className="text-xs text-neutral-900 font-semibold">
-            {new Date().toLocaleDateString("en-US", {
-              month: "short",
-              day: "numeric",
+            {new Date().toLocaleDateString('en-US', {
+              month: 'short',
+              day: 'numeric',
             })}
           </div>
         </div>
@@ -113,15 +111,12 @@ export default function Header({ sidebarOpen, setSidebarOpen }) {
             <img
               className="w-full h-full object-cover"
               src={profilePic}
-              alt={`${user?.first_name ?? ""} ${user?.last_name ?? ""}`}
+              alt={`${user?.first_name ?? ''} ${user?.last_name ?? ''}`}
             />
           </div>
 
           <div>
-            <AccountMenu
-              isOpen={isProfileModalOpen}
-              onClose={() => setIsProfileModalOpen(false)}
-            />
+            <AccountMenu isOpen={isProfileModalOpen} onClose={() => setIsProfileModalOpen(false)} />
           </div>
         </div>
       </div>

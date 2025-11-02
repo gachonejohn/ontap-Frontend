@@ -8,14 +8,14 @@ const LeaveModal = ({ isOpen, onClose, onSubmit }) => {
     endDate: '',
     reason: '',
     emergencyContact: '',
-    notes: ''
+    notes: '',
   });
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -28,7 +28,7 @@ const LeaveModal = ({ isOpen, onClose, onSubmit }) => {
       endDate: '',
       reason: '',
       emergencyContact: '',
-      notes: ''
+      notes: '',
     });
   };
 
@@ -40,12 +40,14 @@ const LeaveModal = ({ isOpen, onClose, onSubmit }) => {
         {/* Modal Header */}
         <div className="flex justify-between items-center p-6 border-b">
           <h2 className="text-lg font-semibold text-gray-900">Apply for Leave</h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
-          >
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
@@ -55,9 +57,7 @@ const LeaveModal = ({ isOpen, onClose, onSubmit }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Leave Type */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Leave Type *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Leave Type *</label>
               <select
                 name="leaveType"
                 value={formData.leaveType}
@@ -93,9 +93,7 @@ const LeaveModal = ({ isOpen, onClose, onSubmit }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Start Date */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Start Date *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Start Date *</label>
               <input
                 type="date"
                 name="startDate"
@@ -108,9 +106,7 @@ const LeaveModal = ({ isOpen, onClose, onSubmit }) => {
 
             {/* End Date */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                End Date *
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">End Date *</label>
               <input
                 type="date"
                 name="endDate"
@@ -140,9 +136,7 @@ const LeaveModal = ({ isOpen, onClose, onSubmit }) => {
 
           {/* Additional Notes */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Additional Notes
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Additional Notes</label>
             <textarea
               name="notes"
               value={formData.notes}

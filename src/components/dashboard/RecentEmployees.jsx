@@ -1,36 +1,35 @@
-import ButtonDropdown from "@components/common/ActionsPopover";
-import NoDataFound from "@components/common/NoData";
-import { CreateEmployee } from "@components/employees/NewEmployee";
-import { useGetDepartmentsQuery } from "@store/services/companies/companiesService";
-import { useMemo } from "react";
-import { FiEdit, FiUserMinus } from "react-icons/fi";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { PAGE_SIZE } from "../../constants/constants";
-import { useFilters } from "../../hooks/useFIlters";
-import { useGetEmployeesQuery } from "../../store/services/employees/employeesService";
-import { YearMonthCustomDate } from "../../utils/dates";
-import DataTable from "../common/DataTable";
-import Pagination from "../common/pagination";
-import ContentSpinner from "../common/spinners/dataLoadingSpinner";
+import ButtonDropdown from '@components/common/ActionsPopover';
+import NoDataFound from '@components/common/NoData';
+import { CreateEmployee } from '@components/employees/NewEmployee';
+import { useGetDepartmentsQuery } from '@store/services/companies/companiesService';
+import { useMemo } from 'react';
+import { FiEdit, FiUserMinus } from 'react-icons/fi';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { PAGE_SIZE } from '../../constants/constants';
+import { useFilters } from '../../hooks/useFIlters';
+import { useGetEmployeesQuery } from '../../store/services/employees/employeesService';
+import { YearMonthCustomDate } from '../../utils/dates';
+import DataTable from '../common/DataTable';
+import Pagination from '../common/pagination';
+import ContentSpinner from '../common/spinners/dataLoadingSpinner';
 
 const RecentEmployees = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  const currentPageParam = parseInt(searchParams.get("page") || "1", 10);
+  const currentPageParam = parseInt(searchParams.get('page') || '1', 10);
 
-  const { filters, currentPage, handleFilterChange, handlePageChange } =
-    useFilters({
-      initialFilters: {
-        employee_no: searchParams.get("employee_no") || "",
-        department: searchParams.get("department") || "",
-        status: searchParams.get("status") || "",
-      },
-      initialPage: currentPageParam,
-      navigate,
-      debounceTime: 100,
-      debouncedFields: ["employee_no"],
-    });
+  const { filters, currentPage, handleFilterChange, handlePageChange } = useFilters({
+    initialFilters: {
+      employee_no: searchParams.get('employee_no') || '',
+      department: searchParams.get('department') || '',
+      status: searchParams.get('status') || '',
+    },
+    initialPage: currentPageParam,
+    navigate,
+    debounceTime: 100,
+    debouncedFields: ['employee_no'],
+  });
 
   const queryParams = useMemo(
     () => ({
@@ -51,7 +50,7 @@ const RecentEmployees = () => {
   const { data: departmentsData } = useGetDepartmentsQuery(queryParams, {
     refetchOnMountOrArgChange: true,
   });
-  console.log("employeesData", employeesData);
+  console.log('employeesData', employeesData);
   const departmentsOptions =
     departmentsData?.map((item) => ({
       value: item.id,
@@ -60,29 +59,29 @@ const RecentEmployees = () => {
 
   const handleDepartmentChange = (selectedOption) => {
     handleFilterChange({
-      department: selectedOption ? selectedOption.value : "",
+      department: selectedOption ? selectedOption.value : '',
     });
   };
 
   const handleStatusChange = (selectedOption) => {
     handleFilterChange({
-      status: selectedOption ? selectedOption.value : "",
+      status: selectedOption ? selectedOption.value : '',
     });
   };
 
   const handleViewDetails = (id) => navigate(`/dashboard/employees/${id}`);
   const handleViewAll = () => navigate(`/dashboard/employees`);
-  const defaultProfile = "/images/avatar/default-avatar.jpg";
+  const defaultProfile = '/images/avatar/default-avatar.jpg';
   const API_BASE_URL = process.env.REACT_APP_SERVER_URI;
 
   const columns = [
     {
-      header: "Profile",
-      accessor: "user",
+      header: 'Profile',
+      accessor: 'user',
       cell: (item) => {
         let profilePic = item?.user?.profile_picture;
 
-        if (profilePic && !profilePic.startsWith("http")) {
+        if (profilePic && !profilePic.startsWith('http')) {
           profilePic = `${API_BASE_URL}${profilePic}`;
         }
 
@@ -105,8 +104,8 @@ const RecentEmployees = () => {
       },
     },
     {
-      header: "Name",
-      accessor: "user",
+      header: 'Name',
+      accessor: 'user',
       cell: (item) => (
         <span>
           {item.user.first_name} {item.user.last_name}
@@ -114,56 +113,48 @@ const RecentEmployees = () => {
       ),
     },
     {
-      header: "Department",
-      accessor: "department",
-      cell: (item) => (
-        <span className="text-xs font-medium">
-          {item?.department?.name ?? ""}
-        </span>
-      ),
+      header: 'Department',
+      accessor: 'department',
+      cell: (item) => <span className="text-xs font-medium">{item?.department?.name ?? ''}</span>,
     },
     {
-      header: "Position",
-      accessor: "position",
-      cell: (item) => (
-        <span className="text-xs font-medium">
-          {item?.position?.title ?? ""}
-        </span>
-      ),
+      header: 'Position',
+      accessor: 'position',
+      cell: (item) => <span className="text-xs font-medium">{item?.position?.title ?? ''}</span>,
     },
     {
-      header: "Status",
-      accessor: "status",
+      header: 'Status',
+      accessor: 'status',
       cell: (item) => (
         <span
           className={`text-xs px-4 py-1 rounded-md font-medium border
         ${
-          item.status === "ACTIVE"
-            ? "bg-green-100 text-green-500 border-green-500"
-            : item.status === "INACTIVE"
-            ? "bg-red-100 text-red-500 border-red-500"
-            : item.status === "ON_LEAVE"
-            ? "bg-yellow-100 text-yellow-500 border-yellow-500"
-            : item.status === "SUSPENDED"
-            ? "bg-gray-100 text-gray-500 border-gray-500"
-            : item.status === "TERMINATED"
-            ? "bg-gray-100 text-gray-500 border-gray-500"
-            : item.status === "RESIGNED"
-            ? "bg-gray-100 text-gray-500 border-gray-500"
-            : ""
+          item.status === 'ACTIVE'
+            ? 'bg-green-100 text-green-500 border-green-500'
+            : item.status === 'INACTIVE'
+              ? 'bg-red-100 text-red-500 border-red-500'
+              : item.status === 'ON_LEAVE'
+                ? 'bg-yellow-100 text-yellow-500 border-yellow-500'
+                : item.status === 'SUSPENDED'
+                  ? 'bg-gray-100 text-gray-500 border-gray-500'
+                  : item.status === 'TERMINATED'
+                    ? 'bg-gray-100 text-gray-500 border-gray-500'
+                    : item.status === 'RESIGNED'
+                      ? 'bg-gray-100 text-gray-500 border-gray-500'
+                      : ''
         }
         `}
         >
-          {item?.status ?? ""}
+          {item?.status ?? ''}
         </span>
       ),
     },
     {
-      header: "Date Started",
-      accessor: "latest_contract",
+      header: 'Date Started',
+      accessor: 'latest_contract',
       cell: (item) => (
         <span className="text-xs font-medium">
-          {YearMonthCustomDate(item?.latest_contract?.start_date ?? "")}
+          {YearMonthCustomDate(item?.latest_contract?.start_date ?? '')}
         </span>
       ),
     },
@@ -217,9 +208,9 @@ const RecentEmployees = () => {
           </div>
         ) : error ? (
           <div className="bg-red-50 p-4 rounded-md text-red-800 text-center">
-            {"status" in error && error.data?.error
+            {'status' in error && error.data?.error
               ? error.data.error
-              : "An error occurred while fetching data."}
+              : 'An error occurred while fetching data.'}
           </div>
         ) : employeesData && employeesData.results.length > 0 ? (
           <DataTable

@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 const EditCardModal = ({ isOpen, onClose, card }) => {
   if (!isOpen) return null;
@@ -9,9 +9,7 @@ const EditCardModal = ({ isOpen, onClose, card }) => {
         <div className="flex flex-col justify-start items-start gap-6 h-[566px]">
           {/* Header with Close Button */}
           <div className="flex flex-row justify-between items-center w-[528px] h-7">
-            <div className="font-inter text-lg font-semibold text-neutral-900">
-              Edit ID Card
-            </div>
+            <div className="font-inter text-lg font-semibold text-neutral-900">Edit ID Card</div>
             <button
               onClick={onClose}
               className="flex justify-center items-center w-7 h-7 hover:bg-gray-100 rounded-full"
@@ -23,8 +21,20 @@ const EditCardModal = ({ isOpen, onClose, card }) => {
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
               >
-                <path d="M12 4L4 12" stroke="#4B5563" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M4 4L12 12" stroke="#4B5563" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path
+                  d="M12 4L4 12"
+                  stroke="#4B5563"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M4 4L12 12"
+                  stroke="#4B5563"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
             </button>
           </div>
@@ -42,15 +52,19 @@ const EditCardModal = ({ isOpen, onClose, card }) => {
 
             {/* Template Options */}
             <div className="flex flex-col justify-start items-start gap-4 h-[360px]">
-              <div className="font-inter text-sm text-neutral-900 font-medium">
-                Choose Template
-              </div>
+              <div className="font-inter text-sm text-neutral-900 font-medium">Choose Template</div>
 
               <div className="flex flex-col justify-start items-start gap-3 h-[324px]">
                 {[1, 2, 3].map((row) => (
-                  <div key={row} className="flex flex-row justify-between items-center gap-6 w-[528px] h-[100px]">
+                  <div
+                    key={row}
+                    className="flex flex-row justify-between items-center gap-6 w-[528px] h-[100px]"
+                  >
                     {[1, 2].map((col) => (
-                      <div key={col} className="flex justify-center items-center rounded-lg border border-red-700 w-64 h-[100px]">
+                      <div
+                        key={col}
+                        className="flex justify-center items-center rounded-lg border border-red-700 w-64 h-[100px]"
+                      >
                         <div className="flex flex-row justify-start items-center gap-2 w-48">
                           <div className="rounded-lg w-8 h-8 bg-red-700"></div>
                           <div className="flex flex-col justify-start items-start gap-1">

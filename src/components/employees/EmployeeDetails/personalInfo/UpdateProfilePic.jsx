@@ -1,16 +1,16 @@
-import { useState, useRef } from "react";
-import { IoCloseOutline } from "react-icons/io5";
-import { FiEdit, FiCheckCircle, FiX } from "react-icons/fi";
-import { MdOutlineCloudUpload } from "react-icons/md";
-import { PiSpinnerGap } from "react-icons/pi";
-import { toast } from "react-toastify";
-import { useUpdateProfilePicMutation } from "@store/services/employees/employeesService";
+import { useState, useRef } from 'react';
+import { IoCloseOutline } from 'react-icons/io5';
+import { FiEdit, FiCheckCircle, FiX } from 'react-icons/fi';
+import { MdOutlineCloudUpload } from 'react-icons/md';
+import { PiSpinnerGap } from 'react-icons/pi';
+import { toast } from 'react-toastify';
+import { useUpdateProfilePicMutation } from '@store/services/employees/employeesService';
 
 const EditProfilePicture = ({ data: employeeData, refetchData }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [file, setFile] = useState(null);
   const fileInputRef = useRef(null);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
   const [updateProfilePicture, { isLoading }] = useUpdateProfilePicMutation();
 
@@ -18,12 +18,12 @@ const EditProfilePicture = ({ data: employeeData, refetchData }) => {
   const closeModal = () => {
     setIsOpen(false);
     setFile(null);
-    setError("");
+    setError('');
   };
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files?.[0];
-    setError("");
+    setError('');
     if (!selectedFile) return;
     setFile(selectedFile);
   };
@@ -34,7 +34,7 @@ const EditProfilePicture = ({ data: employeeData, refetchData }) => {
 
   const onDrop = (e) => {
     e.preventDefault();
-    setError("");
+    setError('');
     const selectedFile = e.dataTransfer.files[0];
     if (!selectedFile) return;
     setFile(selectedFile);
@@ -44,24 +44,24 @@ const EditProfilePicture = ({ data: employeeData, refetchData }) => {
   const onSubmit = async (e) => {
     e.preventDefault();
     if (!file) {
-      setError("Please select an image");
+      setError('Please select an image');
       return;
     }
 
     const formData = new FormData();
-    formData.append("profile_picture", file);
+    formData.append('profile_picture', file);
 
     try {
       await updateProfilePicture({
         id: employeeData.user.id,
         data: formData,
       }).unwrap();
-      toast.success("Profile picture updated successfully");
+      toast.success('Profile picture updated successfully');
       refetchData();
       closeModal();
     } catch (err) {
       console.error(err);
-      toast.error("Failed to update profile picture. Please try again.");
+      toast.error('Failed to update profile picture. Please try again.');
     }
   };
 
@@ -76,11 +76,7 @@ const EditProfilePicture = ({ data: employeeData, refetchData }) => {
       </div>
 
       {isOpen && (
-        <div
-          className="relative z-50 animate-fadeIn"
-          role="dialog"
-          aria-modal="true"
-        >
+        <div className="relative z-50 animate-fadeIn" role="dialog" aria-modal="true">
           <div
             onClick={closeModal}
             className="fixed inset-0 bg-black bg-opacity-50 transition-opacity animate-fadeIn cursor-pointer"
@@ -92,14 +88,8 @@ const EditProfilePicture = ({ data: employeeData, refetchData }) => {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="sticky top-0 bg-white z-40 flex px-4 justify-between items-center py-4">
-                <p className="text-sm md:text-lg font-semibold">
-                  Update Profile Picture
-                </p>
-                <IoCloseOutline
-                  size={20}
-                  className="cursor-pointer"
-                  onClick={closeModal}
-                />
+                <p className="text-sm md:text-lg font-semibold">Update Profile Picture</p>
+                <IoCloseOutline size={20} className="cursor-pointer" onClick={closeModal} />
               </div>
 
               <form onSubmit={onSubmit} className="space-y-4 p-4">
@@ -108,10 +98,10 @@ const EditProfilePicture = ({ data: employeeData, refetchData }) => {
                   className={`border-2 border-dashed rounded-lg p-8 flex flex-col items-center justify-center cursor-pointer mb-6
                     ${
                       file
-                        ? "border-primary bg-primary-50"
+                        ? 'border-primary bg-primary-50'
                         : error
-                        ? "border-red-400 bg-red-50"
-                        : "border-gray-300 hover:border-blue-400 hover:bg-blue-50"
+                          ? 'border-red-400 bg-red-50'
+                          : 'border-gray-300 hover:border-blue-400 hover:bg-blue-50'
                     }`}
                   onClick={triggerFileInput}
                   onDrop={onDrop}
@@ -146,9 +136,7 @@ const EditProfilePicture = ({ data: employeeData, refetchData }) => {
                   ) : (
                     <>
                       <MdOutlineCloudUpload
-                        className={`text-4xl mb-3 ${
-                          error ? "text-red-500" : "text-primary"
-                        }`}
+                        className={`text-4xl mb-3 ${error ? 'text-red-500' : 'text-primary'}`}
                       />
                       <p className="text-gray-700 font-medium">
                         Click to select or drag an image here
@@ -178,11 +166,7 @@ const EditProfilePicture = ({ data: employeeData, refetchData }) => {
                     type="submit"
                     disabled={!file || isLoading}
                     className={`px-4 py-2 rounded-md text-white font-medium flex items-center gap-2
-                      ${
-                        !file || isLoading
-                          ? "bg-gray-400 cursor-not-allowed"
-                          : "bg-primary"
-                      }`}
+                      ${!file || isLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-primary'}`}
                   >
                     {isLoading ? (
                       <>

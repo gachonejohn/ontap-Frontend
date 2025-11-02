@@ -1,23 +1,22 @@
-import { genderOptions } from "@constants/constants";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { genderOptions } from '@constants/constants';
+import { zodResolver } from '@hookform/resolvers/zod';
 
-import { updateEmployeePersonalInfoSchema } from "@schemas/employees/employeeSchema";
-import { getApiErrorMessage } from "@utils/errorHandler";
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { FiEdit } from "react-icons/fi";
-import { IoCloseOutline } from "react-icons/io5";
-import Select from "react-select";
-import { toast } from "react-toastify";
-import { useUpdateUserInfoMutation } from "../../../../store/services/employees/employeesService";
-import SubmitCancelButtons from "../../../common/Buttons/ActionButton";
-import CreateUpdateButton from "../../../common/Buttons/CreateUpdateButton";
+import { updateEmployeePersonalInfoSchema } from '@schemas/employees/employeeSchema';
+import { getApiErrorMessage } from '@utils/errorHandler';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { FiEdit } from 'react-icons/fi';
+import { IoCloseOutline } from 'react-icons/io5';
+import Select from 'react-select';
+import { toast } from 'react-toastify';
+import { useUpdateUserInfoMutation } from '../../../../store/services/employees/employeesService';
+import SubmitCancelButtons from '../../../common/Buttons/ActionButton';
+import CreateUpdateButton from '../../../common/Buttons/CreateUpdateButton';
 
 export const EditPersonalInfo = ({ refetchData, data }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const [updateUserInfo, { isLoading: isUpdating }] =
-    useUpdateUserInfoMutation();
+  const [updateUserInfo, { isLoading: isUpdating }] = useUpdateUserInfoMutation();
 
   const {
     register,
@@ -28,16 +27,16 @@ export const EditPersonalInfo = ({ refetchData, data }) => {
   } = useForm({
     resolver: zodResolver(updateEmployeePersonalInfoSchema),
     defaultValues: {
-      first_name: data?.user?.first_name ?? "",
-      last_name: data?.user?.last_name ?? "",
-      email: data?.user?.email ?? "",
-      phone_number: data?.user?.phone_number ?? "",
-      date_of_birth: data?.user?.date_of_birth ?? "",
-      gender: data?.user?.gender ?? "",
+      first_name: data?.user?.first_name ?? '',
+      last_name: data?.user?.last_name ?? '',
+      email: data?.user?.email ?? '',
+      phone_number: data?.user?.phone_number ?? '',
+      date_of_birth: data?.user?.date_of_birth ?? '',
+      gender: data?.user?.gender ?? '',
     },
   });
   useEffect(() => {
-    console.log("Form Errors:", errors);
+    console.log('Form Errors:', errors);
   }, [errors]);
   const onSubmit = async (formData) => {
     try {
@@ -45,17 +44,17 @@ export const EditPersonalInfo = ({ refetchData, data }) => {
         id: data.user.id,
         data: formData,
       }).unwrap();
-      toast.success("Personal Info details updated successfully!");
+      toast.success('Personal Info details updated successfully!');
       handleCloseModal();
       refetchData();
     } catch (error) {
-      const message = getApiErrorMessage(error, "Error Updating info.");
+      const message = getApiErrorMessage(error, 'Error Updating info.');
       toast.error(message);
-    } 
+    }
   };
   const handleGenderChange = (selected) => {
     if (selected) {
-      setValue("gender", selected.value);
+      setValue('gender', selected.value);
     }
   };
 
@@ -117,13 +116,11 @@ export const EditPersonalInfo = ({ refetchData, data }) => {
                   <input
                     type="text"
                     placeholder="E.g. Peter"
-                    {...register("first_name")}
+                    {...register('first_name')}
                     className="w-full py-2 px-4 rounded-md border bg-slate-50 focus:outline-none focus:border-primary focus:bg-white placeholder:text-[12px]"
                   />
                   {errors.first_name && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {errors.first_name.message}
-                    </p>
+                    <p className="text-red-500 text-sm mt-1">{errors.first_name.message}</p>
                   )}
                 </div>
 
@@ -137,13 +134,11 @@ export const EditPersonalInfo = ({ refetchData, data }) => {
                     <input
                       type="text"
                       placeholder="E.g. Smith"
-                      {...register("last_name")}
+                      {...register('last_name')}
                       className="w-full py-2 px-4 rounded-md border bg-slate-50 focus:outline-none focus:border-primary focus:bg-white placeholder:text-[12px]"
                     />
                     {errors.last_name && (
-                      <p className="text-red-500 text-sm mt-1">
-                        {errors.last_name.message}
-                      </p>
+                      <p className="text-red-500 text-sm mt-1">{errors.last_name.message}</p>
                     )}
                   </div>
                   <div>
@@ -153,13 +148,11 @@ export const EditPersonalInfo = ({ refetchData, data }) => {
                     <input
                       type="date"
                       placeholder="Date of birth"
-                      {...register("date_of_birth")}
+                      {...register('date_of_birth')}
                       className="w-full py-2 px-4 rounded-md border bg-slate-50 focus:outline-none focus:border-primary focus:bg-white placeholder:text-[12px]"
                     />
                     {errors.date_of_birth && (
-                      <p className="text-red-500 text-sm mt-1">
-                        {errors.date_of_birth.message}
-                      </p>
+                      <p className="text-red-500 text-sm mt-1">{errors.date_of_birth.message}</p>
                     )}
                   </div>
                   <div>
@@ -180,18 +173,16 @@ export const EditPersonalInfo = ({ refetchData, data }) => {
                         menuPortal: (base) => ({ ...base, zIndex: 9999 }),
                         control: (base) => ({
                           ...base,
-                          minHeight: "36px",
-                          borderColor: "#d1d5db",
-                          boxShadow: "none",
-                          "&:hover": { borderColor: "#9ca3af" },
-                          backgroundColor: "#F3F4F6",
+                          minHeight: '36px',
+                          borderColor: '#d1d5db',
+                          boxShadow: 'none',
+                          '&:hover': { borderColor: '#9ca3af' },
+                          backgroundColor: '#F3F4F6',
                         }),
                       }}
                     />
                     {errors.gender && (
-                      <p className="text-red-500 text-[12px] mt-1">
-                        {errors.gender.message}
-                      </p>
+                      <p className="text-red-500 text-[12px] mt-1">{errors.gender.message}</p>
                     )}
                   </div>
 
@@ -202,13 +193,11 @@ export const EditPersonalInfo = ({ refetchData, data }) => {
                     <input
                       type="text"
                       placeholder="+234...."
-                      {...register("phone_number")}
+                      {...register('phone_number')}
                       className="w-full py-2 px-4 rounded-md border bg-slate-50 focus:outline-none focus:border-primary focus:bg-white placeholder:text-[12px]"
                     />
                     {errors.phone_number && (
-                      <p className="text-red-500 text-sm mt-1">
-                        {errors.phone_number.message}
-                      </p>
+                      <p className="text-red-500 text-sm mt-1">{errors.phone_number.message}</p>
                     )}
                   </div>
                 </div>
@@ -219,13 +208,11 @@ export const EditPersonalInfo = ({ refetchData, data }) => {
                   <input
                     type="email"
                     placeholder="Enter email"
-                    {...register("email")}
+                    {...register('email')}
                     className="w-full py-2 px-4 rounded-md border bg-slate-50 focus:outline-none focus:border-primary focus:bg-white placeholder:text-[12px]"
                   />
                   {errors.email && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {errors.email.message}
-                    </p>
+                    <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
                   )}
                 </div>
                 <SubmitCancelButtons

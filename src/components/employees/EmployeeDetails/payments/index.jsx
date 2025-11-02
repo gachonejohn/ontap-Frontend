@@ -1,17 +1,16 @@
-import { CreateEmployeePaymentMethodDetails } from "./CreatePaymentMethod";
-import { UpdatePymentMethodInfo } from "./EditPaymentMethod";
-import { getApiErrorMessage } from "@utils/errorHandler";
-import { useState } from "react";
-import { CustomDate } from "@utils/dates";
-import { FiBriefcase, FiTrash2 } from "react-icons/fi";
-import { toast } from "react-toastify";
-import ActionModal from "@components/common/Modals/ActionModal";
-import { useDeletePaymentMethodMutation } from "@store/services/employees/employeesService";
+import { CreateEmployeePaymentMethodDetails } from './CreatePaymentMethod';
+import { UpdatePymentMethodInfo } from './EditPaymentMethod';
+import { getApiErrorMessage } from '@utils/errorHandler';
+import { useState } from 'react';
+import { CustomDate } from '@utils/dates';
+import { FiBriefcase, FiTrash2 } from 'react-icons/fi';
+import { toast } from 'react-toastify';
+import ActionModal from '@components/common/Modals/ActionModal';
+import { useDeletePaymentMethodMutation } from '@store/services/employees/employeesService';
 export const PaymentMethodDetails = ({ data: employeeData, refetch }) => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [deletePaymentMethod, { isLoading: isDeleting }] =
-    useDeletePaymentMethodMutation();
+  const [deletePaymentMethod, { isLoading: isDeleting }] = useDeletePaymentMethodMutation();
   const openDeleteModal = (id) => {
     setSelectedItem(id);
     setIsDeleteModalOpen(true);
@@ -24,14 +23,11 @@ export const PaymentMethodDetails = ({ data: employeeData, refetch }) => {
   const handleDelete = async () => {
     try {
       await deletePaymentMethod(selectedItem).unwrap();
-      toast.success("Payment Method Deleted successfully!");
+      toast.success('Payment Method Deleted successfully!');
       closeDeleteModal();
       refetch();
     } catch (error) {
-      const message = getApiErrorMessage(
-        error,
-        "Error deleting payment method."
-      );
+      const message = getApiErrorMessage(error, 'Error deleting payment method.');
       toast.error(message);
     } finally {
       closeDeleteModal();
@@ -40,16 +36,11 @@ export const PaymentMethodDetails = ({ data: employeeData, refetch }) => {
   };
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-6">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">
-        Payment Methods
-      </h3>
+      <h3 className="text-lg font-semibold text-gray-900 mb-4">Payment Methods</h3>
 
       {/* Create new method */}
       <div className="py-3 flex items-center justify-end">
-        <CreateEmployeePaymentMethodDetails
-          data={employeeData}
-          refetchData={refetch}
-        />
+        <CreateEmployeePaymentMethodDetails data={employeeData} refetchData={refetch} />
       </div>
 
       {employeeData.payment_methods?.length > 0 ? (
@@ -58,7 +49,7 @@ export const PaymentMethodDetails = ({ data: employeeData, refetch }) => {
             <div
               key={method.id}
               className={`border rounded-lg p-4 shadow-sm bg-gray-50 relative ${
-                method.is_primary ? "border-primary" : "border-gray-200"
+                method.is_primary ? 'border-primary' : 'border-gray-200'
               }`}
             >
               {/* actions + badges go together */}
@@ -70,10 +61,7 @@ export const PaymentMethodDetails = ({ data: employeeData, refetch }) => {
                 )}
                 <div className="flex items-center gap-3">
                   <div>
-                    <UpdatePymentMethodInfo
-                      refetchData={refetch}
-                      data={method}
-                    />
+                    <UpdatePymentMethodInfo refetchData={refetch} data={method} />
                   </div>
 
                   <div
@@ -90,30 +78,24 @@ export const PaymentMethodDetails = ({ data: employeeData, refetch }) => {
               <p className="text-sm text-gray-600 mb-1">Channel</p>
               <p className="font-medium text-gray-900">{method.method}</p>
 
-              {method.method === "BANK" && (
+              {method.method === 'BANK' && (
                 <>
                   <p className="text-sm text-gray-600 mt-3 mb-1">Bank Name</p>
                   <p className="font-medium text-gray-900">
-                    {method?.bank_name ?? "Not Specified"}
+                    {method?.bank_name ?? 'Not Specified'}
                   </p>
 
-                  <p className="text-sm text-gray-600 mt-3 mb-1">
-                    Account Number
-                  </p>
+                  <p className="text-sm text-gray-600 mt-3 mb-1">Account Number</p>
                   <p className="font-medium text-gray-900 break-all">
-                    {method?.account_number ?? "N/A"}
+                    {method?.account_number ?? 'N/A'}
                   </p>
                 </>
               )}
 
-              {method.method === "MOBILE_MONEY" && (
+              {method.method === 'MOBILE_MONEY' && (
                 <>
-                  <p className="text-sm text-gray-600 mt-3 mb-1">
-                    Mobile Number
-                  </p>
-                  <p className="font-medium text-gray-900">
-                    {method.mobile_number || "N/A"}
-                  </p>
+                  <p className="text-sm text-gray-600 mt-3 mb-1">Mobile Number</p>
+                  <p className="font-medium text-gray-900">{method.mobile_number || 'N/A'}</p>
                 </>
               )}
 

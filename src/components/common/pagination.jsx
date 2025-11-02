@@ -1,13 +1,7 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const Pagination = ({
-  currentPage,
-  totalItems,
-  pageSize,
-  onPageChange,
-  className = "",
-}) => {
+const Pagination = ({ currentPage, totalItems, pageSize, onPageChange, className = '' }) => {
   const navigate = useNavigate();
   const totalPages = Math.ceil(totalItems / pageSize);
 
@@ -39,15 +33,9 @@ const Pagination = ({
       className={`flex flex-col md:flex-row items-center justify-between px-4 py-3 border-t border-gray-200 sm:px-6 ${className}`}
     >
       <div className="text-sm text-gray-700 mb-2 md:mb-0">
-        Showing{" "}
-        <span className="font-medium">
-          {(currentPage - 1) * pageSize + 1}
-        </span>{" "}
-        to{" "}
-        <span className="font-medium">
-          {Math.min(currentPage * pageSize, totalItems)}
-        </span>{" "}
-        of <span className="font-medium">{totalItems}</span> results
+        Showing <span className="font-medium">{(currentPage - 1) * pageSize + 1}</span> to{' '}
+        <span className="font-medium">{Math.min(currentPage * pageSize, totalItems)}</span> of{' '}
+        <span className="font-medium">{totalItems}</span> results
       </div>
       <div className="flex flex-wrap items-center justify-center gap-1">
         <button
@@ -55,8 +43,8 @@ const Pagination = ({
           disabled={currentPage === 1}
           className={`px-2 py-1 text-sm rounded-md ${
             currentPage === 1
-              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-              : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-300"
+              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+              : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
           }`}
         >
           Previous
@@ -71,8 +59,8 @@ const Pagination = ({
               onClick={() => handlePageChange(page)}
               className={`min-w-[32px] px-2 py-1 text-sm rounded-md ${
                 currentPage === page
-                  ? "bg-primary text-white"
-                  : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-300"
+                  ? 'bg-primary text-white'
+                  : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
               }`}
             >
               {page}
@@ -85,8 +73,8 @@ const Pagination = ({
           disabled={currentPage >= totalPages}
           className={`px-2 py-1 text-sm rounded-md ${
             currentPage >= totalPages
-              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-              : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-300"
+              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+              : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
           }`}
         >
           Next

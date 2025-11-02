@@ -1,14 +1,13 @@
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { FiUserPlus } from 'react-icons/fi';
+import { IoCloseOutline } from 'react-icons/io5';
+import { toast } from 'react-toastify';
+import { createRoleSchema } from '../../schemas/roleSchema';
+import SubmitSpinner from '../common/spinners/submitSpinner';
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { FiUserPlus } from "react-icons/fi";
-import { IoCloseOutline } from "react-icons/io5";
-import { toast } from "react-toastify";
-import { createRoleSchema } from "../../schemas/roleSchema";
-import SubmitSpinner from "../common/spinners/submitSpinner";
-
-import { useCreateRoleMutation } from "../../store/services/roles/rolesService";
+import { useCreateRoleMutation } from '../../store/services/roles/rolesService';
 export const CreateRole = ({ refetchData }) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -26,18 +25,18 @@ export const CreateRole = ({ refetchData }) => {
   const onSubmit = async (formData) => {
     try {
       await createRole(formData).unwrap();
-      toast.success("Role created successfully!");
+      toast.success('Role created successfully!');
       handleCloseModal();
-       refetchData();
+      refetchData();
     } catch (error) {
-      console.error("Error:", error);
+      console.error('Error:', error);
       if (error && error.data && error.data.error) {
         toast.error(error.data.error);
       } else {
-        toast.error("An error occurred. Please try again.");
+        toast.error('An error occurred. Please try again.');
       }
-    }finally {
-        refetchData();
+    } finally {
+      refetchData();
     }
   };
 
@@ -78,20 +77,11 @@ export const CreateRole = ({ refetchData }) => {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="sticky top-0 bg-white z-40 flex px-4 justify-between items-center py-4">
-                <p className="text-sm md:text-lg lg:text-lg font-semibold">
-                  Add New Role
-                </p>
-                <IoCloseOutline
-                  size={20}
-                  className="cursor-pointer"
-                  onClick={handleCloseModal}
-                />
+                <p className="text-sm md:text-lg lg:text-lg font-semibold">Add New Role</p>
+                <IoCloseOutline size={20} className="cursor-pointer" onClick={handleCloseModal} />
               </div>
 
-              <form
-                onSubmit={handleSubmit(onSubmit)}
-                className="space-y-4 p-4"
-              >
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 p-4">
                 {/* Name */}
                 <div>
                   <label className="block text-sm font-medium mb-2">
@@ -100,30 +90,22 @@ export const CreateRole = ({ refetchData }) => {
                   <input
                     type="text"
                     placeholder="E.g. HR"
-                    {...register("name")}
+                    {...register('name')}
                     className="w-full py-2 px-4 rounded-md border border-gray-400 focus:outline-none focus:border-[#1E9FF2] focus:bg-white placeholder:text-sm"
                   />
-                  {errors.name && (
-                    <p className="text-red-500 text-sm">
-                      {errors.name.message}
-                    </p>
-                  )}
+                  {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
                 </div>
 
                 {/* Description */}
                 <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Description
-                  </label>
+                  <label className="block text-sm font-medium mb-2">Description</label>
                   <textarea
                     placeholder="Description here..."
-                    {...register("description")}
+                    {...register('description')}
                     className="w-full py-2 px-4 rounded-md border border-gray-400 focus:outline-none focus:border-[#1E9FF2] focus:bg-white placeholder:text-sm"
                   />
                   {errors.description && (
-                    <p className="text-red-500 text-sm">
-                      {errors.description.message}
-                    </p>
+                    <p className="text-red-500 text-sm">{errors.description.message}</p>
                   )}
                 </div>
 
@@ -147,7 +129,7 @@ export const CreateRole = ({ refetchData }) => {
                         <span>Submitting...</span>
                       </span>
                     ) : (
-                      "Submit"
+                      'Submit'
                     )}
                   </button>
                 </div>
