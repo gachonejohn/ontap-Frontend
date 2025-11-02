@@ -1,126 +1,191 @@
-import { CreateBreak } from '@components/attendance/breaks/CreateBreak';
-import { useGetEmployeeBreaksQuery } from '@store/services/policies/policyService';
-import { useState } from 'react';
-import Countdown from 'react-countdown';
-import { FiClock } from 'react-icons/fi';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import LeaveModal from '../../dashboards/employee/components/LeaveModal';
+// src/components/leaves/EmployeeLeavesDashboardContent.jsx
+import React, { useState, useEffect, useMemo, useRef } from "react";
+import { toast } from "react-toastify";
+import ApplyLeave from "./ApplyLeave";
+import ApplySpecialLeave from "./ApplySpecialLeave";
+import LeaveDetailsModal from "./LeaveDetails";
 import {
-  useCheckInMutation,
-  useCheckOutMutation,
-  useGetTodayAttendaceQuery,
-} from '../../store/services/attendance/attendanceService';
-import { formatClockTime, formatHoursWorked } from '../../utils/dates';
-import ActionModal from '../common/Modals/ActionModal';
-import { isBreakActive } from '@utils/isBreakActive';
+  useGetLeavePoliciesQuery,
+  useGetLeaveRequestsQuery,
+} from "@store/services/leaves/leaveService";
+import { CustomDate } from "../../utils/dates";
+import ContentSpinner from "@components/common/spinners/dataLoadingSpinner";
+import NoDataFound from "@components/common/NoData";
+import { PAGE_SIZE } from "@constants/constants";
 
-const EmployLeaveDashboardContent = () => {
+const EmployeeLeavesDashboardContent = () => {
   const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('leaveManagement');
-  const [modalType, setModalType] = useState('');
-  const navigate = useNavigate();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedItem, setSelectedItem] = useState(null);
+  const [isSpecialLeaveModalOpen, setIsSpecialLeaveModalOpen] = useState(false);
+  const [isLeaveDetailsModalOpen, setIsLeaveDetailsModalOpen] = useState(false);
+  const [selectedLeaveId, setSelectedLeaveId] = useState(null);
+  const [activeTab, setActiveTab] = useState("leaveManagement");
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [allLeaveRequests, setAllLeaveRequests] = useState([]);
+  const [hasMore, setHasMore] = useState(true);
+  const observerTarget = useRef(null);
+
+  const [policiesPage, setPoliciesPage] = useState(1);
+  const [allPolicies, setAllPolicies] = useState([]);
+  const [hasMorePolicies, setHasMorePolicies] = useState(true);
+
+  const policiesQueryParams = useMemo(
+    () => ({
+      page: policiesPage,
+      page_size: PAGE_SIZE,
+    }),
+    [policiesPage]
+  );
+
   const {
-    data: attendanceData,
-    isLoading: loadingData,
-    error,
+    data: policiesData,
+    isLoading: loadingPolicies,
+    isFetching: isFetchingPolicies,
+    error: policiesError,
+  } = useGetLeavePoliciesQuery(policiesQueryParams);
+
+  useEffect(() => {
+    if (policiesData?.results) {
+      if (policiesPage === 1) {
+        setAllPolicies(policiesData.results);
+      } else {
+        setAllPolicies(prev => {
+          const newPolicies = policiesData.results.filter(
+            newPolicy => !prev.some(existingPolicy => existingPolicy.id === newPolicy.id)
+          );
+          return [...prev, ...newPolicies];
+        });
+      }
+      
+      setHasMorePolicies(policiesData.next !== null);
+    }
+  }, [policiesData, policiesPage]);
+
+  const queryParams = useMemo(
+    () => ({
+      page: currentPage,
+      page_size: PAGE_SIZE,
+    }),
+    [currentPage]
+  );
+
+  const {
+    data: leaveRequestsData,
     refetch,
-  } = useGetTodayAttendaceQuery({}, { refetchOnMountOrArgChange: true });
+    isFetching,
+    isLoading: loadingLeaveRequests,
+  } = useGetLeaveRequestsQuery(queryParams);
 
-  const {
-    data: breakData,
-    isLoading: loadingBreakData,
-    error: breakError,
-    refetch: refetchBreak,
-  } = useGetEmployeeBreaksQuery({}, { refetchOnMountOrArgChange: true });
+  useEffect(() => {
+    if (leaveRequestsData?.results) {
+      if (currentPage === 1) {
+        setAllLeaveRequests(leaveRequestsData.results);
+      } else {
+        setAllLeaveRequests(prev => {
+          const newRequests = leaveRequestsData.results.filter(
+            newRequest => !prev.some(existingRequest => existingRequest.id === newRequest.id)
+          );
+          return [...prev, ...newRequests];
+        });
+      }
+      
+      setHasMore(leaveRequestsData.next !== null);
+    }
+  }, [leaveRequestsData, currentPage]);
 
-  const [checkIn, { isLoading: isClockingIn }] = useCheckInMutation();
-  const [checkOut, { isLoading: isClockingOut }] = useCheckOutMutation();
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting && hasMore && !isFetching) {
+          setCurrentPage(prev => prev + 1);
+        }
+      },
+      { threshold: 0.1 }
+    );
 
-  const [isNavigating, setIsNavigating] = useState(false);
-  console.log('attendanceData', attendanceData);
-  console.log('breakData', breakData);
-  const clockIn = attendanceData?.clock_in;
-  const clockOut = attendanceData?.clock_out;
+    const currentTarget = observerTarget.current;
+    if (currentTarget) {
+      observer.observe(currentTarget);
+    }
 
-  const openClockInModal = () => {
-    setModalType('clockIn');
-    setIsModalOpen(true);
+    return () => {
+      if (currentTarget) {
+        observer.unobserve(currentTarget);
+      }
+    };
+  }, [hasMore, isFetching]);
+
+  const totalLeaveRequestsCount = leaveRequestsData?.count || allLeaveRequests.length;
+
+  const handleOpenLeaveDetails = (leaveId) => {
+    setSelectedLeaveId(leaveId);
+    setIsLeaveDetailsModalOpen(true);
   };
-  console.log('breakData', breakData);
-  const openClockOutModal = (id) => {
-    console.log('Clicked ID:', id);
-    setSelectedItem(id);
-    setModalType('clockOut');
-    setIsModalOpen(true);
+
+  const getStatusColor = (status) => {
+    switch (status?.toLowerCase()) {
+      case 'pending':
+        return 'bg-teal-500';
+      case 'approved':
+        return 'bg-green-600';
+      case 'declined':
+      case 'rejected':
+        return 'bg-red-600';
+      case 'cancelled':
+        return 'bg-gray-500';
+      default:
+        return 'bg-gray-500';
+    }
   };
 
-  const closeModal = () => {
-    setIsModalOpen(false);
+  const getStatusIcon = (status) => {
+    switch (status?.toLowerCase()) {
+      case 'approved':
+        return '/images/approveleave.png';
+      case 'declined':
+      case 'rejected':
+        return '/images/declineleave.png';
+      default:
+        return null;
+    }
   };
-  const refetchInfo = () => {
+
+  const calculateUsedDays = (policyId) => {
+    if (!allLeaveRequests) return 0;
+    
+    const usedDays = allLeaveRequests
+      .filter(request => 
+        request.leave_policy === policyId && 
+        request.status?.toUpperCase() === 'APPROVED'
+      )
+      .reduce((total, request) => {
+        return total + (parseFloat(request.days) || 0);
+      }, 0);
+    
+    return usedDays;
+  };
+
+  const calculateRemainingDays = (policy) => {
+    const defaultDays = parseFloat(policy.default_days) || 0;
+    const usedDays = calculateUsedDays(policy.id);
+    const remaining = defaultDays - usedDays;
+    return remaining > 0 ? remaining : 0;
+  };
+
+  const calculateProgressPercentage = (policy) => {
+    const defaultDays = parseFloat(policy.default_days) || 0;
+    if (defaultDays === 0) return 0;
+    
+    const usedDays = calculateUsedDays(policy.id);
+    const percentage = (usedDays / defaultDays) * 100;
+    return Math.min(percentage, 100); 
+  };
+
+  const handleLeaveSuccess = () => {
+    setCurrentPage(1);
+    setAllLeaveRequests([]);
+    setHasMore(true);
     refetch();
-    refetchBreak();
-  };
-  const handleClockIn = async () => {
-    try {
-      const res = await checkIn().unwrap();
-      const msg = res?.message || 'Clocked in successfully!';
-      toast.success(msg);
-
-      setIsNavigating(true);
-      await refetch();
-
-      setTimeout(() => {
-        navigate('/dashboard/tasks');
-      }, 300);
-    } catch (error) {
-      console.log('error', error);
-      if (error && typeof error === 'object' && 'data' in error && error.data) {
-        const errorData = error.data;
-        toast.error(errorData.error || 'Error clocking in!.');
-      } else {
-        toast.error('Unexpected Error occured. Please try again.');
-      }
-      closeModal();
-      setIsNavigating(false);
-    }
-  };
-  const handleCheckOut = async () => {
-    console.log('selectedItem', selectedItem);
-    try {
-      const res = await checkOut(selectedItem).unwrap();
-      const msg = res?.message || 'Clocked out successfully!';
-      toast.success(msg);
-      setSelectedItem(null);
-    } catch (error) {
-      console.log('error', error);
-      if (error && typeof error === 'object' && 'data' in error && error.data) {
-        const errorData = error.data;
-        console.log('errorData', errorData);
-        toast.error(errorData.error || 'Error clocking out!.');
-      } else {
-        toast.error('Unexpected Error occured. Please try again.');
-      }
-    } finally {
-      closeModal();
-      refetch();
-    }
-  };
-  const calculateBreakEndTime = (breakEndTime) => {
-    // breakEndTime: e.g. "16:15:00"
-    const [hours, minutes, seconds] = breakEndTime.split(':').map(Number);
-
-    const now = new Date();
-    const end = new Date(now);
-    end.setHours(hours, minutes, seconds, 0);
-
-    // If end time is already passed (e.g., API from earlier), return now
-    if (end < now) return now;
-
-    return end;
   };
 
   return (
@@ -128,217 +193,124 @@ const EmployLeaveDashboardContent = () => {
       {/* Leave Header */}
       <div className="flex flex-row justify-between items-center">
         <div className="flex flex-col">
-          <div className="text-lg text-neutral-900 font-semibold">Leave & Attendance</div>
+          <div className="text-lg text-neutral-900 font-semibold">
+            Leave Management
+          </div>
           <div className="text-sm text-gray-600 font-normal">
-            Manage your leave requests and track attendance
+            Track and apply for your leave
           </div>
         </div>
-        <div
-          className="flex justify-center items-center rounded-md w-[180px] h-12 bg-teal-500 cursor-pointer hover:bg-teal-600 transition-colors"
-          onClick={() => setIsLeaveModalOpen(true)}
-        >
-          <div className="flex flex-row items-center gap-2">
-            <div className="flex justify-center items-center w-5 h-5">
-              <img
-                width="15.4px"
-                height="15.3px"
-                src="/images/addtask.png"
-                alt="Apply Leave icon"
-              />
+        <div className="flex flex-row items-center gap-3">
+          <div 
+            className="flex justify-center items-center rounded-md w-40 h-12 bg-orange-400 cursor-pointer hover:bg-orange-500 transition-colors"
+            onClick={() => setIsSpecialLeaveModalOpen(true)}
+          >
+            <div className="flex flex-row items-center gap-2">
+              <div className="flex justify-center items-center w-5 h-5">
+                <img
+                  width="20px"
+                  height="20px"
+                  src="/images/Addleave.png"
+                  alt="Special Leave icon"
+                />
+              </div>
+              <div className="text-sm text-white font-medium">
+                Special Leave
+              </div>
             </div>
-            <div className="text-sm text-white font-medium">Apply for Leave</div>
+          </div>
+          <div
+            className="flex justify-center items-center rounded-md w-40 h-12 bg-teal-500 cursor-pointer hover:bg-teal-600 transition-colors"
+            onClick={() => setIsLeaveModalOpen(true)}
+          >
+            <div className="flex flex-row items-center gap-2">
+              <div className="flex justify-center items-center w-5 h-5">
+                <img
+                  width="20px"
+                  height="20px"
+                  src="/images/Addleave.png"
+                  alt="Apply Leave icon"
+                />
+              </div>
+              <div className="text-sm text-white font-medium">
+                Apply for Leave
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Status Cards */}
-      <div className="grid grid-cols-4 gap-4 w-full items-center">
-        {/* Today's Status with Sticker */}
-        <div
-          className="relative flex items-center p-4 rounded-xl min-h-[120px]  shadow-sm
-         text-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-md overflow-hidden"
-        >
-          {/* Sticker Image as Background */}
-          <img
-            src="/images/card1.png"
-            alt="Sticker background"
-            className="absolute inset-0 w-full h-full object-cover rounded-xl z-0"
-          />
-
-          {/* Content */}
-          <div className="flex flex-col justify-center h-full w-full relative z-10">
-            {/* Status Text & Clock Icon */}
-            <div className="flex flex-row justify-between items-center w-full">
-              <div className="flex flex-col">
-                <div className="text-sm font-medium">Today's Status</div>
-                <div className="text-lg font-semibold">
-                  {clockIn ? `Clocked In: ${formatClockTime(clockIn)}` : 'Not clocked In'}
+      {/* Status Cards - Dynamic from Backend with Pagination */}
+      {loadingPolicies && policiesPage === 1 ? (
+        <div className="flex justify-center items-center py-12">
+          <ContentSpinner />
+        </div>
+      ) : policiesError ? (
+        <div className="bg-red-50 p-4 rounded-md text-red-800 text-center">
+          Error loading leave policies
+        </div>
+      ) : (
+        <div className="grid grid-cols-4 gap-4 w-full items-center">
+          {allPolicies && allPolicies.map((policy) => {
+            const usedDays = calculateUsedDays(policy.id);
+            const remainingDays = calculateRemainingDays(policy);
+            const progressPercentage = calculateProgressPercentage(policy);
+            
+            return (
+              <div key={policy.id} className="flex flex-col justify-start items-start gap-4 p-4 rounded-xl min-h-[121px] shadow-sm bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
+                <div className="flex flex-row justify-between items-start w-full h-5">
+                  <div className="font-inter text-sm whitespace-nowrap text-neutral-900 text-opacity-100 leading-snug tracking-normal font-medium">
+                    {policy.name}
+                  </div>
+                  <div className="flex flex-col justify-start items-start gap-2.5 p-1 rounded border border-neutral-200 h-5 overflow-hidden">
+                    <div className="flex flex-row justify-center items-center gap-1 h-4">
+                      <div className="font-inter text-xs whitespace-nowrap text-neutral-900 text-opacity-100 leading-snug tracking-normal font-semibold">
+                        {policy.default_days}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex flex-col justify-start items-start gap-1.5 w-full h-[53px]">
+                  <div className="flex flex-row justify-between items-center w-full h-4">
+                    <div className="font-inter text-xs whitespace-nowrap text-gray-600 text-opacity-100 leading-tight font-medium">
+                      Used days
+                    </div>
+                    <div className="font-inter text-xs whitespace-nowrap text-neutral-900 text-opacity-100 leading-tight font-medium">
+                      {usedDays} days
+                    </div>
+                  </div>
+                  <div className="w-full h-2 bg-gray-200 rounded-full">
+                    <div 
+                      className="h-full bg-teal-500 rounded-full transition-all duration-300" 
+                      style={{ width: `${progressPercentage}%` }}
+                    ></div>
+                  </div>
+                  <div className="flex flex-row justify-between items-center w-full h-3.5">
+                    <div className="font-inter text-xs whitespace-nowrap text-gray-600 text-opacity-100 leading-tight font-medium">
+                      Remaining
+                    </div>
+                    <div className="font-inter text-xs whitespace-nowrap text-teal-500 text-opacity-100 leading-tight font-medium">
+                      {remainingDays} days
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div className="flex items-center justify-center p-1 rounded-2xl h-8 w-8  shadow-md">
-                {/* <img
-                  width="23"
-                  height="23"
-                  src="/images/clock.png"
-                  alt="Clock Icon"
-                /> */}
-                <FiClock className="w-5 h-5 text-white" />
-              </div>
-            </div>
-          </div>
+            );
+          })}
         </div>
-
-        {/* Hours Today Card */}
-        <div
-          className="flex flex-col justify-between p-4 rounded-xl min-h-[120px]  shadow-sm
-         bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-md"
-        >
-          <div className="flex justify-between items-center">
-            <div className="text-sm text-gray-600 font-medium">Hours Today</div>
-            <div className="flex items-center justify-center p-1 rounded-2xl h-8 w-8 bg-blue-100 shadow-sm">
-              <img width="20px" height="18px" src="/images/payday.png" alt="Payday icon" />
-            </div>
-          </div>
-          <div className="text-lg text-neutral-900 font-semibold">
-            {formatHoursWorked(attendanceData?.hours_worked)}
-          </div>
-        </div>
-
-        {/* Status Card */}
-        <div
-          className="flex flex-col justify-between p-4 rounded-xl min-h-[120px]  shadow-sm
-         bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-md"
-        >
-          <div className="flex justify-between items-center">
-            <div className="text-sm text-gray-600 font-medium">Status</div>
-            <div className="flex items-center justify-center p-1 rounded-2xl h-8 w-8 bg-green-100 shadow-sm">
-              <img width="20px" height="18px" src="/images/greenclock.png" alt="Status icon" />
-            </div>
-          </div>
-          <div className="text-lg text-teal-500 font-semibold">
-            {attendanceData?.status || 'Unknown'}
-          </div>
-        </div>
-
-        {/* Clock Out Button */}
-        {/* <div className="flex justify-center items-center">
-     
-          {!clockIn ? (
-            <button
-              onClick={openClockInModal}
-              className="flex justify-center items-center rounded-md w-[260px] h-[60px] bg-primary cursor-pointer hover:bg-primary-600 transition-colors text-white shadow-md"
-            >
-              Clock In
-            </button>
-          ) : clockIn && !attendanceData.clock_out ? (
-
-            <button
-              onClick={() => openClockOutModal(attendanceData.id)}
-              className="flex justify-center items-center rounded-md w-[260px] h-[60px] bg-danger-600 cursor-pointer hover:bg-red-700 transition-colors text-white shadow-md"
-            >
-              Clock Out
-            </button>
-          ) : (
-            <div className="flex flex-col items-center gap-2 bg-amber-50 min-h-[120px]  shadow-sm rounded-xl p-4 border ">
-              <div className="flex items-center gap-2 text-teal-600">
-                <span className="text-base font-medium text-amber-700">
-                  Clocked out at
-                </span>
-                <FiClock className="w-5 h-5 text-amber-500" />
-              </div>
-              <span className="text-2xl font-bold text-amber-700">
-                {formatClockTime(attendanceData.clock_out)}
-              </span>
-            </div>
-          )}
-        </div> */}
-        {/* Clock & Break Controls */}
-        <div className="flex flex-col justify-center items-center gap-3">
-          {/* If user hasn't clocked in yet */}
-          {!clockIn ? (
-            <button
-              onClick={openClockInModal}
-              className="w-[260px] h-[60px] bg-primary text-white rounded-md shadow-md hover:bg-primary-600 transition-colors"
-            >
-              Clock In
-            </button>
-          ) : clockIn && !attendanceData.clock_out ? (
-            <>
-              {/* If on break */}
-              {breakData ? (
-                isBreakActive(breakData.break_end) ? (
-                  <div className="flex flex-col items-center gap-2 bg-blue-50 rounded-xl p-4 border shadow-sm">
-                    <div className="text-blue-800 font-semibold">On Break — Ends in:</div>
-
-                    <Countdown
-                      key={breakData.id}
-                      date={
-                        new Date(new Date().setHours(...breakData.break_end.split(':').map(Number)))
-                      }
-                      renderer={({ minutes, seconds, completed }) => {
-                        if (completed) {
-                          return <span className="text-red-600 font-semibold">Break ended</span>;
-                        }
-                        return (
-                          <span className="text-lg font-semibold text-blue-700">
-                            {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
-                          </span>
-                        );
-                      }}
-                    />
-
-                    {/* <button
-        // onClick={handleEndBreak}
-        className="mt-2 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
-      >
-        End Break
-      </button> */}
-                  </div>
-                ) : (
-                  <>
-                    <CreateBreak refetchData={refetchInfo} />
-                    <button
-                      onClick={() => openClockOutModal(attendanceData.id)}
-                      className="w-[150px] h-[50px] text-red-500 rounded-md shadow-md hover:bg-red-100 border border-red-500 transition-colors"
-                    >
-                      Clock Out
-                    </button>
-                  </>
-                )
-              ) : (
-                <>
-                  <CreateBreak refetchData={refetchInfo} />
-                  <button
-                    onClick={() => openClockOutModal(attendanceData.id)}
-                    className="w-[150px] h-[50px] text-red-500 rounded-md shadow-md hover:bg-red-100 border border-red-500 transition-colors"
-                  >
-                    Clock Out
-                  </button>
-                </>
-              )}
-            </>
-          ) : (
-            <div className="flex flex-col items-center gap-2 bg-amber-50 rounded-xl p-4 border shadow-sm">
-              <span className="text-base text-amber-700 font-medium">Clocked out at</span>
-              <span className="text-2xl font-bold text-amber-700">
-                {formatClockTime(attendanceData.clock_out)}
-              </span>
-            </div>
-          )}
-        </div>
-      </div>
+      )}
 
       {/* Tabs */}
       <div className="flex rounded-lg border border-slate-100 h-10 bg-slate-50 overflow-hidden">
         <div
           className={`flex items-center justify-center h-10 w-1/2 cursor-pointer ${
-            activeTab === 'leaveManagement' ? 'bg-white' : ''
+            activeTab === "leaveManagement" ? "bg-white" : ""
           }`}
-          onClick={() => setActiveTab('leaveManagement')}
+          onClick={() => setActiveTab("leaveManagement")}
         >
           <div
             className={`text-xs text-neutral-900 ${
-              activeTab === 'leaveManagement' ? 'font-semibold' : 'font-medium'
+              activeTab === "leaveManagement" ? "font-semibold" : "font-medium"
             }`}
           >
             Leave Management
@@ -346,373 +318,251 @@ const EmployLeaveDashboardContent = () => {
         </div>
         <div
           className={`flex items-center justify-center h-10 w-1/2 cursor-pointer ${
-            activeTab === 'leaveBalance' ? 'bg-white' : ''
+            activeTab === "leaveBalance" ? "bg-white" : ""
           }`}
-          onClick={() => setActiveTab('leaveBalance')}
+          onClick={() => setActiveTab("leaveBalance")}
         >
           <div
             className={`text-xs text-neutral-900 ${
-              activeTab === 'leaveBalance' ? 'font-semibold' : 'font-medium'
+              activeTab === "leaveBalance" ? "font-semibold" : "font-medium"
             }`}
           >
-            Leave Balance
+            Leave Policy
           </div>
         </div>
       </div>
 
-      {activeTab === 'leaveManagement' ? (
-        /* Leave Requests Table */
-        <div className="flex flex-col rounded-xl w-full shadow-sm bg-white overflow-hidden">
-          {/* Table Header */}
-          <div className="flex flex-row justify-between items-center p-4 w-full h-20 border-b border-neutral-200">
-            <div className="text-lg text-neutral-900 font-medium">My Leave Requests</div>
-            <div className="flex flex-row justify-center items-center gap-2 p-2 rounded-lg border border-neutral-200 w-[75px] h-11 bg-white cursor-pointer hover:bg-gray-50 transition-colors">
-              <div className="flex items-center gap-1">
-                <div className="flex justify-center items-center h-5">
-                  <img width="16.3px" height="16.3px" src="/images/filter.png" alt="Filter icon" />
+      {activeTab === "leaveManagement" ? (
+        /* Leave Management Content - My Leave Requests */
+        <div className="flex flex-col justify-between items-center rounded-xl border border-neutral-200 w-full bg-white overflow-hidden">
+          <div className="flex flex-row justify-start items-center gap-4 p-4 w-full border-b border-neutral-200">
+            <div className="flex flex-row justify-between items-center gap-12 w-full">
+              <div className="flex flex-row justify-start items-center gap-4">
+                <div className="flex flex-col justify-start items-start gap-1.5">
+                  <div className="font-inter text-lg whitespace-nowrap text-neutral-900 text-opacity-100 leading-snug tracking-normal font-medium">
+                    My Leave Requests
+                  </div>
+                  <div className="font-inter text-sm whitespace-nowrap text-gray-600 text-opacity-100 leading-snug tracking-normal font-normal">
+                    All your leave activities, neatly organized and up to date
+                  </div>
                 </div>
-                <div className="text-xs text-neutral-900 font-semibold">Filter</div>
               </div>
             </div>
           </div>
-
-          {/* Table Content */}
-          <div className="w-full overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="bg-slate-50">
-                  <th className="p-4 text-xs text-gray-500 font-medium text-left">Type</th>
-                  <th className="p-4 text-xs text-gray-500 font-medium text-left">Duration</th>
-                  <th className="p-4 text-xs text-gray-500 font-medium text-left">Days</th>
-                  <th className="p-4 text-xs text-gray-500 font-medium text-left">Status</th>
-                  <th className="p-4 text-xs text-gray-500 font-medium text-left">Applied On</th>
-                  <th className="p-4 text-xs text-gray-500 font-medium text-left">Approver</th>
-                  <th className="p-4 text-xs text-gray-500 font-medium text-left">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {/* Row 1 - Annual Leave */}
-                <tr className="border-b border-neutral-200">
-                  <td className="p-4">
-                    <div className="flex justify-center items-center gap-2.5 py-1 px-5 rounded-lg h-9 bg-blue-50 min-w-[90px]">
-                      <div className="text-xs text-blue-900 font-medium">Annual Leave</div>
-                    </div>
-                  </td>
-                  <td className="p-4">
-                    <div className="text-xs text-gray-800 font-normal">
-                      <span className="font-medium">2025-08-25</span> to 2025-09-10
-                    </div>
-                  </td>
-                  <td className="p-4">
-                    <div className="text-sm text-gray-800 font-medium">15</div>
-                  </td>
-                  <td className="p-4">
-                    <div className="flex justify-center items-center gap-2.5 py-1 px-5 rounded-lg w-[90px] h-9 bg-yellow-100">
-                      <div className="flex items-center gap-1">
-                        <div className="flex justify-center items-center w-4 h-4">
-                          <img
-                            width="16"
-                            height="16"
-                            src="/images/pending.png"
-                            alt="Pending icon"
-                            className="w-full h-full object-contain"
-                          />
+          
+          {/* Leave Requests Content */}
+          {isFetching && allLeaveRequests.length === 0 ? (
+            <div className="flex justify-center items-center py-12 w-full">
+              <ContentSpinner />
+            </div>
+          ) : allLeaveRequests && allLeaveRequests.length > 0 ? (
+            <>
+              <div className="flex flex-col justify-start items-center gap-5 p-4 w-full">
+                <div className="grid grid-cols-2 gap-6 w-full">
+                  {allLeaveRequests.map((request) => (
+                    <div key={request.id} className="flex flex-col justify-start items-start rounded-xl border border-neutral-200 bg-white overflow-hidden">
+                      <div className="flex flex-col justify-center items-center gap-4 p-6 w-full">
+                        <div className="flex flex-row justify-between items-center w-full">
+                          <div className="flex flex-row justify-center items-center gap-2.5 py-1 px-5 rounded-lg border border-blue-200 h-9 bg-blue-100">
+                            <div className="font-inter text-xs whitespace-nowrap text-blue-800 text-opacity-100 leading-snug tracking-normal font-medium">
+                              {request.leave_type_name || request.leave_policy_name || 'Leave'}
+                            </div>
+                          </div>
+                          {request.status?.toLowerCase() !== 'pending' && (
+                            <div 
+                              className="gap-2 flex flex-row justify-center items-center w-9 h-8 rounded-md border border-neutral-200 bg-white cursor-pointer hover:bg-gray-50 transition-colors"
+                              onClick={() => handleOpenLeaveDetails(request.id)}
+                            >
+                              <img
+                                width="18px"
+                                height="18px"
+                                src="/images/viewleave.png"
+                                alt="View icon"
+                              />
+                            </div>
+                          )}
                         </div>
-                        <div className="text-xs text-yellow-800 font-medium">Pending</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="p-4">
-                    <div className="text-xs text-gray-800 font-medium">2025-08-10</div>
-                  </td>
-                  <td className="p-4">
-                    <div className="text-xs text-gray-800 font-medium">HR</div>
-                  </td>
-                  <td className="p-4">
-                    <div className="flex gap-2">
-                      <div className="flex justify-center items-center gap-2.5 py-1 px-5 rounded-lg border border-neutral-200 h-9 min-w-[90px] cursor-pointer hover:bg-gray-50 transition-colors">
-                        <div className="text-xs text-gray-800 font-medium">View</div>
-                      </div>
-                      <div className="flex justify-center items-center gap-2.5 py-1 px-5 rounded-lg border border-neutral-200 h-9 min-w-[90px] cursor-pointer hover:bg-gray-50 transition-colors">
-                        <div className="text-xs text-red-600 font-medium">Cancel</div>
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-
-                {/* Row 2 - Sick Leave */}
-                <tr className="border-b border-neutral-200">
-                  <td className="p-4">
-                    <div className="flex justify-center items-center gap-2.5 py-1 px-5 rounded-lg h-9 bg-orange-50 min-w-[90px]">
-                      <div className="text-xs text-yellow-800 font-medium">Sick Leave</div>
-                    </div>
-                  </td>
-                  <td className="p-4">
-                    <div className="text-xs text-gray-800 font-normal">
-                      <span className="font-medium">2025-08-25</span> to 2025-09-10
-                    </div>
-                  </td>
-                  <td className="p-4">
-                    <div className="text-sm text-gray-800 font-medium">2</div>
-                  </td>
-                  <td className="p-4">
-                    <div className="flex justify-center items-center gap-2.5 py-1 px-5 rounded-lg w-[90px] h-9 bg-green-100">
-                      <div className="flex items-center gap-1">
-                        <div className="flex justify-center items-center w-4 h-4">
-                          <img
-                            width="16"
-                            height="16"
-                            src="/images/approved.png"
-                            alt="Approved icon"
-                            className="w-full h-full object-contain"
-                          />
+                        
+                        <div className="flex flex-col justify-start items-start p-3 rounded-lg w-full bg-gray-50">
+                          <div className="flex flex-row justify-start items-center gap-2 w-full">
+                            <img
+                              width="16px"
+                              height="16px"
+                              src="/images/leavecalendar.png"
+                              alt="Calendar icon"
+                            />
+                            <div className="flex justify-between items-center w-full">
+                              <div className="font-inter text-sm whitespace-nowrap text-gray-700 text-opacity-100 leading-5 tracking-normal font-normal">
+                                {CustomDate(request.start_date)} - {CustomDate(request.end_date)}
+                              </div>
+                              <div className="font-inter text-sm whitespace-nowrap text-teal-500 text-opacity-100 leading-5 tracking-normal font-normal">
+                                ({parseFloat(request.days) || 0} days)
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                        <div className="text-xs text-green-800 font-medium">Approved</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="p-4">
-                    <div className="text-xs text-gray-800 font-medium">2025-08-10</div>
-                  </td>
-                  <td className="p-4">
-                    <div className="text-xs text-gray-800 font-medium">HR</div>
-                  </td>
-                  <td className="p-4">
-                    <div className="flex gap-2">
-                      <div className="flex justify-center items-center gap-2.5 py-1 px-5 rounded-lg border border-neutral-200 h-9 min-w-[90px] cursor-pointer hover:bg-gray-50 transition-colors">
-                        <div className="text-xs text-gray-800 font-medium">View</div>
-                      </div>
-                    </div>
-                  </td>
-                </tr>
 
-                {/* Row 3 - Personal Leave */}
-                <tr>
-                  <td className="p-4">
-                    <div className="flex justify-center items-center gap-2.5 py-1 px-5 rounded-lg h-9 bg-purple-50 min-w-[90px]">
-                      <div className="text-xs text-purple-900 font-medium">Personal Leave</div>
-                    </div>
-                  </td>
-                  <td className="p-4">
-                    <div className="text-xs text-gray-800 font-normal">
-                      <span className="font-medium">2025-08-25</span> to 2025-09-10
-                    </div>
-                  </td>
-                  <td className="p-4">
-                    <div className="text-sm text-gray-800 font-medium">2</div>
-                  </td>
-                  <td className="p-4">
-                    <div className="flex justify-center items-center gap-2.5 py-1 px-5 rounded-lg w-[90px] h-9 bg-red-100">
-                      <div className="flex items-center gap-1">
-                        <div className="flex justify-center items-center w-4 h-4">
-                          <img
-                            width="16"
-                            height="16"
-                            src="/images/denied.png"
-                            alt="Denied icon"
-                            className="w-full h-full object-contain"
-                          />
+                        <div className="flex flex-col justify-start items-start gap-1 w-full">
+                          <div className="flex justify-start items-center w-full">
+                            <div className="font-inter text-sm whitespace-nowrap text-gray-700 text-opacity-100 leading-5 tracking-normal font-medium">
+                              Reason:
+                            </div>
+                          </div>
+                          <div className="flex justify-start items-center w-full">
+                            <div className="font-inter text-sm whitespace-nowrap text-gray-600 text-opacity-100 leading-5 tracking-normal font-normal">
+                              {request.reason || 'No reason provided'}
+                            </div>
+                          </div>
                         </div>
-                        <div className="text-xs text-orange-800 font-medium">Denied</div>
+
+                        <div className="flex flex-col justify-start items-start gap-3 pt-4 border-t border-neutral-200 w-full">
+                          <div className="flex justify-start items-center w-full">
+                            <div className="font-inter text-xs whitespace-nowrap text-gray-500 text-opacity-100 leading-4 font-normal">
+                              Submitted on {CustomDate(request.created_at)}
+                            </div>
+                          </div>
+                          <div className={`flex justify-center items-center rounded-lg w-full h-8 ${getStatusColor(request.status)}`}>
+                            <div className="flex flex-row justify-center items-center gap-1">
+                              {getStatusIcon(request.status) && (
+                                <div className="flex flex-col justify-center items-center h-4">
+                                  <img
+                                    width="13.5px"
+                                    height="9.8px"
+                                    src={getStatusIcon(request.status)}
+                                    alt="Status icon"
+                                  />
+                                </div>
+                              )}
+                              <div className="font-inter text-sm whitespace-nowrap text-white text-opacity-100 leading-5 tracking-normal font-medium">
+                                {request.status?.charAt(0).toUpperCase() + request.status?.slice(1).toLowerCase()}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </td>
-                  <td className="p-4">
-                    <div className="text-xs text-gray-800 font-medium">2025-08-10</div>
-                  </td>
-                  <td className="p-4">
-                    <div className="text-xs text-gray-800 font-medium">HR</div>
-                  </td>
-                  <td className="p-4">
-                    <div className="flex gap-2">
-                      <div className="flex justify-center items-center gap-2.5 py-1 px-5 rounded-lg border border-neutral-200 h-9 min-w-[90px] cursor-pointer hover:bg-gray-50 transition-colors">
-                        <div className="text-xs text-gray-800 font-medium">View</div>
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Infinite Scroll Observer Target */}
+              <div 
+                ref={observerTarget} 
+                className="w-full h-10 flex items-center justify-center"
+              >
+                {isFetching && hasMore && (
+                  <div className="text-sm text-gray-500 py-4">Loading more leave requests...</div>
+                )}
+              </div>
+            </>
+          ) : (
+            <div className="w-full">
+              <NoDataFound message="No leave requests found. Start by applying for leave!" />
+            </div>
+          )}
         </div>
       ) : (
-        /* Leave Balance Content */
-        <div className="flex flex-col justify-between items-center gap-6 w-full">
-          {/* Leave Balance Cards */}
-          <div className="flex flex-row justify-between items-center gap-3 w-full h-[123px]">
-            <div className="flex flex-col justify-between p-4 rounded-xl w-64 h-[121px] shadow-lg bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl">
-              <div className="flex justify-between items-center">
-                <div className="text-sm text-gray-600 font-medium">Annual Leave</div>
-                <div className="flex flex-col justify-start items-start gap-2.5 p-1 rounded border border-neutral-200 h-5 overflow-hidden">
-                  <div className="flex flex-row justify-center items-center gap-1 h-4">
-                    <div className="text-xs text-neutral-900 font-semibold">8/25</div>
-                  </div>
+        /* Leave Balance Content - Leave Policy */
+        <div className="flex flex-col justify-between items-center rounded-xl border border-neutral-200 w-full bg-white">
+          <div className="flex flex-row justify-start items-center gap-4 p-4 w-full border-b border-neutral-200">
+            <div className="flex flex-row justify-start items-center gap-4">
+              <div className="flex flex-col justify-start items-start gap-1.5">
+                <div className="font-inter text-lg whitespace-nowrap text-neutral-900 text-opacity-100 leading-snug tracking-normal font-medium">
+                  Leave Policy
                 </div>
-              </div>
-              <div className="flex flex-col justify-start items-start gap-1.5 h-[53px] w-full">
-                <div className="flex flex-row justify-between items-center w-full h-4">
-                  <div className="text-xs text-gray-600 font-medium">Used</div>
-                  <div className="text-xs text-neutral-900 font-medium">8 days</div>
-                </div>
-                <div className="w-full h-2 bg-gray-200 rounded-full">
-                  <div className="h-full bg-blue-500 rounded-full" style={{ width: '32%' }}></div>
-                </div>
-                <div className="flex flex-row justify-between items-center w-full h-3.5">
-                  <div className="text-xs text-gray-600 font-medium">Remaining</div>
-                  <div className="text-xs text-teal-500 font-medium">17 days</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex flex-col justify-between p-4 rounded-xl w-64 h-[121px] shadow-lg bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl">
-              <div className="flex justify-between items-center">
-                <div className="text-sm text-gray-600 font-medium">Sick Leave</div>
-                <div className="flex flex-col justify-start items-start gap-2.5 p-1 rounded border border-neutral-200 h-5 overflow-hidden">
-                  <div className="flex flex-row justify-center items-center gap-1 h-4">
-                    <div className="text-xs text-neutral-900 font-semibold">3/10</div>
-                  </div>
-                </div>
-              </div>
-              <div className="flex flex-col justify-start items-start gap-1.5 h-[53px] w-full">
-                <div className="flex flex-row justify-between items-center w-full h-4">
-                  <div className="text-xs text-gray-600 font-medium">Used</div>
-                  <div className="text-xs text-neutral-900 font-medium">3 days</div>
-                </div>
-                <div className="w-full h-2 bg-gray-200 rounded-full">
-                  <div className="h-full bg-green-500 rounded-full" style={{ width: '30%' }}></div>
-                </div>
-                <div className="flex flex-row justify-between items-center w-full h-3.5">
-                  <div className="text-xs text-gray-600 font-medium">Remaining</div>
-                  <div className="text-xs text-teal-500 font-medium">7 days</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex flex-col justify-between p-4 rounded-xl w-64 h-[121px] shadow-lg bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl">
-              <div className="flex justify-between items-center">
-                <div className="text-sm text-gray-600 font-medium">Personal Leave</div>
-                <div className="flex flex-col justify-start items-start gap-2.5 p-1 rounded border border-neutral-200 h-5 overflow-hidden">
-                  <div className="flex flex-row justify-center items-center gap-1 w-8 h-4">
-                    <div className="text-xs text-neutral-900 font-semibold">2/5</div>
-                  </div>
-                </div>
-              </div>
-              <div className="flex flex-col justify-start items-start gap-1.5 h-[53px] w-full">
-                <div className="flex flex-row justify-between items-center w-full h-4">
-                  <div className="text-xs text-gray-600 font-medium">Used</div>
-                  <div className="text-xs text-neutral-900 font-medium">2 days</div>
-                </div>
-                <div className="w-full h-2 bg-gray-200 rounded-full">
-                  <div className="h-full bg-purple-500 rounded-full" style={{ width: '40%' }}></div>
-                </div>
-                <div className="flex flex-row justify-between items-center w-full h-3.5">
-                  <div className="text-xs text-gray-600 font-medium">Remaining</div>
-                  <div className="text-xs text-teal-500 font-medium">3 days</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex flex-col justify-between p-4 rounded-xl w-64 h-[121px] shadow-lg bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl">
-              <div className="flex justify-between items-center">
-                <div className="text-sm text-gray-600 font-medium">Maternity Leave</div>
-                <div className="flex flex-col justify-start items-start gap-2.5 p-1 rounded border border-neutral-200 h-5 overflow-hidden">
-                  <div className="flex flex-row justify-center items-center gap-1 h-4">
-                    <div className="text-xs text-neutral-900 font-semibold">0/90</div>
-                  </div>
-                </div>
-              </div>
-              <div className="flex flex-col justify-start items-start gap-1.5 h-[53px] w-full">
-                <div className="flex flex-row justify-between items-center w-full h-4">
-                  <div className="text-xs text-gray-600 font-medium">Used</div>
-                  <div className="text-xs text-neutral-900 font-medium">0 days</div>
-                </div>
-                <div className="w-full h-2 bg-gray-200 rounded-full">
-                  <div className="h-full bg-pink-500 rounded-full" style={{ width: '0%' }}></div>
-                </div>
-                <div className="flex flex-row justify-between items-center w-full h-3.5">
-                  <div className="text-xs text-gray-600 font-medium">Remaining</div>
-                  <div className="text-xs text-teal-500 font-medium">90 days</div>
+                <div className="font-inter text-sm whitespace-nowrap text-gray-600 text-opacity-100 leading-snug tracking-normal font-normal">
+                  Review the company's official guidelines on leave entitlements and approvals.
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Leave Policy Section */}
-          <div className="flex flex-col justify-start items-start gap-6 h-[334px] w-full">
-            <div className="flex flex-row justify-start items-center gap-4 py-4 h-14 w-full">
-              <div className="text-lg text-neutral-900 font-medium">Leave Policy</div>
+          {loadingPolicies && policiesPage === 1 ? (
+            <div className="flex justify-center items-center py-12 w-full">
+              <ContentSpinner />
             </div>
-            <div className="flex flex-col justify-start items-start gap-4 h-64 w-full">
-              <div className="flex justify-start items-center p-3 rounded-lg w-full h-[74px] bg-blue-50">
-                <div className="flex flex-col justify-start items-start gap-2 w-full">
-                  <div className="text-base text-blue-900 font-medium">Annual leave</div>
-                  <div className="text-xs text-blue-700 font-medium">
-                    You are entitled to 25 days of annual leave per year. Unused leave can be
-                    carried forward to the next year (maximum 5 days).
-                  </div>
-                </div>
-              </div>
-              <div className="flex justify-start items-center p-3 rounded-lg w-full h-[74px] bg-orange-50">
-                <div className="flex flex-col justify-start items-start gap-2 w-full">
-                  <div className="text-base text-yellow-800 font-medium">Sick leave</div>
-                  <div className="text-xs text-orange-700 font-medium">
-                    You can take up to 10 days of sick leave per year. Medical certificate required
-                    for leaves longer than 2 consecutive days.
-                  </div>
-                </div>
-              </div>
-              <div className="flex justify-start items-center p-3 rounded-lg w-full h-[74px] bg-purple-50">
-                <div className="flex flex-col justify-start items-start gap-2 w-full">
-                  <div className="text-base text-purple-900 font-medium">Personal Leave</div>
-                  <div className="text-xs text-purple-700 font-medium">
-                    You are entitled to 5 days of personal leave per year for urgent personal
-                    matters that cannot be scheduled outside work hours.
-                  </div>
-                </div>
-              </div>
+          ) : policiesError ? (
+            <div className="bg-red-50 p-4 rounded-md text-red-800 text-center w-full">
+              Error loading leave policies
             </div>
-          </div>
+          ) : (
+            <div className="flex flex-col justify-start items-start gap-4 p-4 w-full">
+              {allPolicies && allPolicies.map((policy, index) => {
+                const bgColors = [
+                  'bg-blue-50',
+                  'bg-orange-50',
+                  'bg-purple-50',
+                  'bg-green-50',
+                ];
+                const textColors = [
+                  'text-blue-900',
+                  'text-yellow-800',
+                  'text-purple-900',
+                  'text-green-900',
+                ];
+                const borderColors = [
+                  'border-blue-200',
+                  'border-orange-200',
+                  'border-purple-200',
+                  'border-green-200',
+                ];
+                const labelColors = [
+                  'text-blue-700',
+                  'text-orange-700',
+                  'text-purple-700',
+                  'text-green-700',
+                ];
+
+                const colorIndex = index % bgColors.length;
+
+                return (
+                  <div 
+                    key={policy.id}
+                    className={`flex justify-start items-center p-3 rounded-lg w-full ${bgColors[colorIndex]} border ${borderColors[colorIndex]}`}
+                  >
+                    <div className="flex flex-col justify-start items-start gap-2 w-full">
+                      <div className={`font-inter text-base whitespace-nowrap ${textColors[colorIndex]} text-opacity-100 leading-tight font-medium`}>
+                        {policy.name}
+                      </div>
+                      <div className={`font-inter text-xs whitespace-nowrap ${labelColors[colorIndex]} text-opacity-100 leading-snug tracking-normal font-medium`}>
+                        {policy.description}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+              
+              {/* Show loading indicator when fetching more policies */}
+              {isFetchingPolicies && hasMorePolicies && (
+                <div className="flex justify-center items-center py-4 w-full">
+                  <div className="text-sm text-gray-500">Loading more policies...</div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       )}
-      {/* <LogTaskModal
-  isOpen={isTaskModalOpen}
-  onClose={() => setIsTaskModalOpen(false)}
-  onSubmit={onSubmit} 
-  isHR={false} 
-/> */}
-      {/* Leave Modal */}
-      <LeaveModal
+
+      {/* Leave Modals */}
+      <ApplyLeave
         isOpen={isLeaveModalOpen}
         onClose={() => setIsLeaveModalOpen(false)}
-        // onSubmit={handleLeaveSubmit}
+        onSuccess={handleLeaveSuccess}
       />
-      <ActionModal
-        isOpen={isModalOpen}
-        onClose={closeModal}
-        actionType={modalType === 'clockIn' ? 'submit' : 'delete'}
-        onDelete={modalType === 'clockIn' ? handleClockIn : handleCheckOut}
-        isDeleting={isClockingIn || isClockingOut}
-        title={modalType === 'clockIn' ? 'Confirm Clock In' : 'Confirm Clock Out'}
-        confirmationMessage={
-          modalType === 'clockIn'
-            ? 'Are you sure you want to clock in now?'
-            : 'Are you sure you want to clock out now?'
-        }
-        extraInfo={
-          modalType === 'clockOut'
-            ? {
-                pending: attendanceData?.pending_tasks ?? 0,
-                inProgress: attendanceData?.in_progress_tasks ?? 0,
-                link: '/dashboard/tasks',
-                linkText: 'Go to Tasks Dashboard',
-              }
-            : null
-        }
-        deleteMessage="This action will update your attendance records."
-        actionText={modalType === 'clockIn' ? 'Clock In' : 'Clock Out'}
+      
+      <ApplySpecialLeave
+        isOpen={isSpecialLeaveModalOpen}
+        onClose={() => setIsSpecialLeaveModalOpen(false)}
+        onSuccess={handleLeaveSuccess}
+      />
+
+      <LeaveDetailsModal
+        isOpen={isLeaveDetailsModalOpen}
+        onClose={() => setIsLeaveDetailsModalOpen(false)}
+        leaveId={selectedLeaveId}
       />
     </div>
   );
 };
 
-export default EmployLeaveDashboardContent;
+export default EmployeeLeavesDashboardContent;

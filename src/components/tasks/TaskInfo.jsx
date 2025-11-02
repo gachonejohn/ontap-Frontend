@@ -1,31 +1,35 @@
-import React, { useState, useEffect } from 'react';
-import Select from 'react-select';
-import { useGetEmployeesQuery } from '../../store/services/employees/employeesService';
-import { useGetDepartmentsQuery } from '../../store/services/companies/departmentsService';
-import { useAssignTaskMutation } from '../../store/services/tasks/tasksService';
-import { formatDate } from './taskFunctions/dateFormatters';
-import { getAssigneeName, getDepartmentName } from './taskFunctions/taskHelpers';
+import React, { useState, useEffect } from "react";
+import Select from "react-select";
+import { useGetEmployeesQuery } from "../../store/services/employees/employeesService";
+import { useGetDepartmentsQuery } from "../../store/services/companies/departmentsService";
+import { useAssignTaskMutation } from "../../store/services/tasks/tasksService";
+import { formatDate } from "./taskFunctions/dateFormatters";
+import { getAssigneeName, getDepartmentName } from "./taskFunctions/taskHelpers";
 
 const TaskInfo = ({
   task,
   isEditingMode,
-  fieldPermissions,
+  canEdit,
+  canViewAll,
+  isAssignee,
+  isCreator,
   formData,
   onFormDataUpdate,
   currentUser,
 }) => {
-  // Fetch employees and departments based on permissions
-  const { data: employeesData } = useGetEmployeesQuery({}, { skip: !fieldPermissions.canViewAll });
+  const { data: employeesData } = useGetEmployeesQuery(
+    {},
+    { skip: !canViewAll }
+  );
   let employees = employeesData?.results || [];
 
   const { data: departmentsData } = useGetDepartmentsQuery(
     {},
-    { skip: !fieldPermissions.canViewAll, refetchOnMountOrArgChange: true }
+    { skip: !canViewAll, refetchOnMountOrArgChange: true }
   );
   let departments = departmentsData || [];
 
-  // Fallback for limited permissions
-  if (!fieldPermissions.canViewAll && currentUser) {
+  if (!canViewAll && currentUser) {
     employees = [
       {
         id: currentUser.employee_id || currentUser.id,
@@ -46,54 +50,52 @@ const TaskInfo = ({
   }
 
   const priorityMap = {
-    LOW: 'Low',
-    MEDIUM: 'Medium',
-    HIGH: 'High',
-    URGENT: 'Urgent',
+    LOW: "Low",
+    MEDIUM: "Medium",
+    HIGH: "High",
+    URGENT: "Urgent",
   };
 
-  // Assign Task mutation
   const [assignTask, { isLoading: isAssigning }] = useAssignTaskMutation();
 
-  // Local state for reason modal
   const [isReasonPromptOpen, setIsReasonPromptOpen] = useState(false);
   const [pendingAssigneeId, setPendingAssigneeId] = useState(null);
-  const [reasonText, setReasonText] = useState('');
+  const [reasonText, setReasonText] = useState("");
 
-  // Local state for live countdown
-  const [timeRemaining, setTimeRemaining] = useState('');
+  const [timeRemaining, setTimeRemaining] = useState("");
 
-  // Triggered when user selects a new assignee
+  const canEditAssignee = isEditingMode && canEdit;
+  const canEditDepartment = isEditingMode && canEdit && canViewAll;
+  const canEditDueDate = isEditingMode && canEdit;
+
   const handleAssigneeChange = (e) => {
     const newAssigneeId = e.target.value;
-    onFormDataUpdate('assigneeValue', newAssigneeId);
+    onFormDataUpdate("assigneeValue", newAssigneeId);
 
-    if (!newAssigneeId) return; // Unassigned, skip modal
+    if (!newAssigneeId) return; 
     setPendingAssigneeId(newAssigneeId);
     setIsReasonPromptOpen(true);
   };
 
-  // Confirm and send assign_task request
   const confirmReassignment = async () => {
     if (!pendingAssigneeId) return;
     try {
       await assignTask({
         id: task.id,
         assignee: pendingAssigneeId,
-        reason: reasonText || `Reassigned by ${currentUser?.first_name || 'User'}`,
+        reason: reasonText || `Reassigned by ${currentUser?.first_name || "User"}`,
       }).unwrap();
 
-      console.log('✅ Task successfully reassigned');
+      console.log("✅ Task successfully reassigned");
     } catch (error) {
-      console.error('❌ Error reassigning task:', error);
+      console.error("❌ Error reassigning task:", error);
     } finally {
       setIsReasonPromptOpen(false);
-      setReasonText('');
+      setReasonText("");
       setPendingAssigneeId(null);
     }
   };
 
-  // Calculate live countdown
   useEffect(() => {
     if (!task?.due_date) return;
 
@@ -103,7 +105,7 @@ const TaskInfo = ({
       const diff = due - now;
 
       if (diff <= 0) {
-        setTimeRemaining('Expired');
+        setTimeRemaining("Expired");
         return;
       }
 
@@ -112,13 +114,13 @@ const TaskInfo = ({
       const seconds = Math.floor((diff / 1000) % 60);
 
       setTimeRemaining(
-        `${hours.toString().padStart(2, '0')}:${minutes
+        `${hours.toString().padStart(2, "0")}:${minutes
           .toString()
-          .padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+          .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
       );
     };
 
-    updateCountdown(); // initial call
+    updateCountdown(); 
     const intervalId = setInterval(updateCountdown, 1000);
 
     return () => clearInterval(intervalId);
@@ -126,7 +128,7 @@ const TaskInfo = ({
 
   const getDueDateForDisplay = () => {
     const dueDate = task?.due_date || task?.dueDate;
-    return formatDate(dueDate) || 'No due date';
+    return formatDate(dueDate) || "No due date";
   };
 
   return (
@@ -140,8 +142,8 @@ const TaskInfo = ({
           {/* Assignee */}
           <div className="flex flex-row justify-between items-center w-full">
             <div className="text-xs text-gray-600 font-medium">Assignee</div>
-            {isEditingMode && fieldPermissions.canEditAssignee ? (
-              fieldPermissions.canViewAll ? (
+            {canEditAssignee ? (
+              canViewAll ? (
                 <select
                   value={formData.assigneeValue}
                   onChange={handleAssigneeChange}
@@ -170,7 +172,7 @@ const TaskInfo = ({
           {/* Department */}
           <div className="flex flex-row justify-between items-center w-full">
             <div className="text-xs text-gray-600 font-medium">Department</div>
-            {isEditingMode && fieldPermissions.canEditDepartment ? (
+            {canEditDepartment ? (
               <Select
                 options={departments.map((d) => ({
                   value: d.id,
@@ -179,10 +181,14 @@ const TaskInfo = ({
                 value={
                   departments
                     .map((d) => ({ value: d.id, label: d.name }))
-                    .find((opt) => opt.value === formData.departmentValue) || null
+                    .find((opt) => opt.value === formData.departmentValue) ||
+                  null
                 }
                 onChange={(selected) =>
-                  onFormDataUpdate('departmentValue', selected ? selected.value : '')
+                  onFormDataUpdate(
+                    "departmentValue",
+                    selected ? selected.value : ""
+                  )
                 }
                 menuPortalTarget={document.body}
                 menuPlacement="auto"
@@ -190,23 +196,23 @@ const TaskInfo = ({
                   menuPortal: (base) => ({ ...base, zIndex: 9999 }),
                   control: (base) => ({
                     ...base,
-                    minHeight: '28px',
-                    borderColor: '#d1d5db',
-                    borderRadius: '4px',
-                    fontSize: '12px',
-                    '&:hover': { borderColor: '#9ca3af' },
-                    '&:focus-within': {
-                      borderColor: '#14b8a6',
-                      boxShadow: '0 0 0 2px rgba(20,184,166,0.2)',
+                    minHeight: "28px",
+                    borderColor: "#d1d5db",
+                    borderRadius: "4px",
+                    fontSize: "12px",
+                    "&:hover": { borderColor: "#9ca3af" },
+                    "&:focus-within": {
+                      borderColor: "#14b8a6",
+                      boxShadow: "0 0 0 2px rgba(20,184,166,0.2)",
                     },
                   }),
                   dropdownIndicator: (base) => ({
                     ...base,
-                    padding: '4px',
+                    padding: "4px",
                   }),
                   clearIndicator: (base) => ({
                     ...base,
-                    padding: '4px',
+                    padding: "4px",
                   }),
                 }}
                 className="w-32 text-xs"
@@ -229,24 +235,28 @@ const TaskInfo = ({
           {/* Created */}
           <div className="flex flex-row justify-between items-center w-full">
             <div className="text-xs text-gray-600 font-medium">Created</div>
-            <div className="text-xs text-gray-600 font-medium">{formatDate(task?.created_at)}</div>
+            <div className="text-xs text-gray-600 font-medium">
+              {formatDate(task?.created_at)}
+            </div>
           </div>
 
           {/* Due Date with live countdown */}
           <div className="flex flex-row justify-between items-center w-full">
             <div className="text-xs text-gray-600 font-medium">Due Date</div>
-            {isEditingMode && fieldPermissions.canEditDueDate ? (
+            {canEditDueDate ? (
               <input
                 type="date"
                 value={formData.dueDateValue}
-                onChange={(e) => onFormDataUpdate('dueDateValue', e.target.value)}
+                onChange={(e) =>
+                  onFormDataUpdate("dueDateValue", e.target.value)
+                }
                 className="w-32 p-1 border border-gray-300 rounded text-xs"
               />
             ) : (
               <div className="text-xs text-gray-600 font-medium">
                 {task?.due_date
                   ? `${formatDate(task.due_date)} | Time left: ${timeRemaining}`
-                  : 'No due date'}
+                  : "No due date"}
               </div>
             )}
           </div>
@@ -257,7 +267,9 @@ const TaskInfo = ({
       {isReasonPromptOpen && (
         <div className="absolute inset-0 bg-black/40 flex justify-center items-center z-50">
           <div className="bg-white p-4 rounded-xl shadow-md w-[220px]">
-            <div className="text-xs font-medium text-gray-700 mb-2">Reason for reassignment</div>
+            <div className="text-xs font-medium text-gray-700 mb-2">
+              Reason for reassignment
+            </div>
             <textarea
               value={reasonText}
               onChange={(e) => setReasonText(e.target.value)}
@@ -269,7 +281,7 @@ const TaskInfo = ({
               <button
                 onClick={() => {
                   setIsReasonPromptOpen(false);
-                  setReasonText('');
+                  setReasonText("");
                   setPendingAssigneeId(null);
                 }}
                 className="text-xs px-2 py-1 bg-gray-200 rounded"
