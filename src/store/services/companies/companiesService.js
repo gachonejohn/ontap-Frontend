@@ -1,4 +1,4 @@
-import { apiSlice } from "../../api/apiSlice";
+import { apiSlice } from '../../api/apiSlice';
 
 export const companiesApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -10,13 +10,12 @@ export const companiesApi = apiSlice.injectEndpoints({
         if (employee_no) queryParams.employee_no = employee_no;
         return {
           url: `companies/departments/`,
-          method: "GET",
+          method: 'GET',
           params: queryParams,
         };
       },
     }),
- 
-   
+
     getPositions: builder.query({
       query: ({ page, page_size, employee_no } = {}) => {
         const queryParams = {};
@@ -25,18 +24,12 @@ export const companiesApi = apiSlice.injectEndpoints({
         if (employee_no) queryParams.employee_no = employee_no;
         return {
           url: `companies/positions/`,
-          method: "GET",
+          method: 'GET',
           params: queryParams,
         };
       },
     }),
-
-
-    
   }),
 });
 
-export const {
- useGetDepartmentsQuery,
- useGetPositionsQuery,
-} = companiesApi;
+export const { useGetDepartmentsQuery, useGetPositionsQuery } = companiesApi;

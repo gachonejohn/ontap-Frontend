@@ -1,7 +1,7 @@
-import React, { useState } from "react";
-import PayrollDetailsModal from "../components/PayrollDetailsModal";
-import AttendanceTrendsChart from "../components/AttendanceTrendsChart";
-import LeaveChartDistribution from "../components/LeaveChartDistribution";
+import React, { useState } from 'react';
+import PayrollDetailsModal from '../components/PayrollDetailsModal';
+import AttendanceTrendsChart from '../components/AttendanceTrendsChart';
+import LeaveChartDistribution from '../components/LeaveChartDistribution';
 
 export default function Payroll() {
   const [activeActionId, setActiveActionId] = useState(null);
@@ -11,59 +11,59 @@ export default function Payroll() {
   const itemsPerPage = 3;
 
   const [leaveRequests, setLeaveRequests] = useState([
-    { id: 1, type: "Annual Leave", status: "Pending", name: "John Doe" },
-    { id: 2, type: "Sick Leave", status: "Approved", name: "Jane Smith" },
-    { id: 3, type: "Personal Leave", status: "Rejected", name: "Alice Brown" },
+    { id: 1, type: 'Annual Leave', status: 'Pending', name: 'John Doe' },
+    { id: 2, type: 'Sick Leave', status: 'Approved', name: 'Jane Smith' },
+    { id: 3, type: 'Personal Leave', status: 'Rejected', name: 'Alice Brown' },
   ]);
 
   const payrollData = [
     {
       id: 1,
-      name: "Sarah Johnson",
-      department: "Engineering",
-      image: "/images/sarah.png",
-      payPeriod: "December 2024",
-      basicSalary: "$4,000",
-      overtime: "$500",
-      bonus: "$500",
-      netpay: "$5,000",
-      status: "Processed"
+      name: 'Sarah Johnson',
+      department: 'Engineering',
+      image: '/images/sarah.png',
+      payPeriod: 'December 2024',
+      basicSalary: '$4,000',
+      overtime: '$500',
+      bonus: '$500',
+      netpay: '$5,000',
+      status: 'Processed',
     },
     {
       id: 2,
-      name: "Victor Josh",
-      department: "Design",
-      image: "/images/michael.png",
-      payPeriod: "December 2024",
-      basicSalary: "$3,800",
-      overtime: "$600",
-      bonus: "$300",
-      netpay: "$4,700",
-      status: "Pending"
+      name: 'Victor Josh',
+      department: 'Design',
+      image: '/images/michael.png',
+      payPeriod: 'December 2024',
+      basicSalary: '$3,800',
+      overtime: '$600',
+      bonus: '$300',
+      netpay: '$4,700',
+      status: 'Pending',
     },
     {
       id: 3,
-      name: "David Wilson",
-      department: "Engineering",
-      image: "/images/david.png",
-      payPeriod: "December 2024",
-      basicSalary: "$4,200",
-      overtime: "$400",
-      bonus: "$400",
-      netpay: "$5,000",
-      status: "Processed"
+      name: 'David Wilson',
+      department: 'Engineering',
+      image: '/images/david.png',
+      payPeriod: 'December 2024',
+      basicSalary: '$4,200',
+      overtime: '$400',
+      bonus: '$400',
+      netpay: '$5,000',
+      status: 'Processed',
     },
     {
       id: 4,
-      name: "Lisa Anderson",
-      department: "Engineering",
-      image: "/images/lisa.png",
-      payPeriod: "December 2024",
-      basicSalary: "$4,100",
-      overtime: "$300",
-      bonus: "$600",
-      netpay: "$5,000",
-      status: "Processed"
+      name: 'Lisa Anderson',
+      department: 'Engineering',
+      image: '/images/lisa.png',
+      payPeriod: 'December 2024',
+      basicSalary: '$4,100',
+      overtime: '$300',
+      bonus: '$600',
+      netpay: '$5,000',
+      status: 'Processed',
     },
   ];
 
@@ -78,9 +78,7 @@ export default function Payroll() {
   };
 
   const handleStatusChange = (id, status) => {
-    setLeaveRequests(prev =>
-      prev.map(req => (req.id === id ? { ...req, status } : req))
-    );
+    setLeaveRequests((prev) => prev.map((req) => (req.id === id ? { ...req, status } : req)));
     setActiveActionId(null);
   };
 
@@ -169,9 +167,7 @@ export default function Payroll() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Attendance Trends */}
         <div className="bg-white rounded-xl shadow-lg p-4">
-          <h2 className="text-md font-semibold text-gray-800 mb-4">
-            Monthly Payroll Trends
-          </h2>
+          <h2 className="text-md font-semibold text-gray-800 mb-4">Monthly Payroll Trends</h2>
           <AttendanceTrendsChart dataPoints={attendanceData} />
         </div>
 
@@ -190,12 +186,7 @@ export default function Payroll() {
       <div className="flex flex-col lg:flex-row justify-between items-center gap-4">
         <div className="flex items-center gap-2 p-2 rounded-lg border border-slate-100 h-10 shadow-md bg-white flex-1">
           <div className="flex justify-center items-center h-5">
-            <img
-              width="16.5px"
-              height="16.5px"
-              src="/images/search.png"
-              alt="Search icon"
-            />
+            <img width="16.5px" height="16.5px" src="/images/search.png" alt="Search icon" />
           </div>
           <input
             type="text"
@@ -206,30 +197,16 @@ export default function Payroll() {
 
         <div className="flex flex-row justify-center items-center gap-2">
           <div className="flex flex-row justify-center items-center gap-2 p-2 rounded-lg border border-neutral-200 w-[120px] h-10 bg-white cursor-pointer hover:bg-gray-50 transition-colors">
-            <div className="text-xs text-neutral-900 font-semibold">
-              All Status
-            </div>
+            <div className="text-xs text-neutral-900 font-semibold">All Status</div>
             <div className="flex flex-col justify-center items-center w-4 h-4">
-              <img
-                width="9.5px"
-                height="5.1px"
-                src="/images/dropdown.png"
-                alt="Dropdown icon"
-              />
+              <img width="9.5px" height="5.1px" src="/images/dropdown.png" alt="Dropdown icon" />
             </div>
           </div>
 
           <div className="flex flex-row justify-center items-center gap-2 p-2 rounded-lg border border-neutral-200 w-[120px] h-10 bg-white cursor-pointer hover:bg-gray-50 transition-colors">
-            <div className="text-xs text-neutral-900 font-semibold">
-              All Types
-            </div>
+            <div className="text-xs text-neutral-900 font-semibold">All Types</div>
             <div className="flex flex-col justify-center items-center w-4 h-4">
-              <img
-                width="9.5px"
-                height="5.1px"
-                src="/images/dropdown.png"
-                alt="Dropdown icon"
-              />
+              <img width="9.5px" height="5.1px" src="/images/dropdown.png" alt="Dropdown icon" />
             </div>
           </div>
         </div>
@@ -241,7 +218,7 @@ export default function Payroll() {
           <div className="text-lg text-neutral-900 font-semibold">
             Employee Payroll ({payrollData.length})
           </div>
-          <button 
+          <button
             onClick={() => {
               setSelectedPayroll(payrollData[0]);
               setShowPayrollDetails(true);
@@ -291,11 +268,11 @@ export default function Payroll() {
                     <td>
                       <span
                         className={`text-xs px-3 py-1 rounded-full ${
-                          employee.status === "Processed"
-                            ? "bg-teal-100 text-teal-800"
-                            : employee.status === "Pending"
-                            ? "bg-orange-100 text-orange-800"
-                            : "bg-gray-100 text-gray-800"
+                          employee.status === 'Processed'
+                            ? 'bg-teal-100 text-teal-800'
+                            : employee.status === 'Pending'
+                              ? 'bg-orange-100 text-orange-800'
+                              : 'bg-gray-100 text-gray-800'
                         }`}
                       >
                         {employee.status}
@@ -306,19 +283,17 @@ export default function Payroll() {
                         <button
                           className="text-gray-600"
                           onClick={() => toggleActionMenu(employee.id)}
-                          aria-label={activeActionId === employee.id ? "Close actions menu" : "Open actions menu"}
+                          aria-label={
+                            activeActionId === employee.id
+                              ? 'Close actions menu'
+                              : 'Open actions menu'
+                          }
                         >
-                          <img
-                            src="/images/eye_icon.png"
-                            alt="View"
-                            className="w-5 h-5"
-                          />
+                          <img src="/images/eye_icon.png" alt="View" className="w-5 h-5" />
                         </button>
 
                         {activeActionId === employee.id && (
-                          <span
-                            className="text-xs px-3 py-1 rounded-full bg-teal-500 text-white select-none"
-                          >
+                          <span className="text-xs px-3 py-1 rounded-full bg-teal-500 text-white select-none">
                             Processed
                           </span>
                         )}
@@ -333,7 +308,9 @@ export default function Payroll() {
         {/* Pagination */}
         <div className="flex justify-between items-center text-sm text-gray-600">
           <div>
-            Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, payrollData.length)} of {payrollData.length} entries
+            Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
+            {Math.min(currentPage * itemsPerPage, payrollData.length)} of {payrollData.length}{' '}
+            entries
           </div>
           <div className="flex gap-2">
             <button
@@ -343,7 +320,7 @@ export default function Payroll() {
             >
               Previous
             </button>
-            
+
             {Array.from({ length: Math.ceil(payrollData.length / itemsPerPage) }, (_, index) => {
               const pageNum = index + 1;
               return (
@@ -356,9 +333,13 @@ export default function Payroll() {
                 </button>
               );
             })}
-            
+
             <button
-              onClick={() => setCurrentPage((prev) => prev < Math.ceil(payrollData.length / itemsPerPage) ? prev + 1 : prev)}
+              onClick={() =>
+                setCurrentPage((prev) =>
+                  prev < Math.ceil(payrollData.length / itemsPerPage) ? prev + 1 : prev
+                )
+              }
               disabled={currentPage >= Math.ceil(payrollData.length / itemsPerPage)}
               className={`px-3 py-1 rounded-lg border border-gray-200 ${currentPage >= Math.ceil(payrollData.length / itemsPerPage) ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-50'}`}
             >

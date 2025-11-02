@@ -1,15 +1,14 @@
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { FiPlus } from 'react-icons/fi';
+import { IoCloseOutline } from 'react-icons/io5';
+import { toast } from 'react-toastify';
+import SubmitSpinner from '@components/common/spinners/submitSpinner';
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { FiPlus } from "react-icons/fi";
-import { IoCloseOutline } from "react-icons/io5";
-import { toast } from "react-toastify";
-import SubmitSpinner from "@components/common/spinners/submitSpinner";
-
-import CreateUpdateButton from "@components/common/Buttons/CreateUpdateButton";
-import { CreateBreakCategorySchema } from "@schemas/companies/policies/breaksPolicySchema";
-import { useCreateBreakCategoryMutation } from "@store/services/policies/policyService";
+import CreateUpdateButton from '@components/common/Buttons/CreateUpdateButton';
+import { CreateBreakCategorySchema } from '@schemas/companies/policies/breaksPolicySchema';
+import { useCreateBreakCategoryMutation } from '@store/services/policies/policyService';
 export const NewCategory = ({ refetchData }) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -27,18 +26,18 @@ export const NewCategory = ({ refetchData }) => {
   const onSubmit = async (formData) => {
     try {
       await createBreakCategory(formData).unwrap();
-      toast.success("Break Category created successfully!");
+      toast.success('Break Category created successfully!');
       handleCloseModal();
-       refetchData();
+      refetchData();
     } catch (error) {
-      console.error("Error:", error);
+      console.error('Error:', error);
       if (error && error.data && error.data.error) {
         toast.error(error.data.error);
       } else {
-        toast.error("An error occurred. Please try again.");
+        toast.error('An error occurred. Please try again.');
       }
-    }finally {
-        refetchData();
+    } finally {
+      refetchData();
     }
   };
 
@@ -50,7 +49,7 @@ export const NewCategory = ({ refetchData }) => {
 
   return (
     <>
- <CreateUpdateButton
+      <CreateUpdateButton
         onClick={handleOpenModal}
         // title="Add New"
         label="New Break Type "
@@ -79,20 +78,11 @@ export const NewCategory = ({ refetchData }) => {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="sticky top-0 bg-white z-40 flex px-4 justify-between items-center py-4">
-                <p className="text-sm md:text-lg lg:text-lg font-semibold">
-                  Add New Break Type
-                </p>
-                <IoCloseOutline
-                  size={20}
-                  className="cursor-pointer"
-                  onClick={handleCloseModal}
-                />
+                <p className="text-sm md:text-lg lg:text-lg font-semibold">Add New Break Type</p>
+                <IoCloseOutline size={20} className="cursor-pointer" onClick={handleCloseModal} />
               </div>
 
-              <form
-                onSubmit={handleSubmit(onSubmit)}
-                className="space-y-4 p-4"
-              >
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 p-4">
                 {/* Name */}
                 <div>
                   <label className="block text-sm font-medium mb-2">
@@ -101,17 +91,11 @@ export const NewCategory = ({ refetchData }) => {
                   <input
                     type="text"
                     placeholder="E.g. HR"
-                    {...register("name")}
+                    {...register('name')}
                     className="w-full py-2 px-4 rounded-md border border-gray-400 focus:outline-none focus:border-[#1E9FF2] focus:bg-white placeholder:text-sm"
                   />
-                  {errors.name && (
-                    <p className="text-red-500 text-sm">
-                      {errors.name.message}
-                    </p>
-                  )}
+                  {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
                 </div>
-
-                
 
                 {/* Buttons */}
                 <div className="sticky bottom-0 bg-white z-40 flex gap-4 justify-between items-center py-2">
@@ -133,7 +117,7 @@ export const NewCategory = ({ refetchData }) => {
                         <span>Submitting...</span>
                       </span>
                     ) : (
-                      "Submit"
+                      'Submit'
                     )}
                   </button>
                 </div>

@@ -1,8 +1,8 @@
-import { Navigate, Outlet, useLocation } from "react-router-dom";
-import Cookies from "js-cookie";
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
+import Cookies from 'js-cookie';
 
 const ProtectedRoute = () => {
-  const token = Cookies.get("accessToken");
+  const token = Cookies.get('accessToken');
   const location = useLocation();
 
   // If no token, send them to /signin and remember where they tried to go

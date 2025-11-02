@@ -1,12 +1,11 @@
-import React, { useState, useRef, useEffect } from "react";
-import { FiMoreHorizontal } from "react-icons/fi";
+import React, { useState, useRef, useEffect } from 'react';
+import { FiMoreHorizontal } from 'react-icons/fi';
 
 const ButtonDropdown = ({ children }) => {
   const [open, setOpen] = useState(false);
   const [positionUp, setPositionUp] = useState(false);
   const buttonRef = useRef();
   const dropdownRef = useRef();
-
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -19,8 +18,8 @@ const ButtonDropdown = ({ children }) => {
         setOpen(false);
       }
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   useEffect(() => {
@@ -52,7 +51,7 @@ const ButtonDropdown = ({ children }) => {
           ref={dropdownRef}
           className={`absolute right-0 bg-white border w-full min-w-[186px] p-2 border-gray-200
              rounded-lg shadow-lg overflow-hidden z-50
-    ${positionUp ? "bottom-full mb-2" : "mt-2"} min-w-max`}
+    ${positionUp ? 'bottom-full mb-2' : 'mt-2'} min-w-max`}
         >
           {React.Children.map(children, (child) =>
             React.cloneElement(child, {
@@ -61,8 +60,8 @@ const ButtonDropdown = ({ children }) => {
                 setOpen(false);
               },
               className: `${
-                child.props.className || ""
-              } w-full text-left px-4 py-3 hover:bg-gray-50`,
+                child.props.className || ''
+              } w-full text-left px-4 py-3 hover:bg-gray-100`,
             })
           )}
         </div>

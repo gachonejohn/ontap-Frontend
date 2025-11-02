@@ -1,13 +1,13 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   useGetMyTasksQuery,
   useCreateTaskMutation,
   useGetTaskDetailQuery,
-} from "../../store/services/tasks/tasksService";
-import LogTaskModal from "./LogTaskModal";
-import TaskModal from "./TaskModal";
-import { useSelector } from "react-redux";
-import { toast } from "react-toastify";
+} from '../../store/services/tasks/tasksService';
+import LogTaskModal from './LogTaskModal';
+import TaskModal from './TaskModal';
+import { useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 
 // Component for individual task card
 const TaskCard = ({ task, onClick }) => {
@@ -15,41 +15,41 @@ const TaskCard = ({ task, onClick }) => {
   const { data: taskDetail } = useGetTaskDetailQuery(task.id);
   const detail = taskDetail || task;
 
-  const description = detail.description || "No description provided";
+  const description = detail.description || 'No description provided';
   const title = detail.title || task.title;
   const dueDate = detail.due_date || task.due_date;
   const priority = detail.priority || task.priority;
   const progress = detail.progress_percentage || task.progress_percentage || 0;
   const status = detail.status || task.status;
-  const createdByName = detail.created_by_name || task.created_by_name || "System";
+  const createdByName = detail.created_by_name || task.created_by_name || 'System';
   const isOverdue = detail.is_overdue || task.is_overdue;
 
   const priorityMap = {
-    LOW: "Low",
-    MEDIUM: "Medium",
-    HIGH: "High",
-    URGENT: "Urgent",
+    LOW: 'Low',
+    MEDIUM: 'Medium',
+    HIGH: 'High',
+    URGENT: 'Urgent',
   };
 
   // Priority flag images
   const priorityFlags = {
-    LOW: "/images/lowflag.png",
-    MEDIUM: "/images/mediumflag.png",
-    HIGH: "/images/highflag.png",
-    URGENT: "/images/urgentflag.png",
+    LOW: '/images/lowflag.png',
+    MEDIUM: '/images/mediumflag.png',
+    HIGH: '/images/highflag.png',
+    URGENT: '/images/urgentflag.png',
   };
 
   const statusColors = {
-    TO_DO: "bg-blue-100 text-blue-800",
-    IN_PROGRESS: "bg-yellow-100 text-yellow-800",
-    COMPLETED: "bg-green-100 text-green-800",
-    UNDER_REVIEW: "bg-purple-100 text-purple-800",
-    CANCELLED: "bg-red-100 text-red-800",
-    ON_HOLD: "bg-gray-100 text-gray-800",
+    TO_DO: 'bg-blue-100 text-blue-800',
+    IN_PROGRESS: 'bg-yellow-100 text-yellow-800',
+    COMPLETED: 'bg-green-100 text-green-800',
+    UNDER_REVIEW: 'bg-purple-100 text-purple-800',
+    CANCELLED: 'bg-red-100 text-red-800',
+    ON_HOLD: 'bg-gray-100 text-gray-800',
   };
 
   // Check if task is overdue and not completed
-  const showOverdueBadge = isOverdue && status !== "COMPLETED";
+  const showOverdueBadge = isOverdue && status !== 'COMPLETED';
 
   return (
     <div
@@ -67,8 +67,8 @@ const TaskCard = ({ task, onClick }) => {
             </span>
           )}
           {/* Priority Flag instead of status badge */}
-          <img 
-            src={priorityFlags[priority] || priorityFlags.MEDIUM} 
+          <img
+            src={priorityFlags[priority] || priorityFlags.MEDIUM}
             alt={`${priorityMap[priority] || priority} priority`}
             width="20"
             height="20"
@@ -79,37 +79,37 @@ const TaskCard = ({ task, onClick }) => {
       </div>
 
       {/* Description */}
-      <div className="text-xs text-gray-700 line-clamp-3 leading-relaxed">
-        {description}
-      </div>
+      <div className="text-xs text-gray-700 line-clamp-3 leading-relaxed">{description}</div>
 
       {/* Dates + Priority */}
       <div className="flex justify-between items-center pt-2">
         <div className="flex items-center gap-1">
           <img width="12.2" height="12.2" src="/images/calendar1.png" alt="Calendar" />
-          <div className={`text-[10px] font-medium ${
-            showOverdueBadge ? "text-red-600" : "text-gray-600"
-          }`}>
-            {dueDate ? new Date(dueDate).toLocaleDateString() : "No due date"}
-            {showOverdueBadge && " • Overdue"}
+          <div
+            className={`text-[10px] font-medium ${
+              showOverdueBadge ? 'text-red-600' : 'text-gray-600'
+            }`}
+          >
+            {dueDate ? new Date(dueDate).toLocaleDateString() : 'No due date'}
+            {showOverdueBadge && ' • Overdue'}
           </div>
         </div>
         <div
           className={`flex items-center justify-center py-0.5 px-2 rounded-md ${
-            priority === "HIGH" || priority === "URGENT"
-              ? "bg-red-100"
-              : priority === "MEDIUM"
-              ? "bg-yellow-100"
-              : "bg-green-100"
+            priority === 'HIGH' || priority === 'URGENT'
+              ? 'bg-red-100'
+              : priority === 'MEDIUM'
+                ? 'bg-yellow-100'
+                : 'bg-green-100'
           }`}
         >
           <div
             className={`text-[10.5px] font-semibold ${
-              priority === "HIGH" || priority === "URGENT"
-                ? "text-pink-800"
-                : priority === "MEDIUM"
-                ? "text-yellow-800"
-                : "text-green-800"
+              priority === 'HIGH' || priority === 'URGENT'
+                ? 'text-pink-800'
+                : priority === 'MEDIUM'
+                  ? 'text-yellow-800'
+                  : 'text-green-800'
             }`}
           >
             {priorityMap[priority] || priority}
@@ -121,9 +121,7 @@ const TaskCard = ({ task, onClick }) => {
       <div className="pt-2 border-t border-neutral-200">
         <div className="flex items-center gap-1">
           <img width="11.5" height="12.8" src="/images/assignee.png" alt="Assignee" />
-          <div className="text-[10px] text-gray-600 font-medium">
-            Assigned by {createdByName}
-          </div>
+          <div className="text-[10px] text-gray-600 font-medium">Assigned by {createdByName}</div>
         </div>
       </div>
 
@@ -147,16 +145,13 @@ const TaskCard = ({ task, onClick }) => {
 };
 
 // Blue rectangle component for column headers
-const ColumnHeader = ({ icon, title, count, bgColor = "bg-blue-500" }) => (
-  <div className={`flex flex-col justify-center items-center gap-2.5 pr-2 pl-2 rounded-lg h-12 shadow-sm ${bgColor}`}>
+const ColumnHeader = ({ icon, title, count, bgColor = 'bg-blue-500' }) => (
+  <div
+    className={`flex flex-col justify-center items-center gap-2.5 pr-2 pl-2 rounded-lg h-12 shadow-sm ${bgColor}`}
+  >
     <div className="flex flex-row justify-between items-center gap-9 w-full h-5">
       <div className="flex flex-row justify-start items-start gap-1">
-        <img
-          width="18px"
-          height="18px"
-          src="/images/taskstatus.png"
-          alt={`${title} icon`}
-        />
+        <img width="18px" height="18px" src="/images/taskstatus.png" alt={`${title} icon`} />
         <div className="flex flex-row justify-center items-center gap-2.5 w-11 h-5">
           <div className="font-inter text-base min-w-[45px] whitespace-nowrap text-white text-opacity-100 leading-tight font-medium">
             {title}
@@ -178,37 +173,37 @@ const EmployeeTasksDashboardContent = () => {
   const [isLogTaskModalOpen, setIsLogTaskModalOpen] = useState(false);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
-  const [activeTab, setActiveTab] = useState("taskManagement");
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("All");
-  const [daysFilter, setDaysFilter] = useState("All");
+  const [activeTab, setActiveTab] = useState('taskManagement');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('All');
+  const [daysFilter, setDaysFilter] = useState('All');
   const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
   const [isDaysDropdownOpen, setIsDaysDropdownOpen] = useState(false);
 
   // Define statusMap for filter options
   const statusMap = {
-    "All": "All Task",
-    "TO_DO": "To Do",
-    "IN_PROGRESS": "In Progress",
-    "COMPLETED": "Completed",
-    "UNDER_REVIEW": "Under Review",
-    "ON_HOLD": "On Hold",
-    "CANCELLED": "Cancelled",
-    "OVERDUE": "Overdue"
+    All: 'All Task',
+    TO_DO: 'To Do',
+    IN_PROGRESS: 'In Progress',
+    COMPLETED: 'Completed',
+    UNDER_REVIEW: 'Under Review',
+    ON_HOLD: 'On Hold',
+    CANCELLED: 'Cancelled',
+    OVERDUE: 'Overdue',
   };
 
   // Define daysMap for filter options (based on created_at)
   const daysMap = {
-    "All": "All Days",
-    "1": "1 Day Ago",
-    "3": "3 Days Ago",
-    "7": "7 Days Ago",
-    "10": "10 Days Ago",
-    "14": "14 Days Ago",
-    "21": "21 Days Ago",
-    "30": "30 Days Ago",
-    "60": "60 Days Ago",
-    "90": "90 Days Ago"
+    All: 'All Days',
+    1: '1 Day Ago',
+    3: '3 Days Ago',
+    7: '7 Days Ago',
+    10: '10 Days Ago',
+    14: '14 Days Ago',
+    21: '21 Days Ago',
+    30: '30 Days Ago',
+    60: '60 Days Ago',
+    90: '90 Days Ago',
   };
 
   const statusOptions = Object.entries(statusMap).map(([key, value]) => ({ key, value }));
@@ -220,19 +215,29 @@ const EmployeeTasksDashboardContent = () => {
   // Get task permissions
   const taskPermissions = useSelector((state) => {
     const permissions = state.auth.user?.role?.permissions;
-    return permissions?.find(p => p.feature_code === "task" || p.feature_code === "task_management");
+    return permissions?.find(
+      (p) => p.feature_code === 'task' || p.feature_code === 'task_management'
+    );
   });
 
   const canCreateTask = taskPermissions?.can_create;
 
   // Employee only sees their own tasks with status filter and increased page size
-  const { data: tasksData, isLoading, error, refetch } = useGetMyTasksQuery({
-    search: searchTerm || undefined,
-    status: statusFilter !== "All" && statusFilter !== "OVERDUE" ? statusFilter : undefined,
-    page_size: 100,
-  }, {
-    refetchOnMountOrArgChange: true,
-  });
+  const {
+    data: tasksData,
+    isLoading,
+    error,
+    refetch,
+  } = useGetMyTasksQuery(
+    {
+      search: searchTerm || undefined,
+      status: statusFilter !== 'All' && statusFilter !== 'OVERDUE' ? statusFilter : undefined,
+      page_size: 100,
+    },
+    {
+      refetchOnMountOrArgChange: true,
+    }
+  );
 
   const [createTask] = useCreateTaskMutation();
 
@@ -241,18 +246,19 @@ const EmployeeTasksDashboardContent = () => {
   const totalTasksCount = tasksData?.count || tasks.length;
 
   // Filter tasks based on overdue filter
-  let filteredTasks = statusFilter === "OVERDUE" 
-    ? tasks.filter(task => task.is_overdue && task.status !== "COMPLETED")
-    : tasks;
+  let filteredTasks =
+    statusFilter === 'OVERDUE'
+      ? tasks.filter((task) => task.is_overdue && task.status !== 'COMPLETED')
+      : tasks;
 
   // Apply days filter based on created_at
-  if (daysFilter !== "All") {
+  if (daysFilter !== 'All') {
     const today = new Date();
     const filterDays = parseInt(daysFilter);
     const pastDate = new Date(today);
     pastDate.setDate(today.getDate() - filterDays);
 
-    filteredTasks = filteredTasks.filter(task => {
+    filteredTasks = filteredTasks.filter((task) => {
       if (!task.created_at) return false;
       const taskCreatedDate = new Date(task.created_at);
       return taskCreatedDate >= pastDate && taskCreatedDate <= today;
@@ -261,91 +267,92 @@ const EmployeeTasksDashboardContent = () => {
 
   // Group tasks by status - show ALL filtered tasks for employee
   const groupedTasks = {
-    todo: filteredTasks.filter((task) => task.status === "TO_DO"),
-    inProgress: filteredTasks.filter((task) => task.status === "IN_PROGRESS"),
-    completed: filteredTasks.filter((task) => task.status === "COMPLETED"),
+    todo: filteredTasks.filter((task) => task.status === 'TO_DO'),
+    inProgress: filteredTasks.filter((task) => task.status === 'IN_PROGRESS'),
+    completed: filteredTasks.filter((task) => task.status === 'COMPLETED'),
   };
 
   // Calculate counts for analytics using the total count
   const completedCount = groupedTasks.completed.length;
   const inProgressCount = groupedTasks.inProgress.length;
-  const overdueCount = tasks.filter(t => t.is_overdue && t.status !== "COMPLETED").length;
+  const overdueCount = tasks.filter((t) => t.is_overdue && t.status !== 'COMPLETED').length;
 
   // Handle new task creation
   const handleCreateTask = async (formData) => {
     try {
-      const formatDate = (date) =>
-        date ? new Date(date).toISOString().split("T")[0] : null;
+      const formatDate = (date) => (date ? new Date(date).toISOString().split('T')[0] : null);
 
       // Create FormData object for file upload
       const formDataObj = new FormData();
-      
+
       // Append all task data
-      formDataObj.append("title", formData.title || "");
-      formDataObj.append("description", formData.description || "");
-      formDataObj.append("status", formData.status || "TO_DO");
-      formDataObj.append("priority", formData.priority || "MEDIUM");
-      
+      formDataObj.append('title', formData.title || '');
+      formDataObj.append('description', formData.description || '');
+      formDataObj.append('status', formData.status || 'TO_DO');
+      formDataObj.append('priority', formData.priority || 'MEDIUM');
+
       // 🔥 FIX: Check if currentUser has a user property (employee object) or is the user object directly
       const userId = currentUser?.user?.id || currentUser?.id;
-      
+
       if (!userId) {
-        console.error("Cannot determine user ID from currentUser:", currentUser);
-        toast.error("Failed to create task: User ID not found");
+        console.error('Cannot determine user ID from currentUser:', currentUser);
+        toast.error('Failed to create task: User ID not found');
         return;
       }
-      
+
       // Use the extracted user ID
-      formDataObj.append("assignee", userId);
-      
-      if (formData.department) formDataObj.append("department", formData.department);
-      
+      formDataObj.append('assignee', userId);
+
+      if (formData.department) formDataObj.append('department', formData.department);
+
       const startDate = formatDate(formData.start_date || formData.startDate);
       const dueDate = formatDate(formData.due_date || formData.dueDate);
-      
-      if (startDate) formDataObj.append("start_date", startDate);
-      if (dueDate) formDataObj.append("due_date", dueDate);
-      
-      formDataObj.append("progress_percentage", formData.progress_percentage || 0);
-      
+
+      if (startDate) formDataObj.append('start_date', startDate);
+      if (dueDate) formDataObj.append('due_date', dueDate);
+
+      formDataObj.append('progress_percentage', formData.progress_percentage || 0);
+
       if (formData.estimated_hours || formData.estimatedHours) {
-        formDataObj.append("estimated_hours", 
+        formDataObj.append(
+          'estimated_hours',
           parseFloat(formData.estimated_hours || formData.estimatedHours)
         );
       }
-      
-      formDataObj.append("is_urgent", Boolean(formData.is_urgent || formData.isUrgent));
-      formDataObj.append("requires_approval", Boolean(
-        formData.requires_approval || formData.requiresApproval
-      ));
+
+      formDataObj.append('is_urgent', Boolean(formData.is_urgent || formData.isUrgent));
+      formDataObj.append(
+        'requires_approval',
+        Boolean(formData.requires_approval || formData.requiresApproval)
+      );
 
       // Append files
       if (formData.files && formData.files.length > 0) {
         formData.files.forEach((file) => {
-          formDataObj.append("files", file);
+          formDataObj.append('files', file);
         });
       }
 
       // DEBUG: Log what we're sending
-      console.log("Creating task with user ID:", userId);
-      console.log("Full currentUser object:", currentUser);
+      console.log('Creating task with user ID:', userId);
+      console.log('Full currentUser object:', currentUser);
 
       // Use the FormData object for the API call
       await createTask(formDataObj).unwrap();
-      toast.success("Task created successfully!");
+      toast.success('Task created successfully!');
       setIsLogTaskModalOpen(false);
       refetch();
     } catch (err) {
-      console.error("Task creation failed:", err);
-      console.error("Error details:", err?.data);
-      
+      console.error('Task creation failed:', err);
+      console.error('Error details:', err?.data);
+
       // Show specific error message if available
       if (err?.data?.assignee) {
         toast.error(`Assignee error: ${err.data.assignee[0]}`);
       } else if (err?.data?.detail) {
         toast.error(err.data.detail);
       } else {
-        toast.error("Failed to create task");
+        toast.error('Failed to create task');
       }
     }
   };
@@ -377,7 +384,7 @@ const EmployeeTasksDashboardContent = () => {
     return (
       <div className="flex justify-center items-center p-8">
         <div className="text-red-500">
-          Error loading tasks: {error?.data?.detail || "Unknown error"}
+          Error loading tasks: {error?.data?.detail || 'Unknown error'}
         </div>
       </div>
     );
@@ -388,9 +395,7 @@ const EmployeeTasksDashboardContent = () => {
       {/* Task Header */}
       <div className="flex flex-row justify-between items-center">
         <div className="flex flex-col">
-          <div className="text-lg text-neutral-900 font-semibold">
-            My Tasks
-          </div>
+          <div className="text-lg text-neutral-900 font-semibold">My Tasks</div>
           <div className="text-sm text-gray-600 font-normal">
             Manage and track your assigned tasks
           </div>
@@ -402,16 +407,9 @@ const EmployeeTasksDashboardContent = () => {
           >
             <div className="flex flex-row items-center gap-2">
               <div className="flex justify-center items-center w-5 h-5">
-                <img
-                  width="15.3px"
-                  height="15.3px"
-                  src="/images/addtask.png"
-                  alt="Add Task icon"
-                />
+                <img width="15.3px" height="15.3px" src="/images/addtask.png" alt="Add Task icon" />
               </div>
-              <div className="text-sm text-white font-medium">
-                New Task
-              </div>
+              <div className="text-sm text-white font-medium">New Task</div>
             </div>
           </div>
         )}
@@ -422,12 +420,7 @@ const EmployeeTasksDashboardContent = () => {
         {/* Search Bar */}
         <div className="flex flex-row items-center gap-2 p-2 rounded-lg border border-slate-100 h-10 shadow-md transition-transform duration-200 hover:-translate-y-1 bg-white flex-1">
           <div className="flex justify-center items-center h-5">
-            <img
-              width="16.5px"
-              height="16.5px"
-              src="/images/search.png"
-              alt="Search icon"
-            />
+            <img width="16.5px" height="16.5px" src="/images/search.png" alt="Search icon" />
           </div>
           <input
             type="text"
@@ -440,25 +433,25 @@ const EmployeeTasksDashboardContent = () => {
 
         {/* Days Filter Dropdown */}
         <div className="relative">
-          <div 
+          <div
             className="flex flex-row justify-center items-center gap-2 p-2 rounded-lg border border-neutral-200 w-[150px] h-10 bg-white cursor-pointer hover:bg-gray-50 transition-colors"
             onClick={() => setIsDaysDropdownOpen(!isDaysDropdownOpen)}
           >
             <div className="flex flex-row items-center gap-1">
               <div className="flex justify-center items-center h-5">
-                <img width="16.3px" height="16.3px" src="/images/calendar1.png" alt="Days filter icon" />
+                <img
+                  width="16.3px"
+                  height="16.3px"
+                  src="/images/calendar1.png"
+                  alt="Days filter icon"
+                />
               </div>
               <div className="text-xs text-neutral-900 font-semibold">
-                {daysMap[daysFilter] || "All Days"}
+                {daysMap[daysFilter] || 'All Days'}
               </div>
             </div>
             <div className="flex flex-col justify-center items-center w-4 h-4">
-              <img
-                width="9.5px"
-                height="5.1px"
-                src="/images/dropdown.png"
-                alt="Dropdown icon"
-              />
+              <img width="9.5px" height="5.1px" src="/images/dropdown.png" alt="Dropdown icon" />
             </div>
           </div>
 
@@ -469,7 +462,7 @@ const EmployeeTasksDashboardContent = () => {
                 <div
                   key={key}
                   className={`px-3 py-2 text-xs cursor-pointer hover:bg-gray-100 ${
-                    daysFilter === key ? "bg-teal-100 text-teal-800" : "text-neutral-900"
+                    daysFilter === key ? 'bg-teal-100 text-teal-800' : 'text-neutral-900'
                   }`}
                   onClick={() => handleDaysFilterChange(key)}
                 >
@@ -482,7 +475,7 @@ const EmployeeTasksDashboardContent = () => {
 
         {/* Status Filter Dropdown */}
         <div className="relative">
-          <div 
+          <div
             className="flex flex-row justify-center items-center gap-2 p-2 rounded-lg border border-neutral-200 w-[150px] h-10 bg-white cursor-pointer hover:bg-gray-50 transition-colors"
             onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
           >
@@ -491,16 +484,11 @@ const EmployeeTasksDashboardContent = () => {
                 <img width="16.3px" height="16.3px" src="/images/filter.png" alt="Filter icon" />
               </div>
               <div className="text-xs text-neutral-900 font-semibold">
-                {statusMap[statusFilter] || "All Task"}
+                {statusMap[statusFilter] || 'All Task'}
               </div>
             </div>
             <div className="flex flex-col justify-center items-center w-4 h-4">
-              <img
-                width="9.5px"
-                height="5.1px"
-                src="/images/dropdown.png"
-                alt="Dropdown icon"
-              />
+              <img width="9.5px" height="5.1px" src="/images/dropdown.png" alt="Dropdown icon" />
             </div>
           </div>
 
@@ -511,7 +499,7 @@ const EmployeeTasksDashboardContent = () => {
                 <div
                   key={key}
                   className={`px-3 py-2 text-xs cursor-pointer hover:bg-gray-100 ${
-                    statusFilter === key ? "bg-teal-100 text-teal-800" : "text-neutral-900"
+                    statusFilter === key ? 'bg-teal-100 text-teal-800' : 'text-neutral-900'
                   }`}
                   onClick={() => handleStatusFilterChange(key)}
                 >
@@ -529,7 +517,9 @@ const EmployeeTasksDashboardContent = () => {
           className={`flex items-center justify-center h-10 w-1/2 cursor-pointer ${activeTab === 'taskManagement' ? 'bg-white' : ''}`}
           onClick={() => setActiveTab('taskManagement')}
         >
-          <div className={`text-xs text-neutral-900 ${activeTab === 'taskManagement' ? 'font-semibold' : 'font-medium'}`}>
+          <div
+            className={`text-xs text-neutral-900 ${activeTab === 'taskManagement' ? 'font-semibold' : 'font-medium'}`}
+          >
             Task Management
           </div>
         </div>
@@ -537,7 +527,9 @@ const EmployeeTasksDashboardContent = () => {
           className={`flex items-center justify-center h-10 w-1/2 cursor-pointer ${activeTab === 'taskAnalytics' ? 'bg-white' : ''}`}
           onClick={() => setActiveTab('taskAnalytics')}
         >
-          <div className={`text-xs text-neutral-900 ${activeTab === 'taskAnalytics' ? 'font-semibold' : 'font-medium'}`}>
+          <div
+            className={`text-xs text-neutral-900 ${activeTab === 'taskAnalytics' ? 'font-semibold' : 'font-medium'}`}
+          >
             Task Analytics
           </div>
         </div>
@@ -559,9 +551,7 @@ const EmployeeTasksDashboardContent = () => {
                 <TaskCard key={task.id} task={task} onClick={handleCardClick} />
               ))}
               {groupedTasks.todo.length === 0 && (
-                <div className="text-center text-gray-500 text-sm py-4">
-                  No tasks to do
-                </div>
+                <div className="text-center text-gray-500 text-sm py-4">No tasks to do</div>
               )}
             </div>
           </div>
@@ -579,9 +569,7 @@ const EmployeeTasksDashboardContent = () => {
                 <TaskCard key={task.id} task={task} onClick={handleCardClick} />
               ))}
               {groupedTasks.inProgress.length === 0 && (
-                <div className="text-center text-gray-500 text-sm py-4">
-                  No tasks in progress
-                </div>
+                <div className="text-center text-gray-500 text-sm py-4">No tasks in progress</div>
               )}
             </div>
           </div>
@@ -599,9 +587,7 @@ const EmployeeTasksDashboardContent = () => {
                 <TaskCard key={task.id} task={task} onClick={handleCardClick} />
               ))}
               {groupedTasks.completed.length === 0 && (
-                <div className="text-center text-gray-500 text-sm py-4">
-                  No completed tasks
-                </div>
+                <div className="text-center text-gray-500 text-sm py-4">No completed tasks</div>
               )}
             </div>
           </div>
@@ -637,10 +623,10 @@ const EmployeeTasksDashboardContent = () => {
               </div>
               <div className="text-lg text-green-500 font-semibold">{completedCount} Tasks</div>
               <div className="w-full h-2 bg-gray-200 rounded-full">
-                <div 
-                  className="h-full bg-green-500 rounded-full" 
-                  style={{ 
-                    width: `${totalTasksCount > 0 ? (completedCount / totalTasksCount) * 100 : 0}%` 
+                <div
+                  className="h-full bg-green-500 rounded-full"
+                  style={{
+                    width: `${totalTasksCount > 0 ? (completedCount / totalTasksCount) * 100 : 0}%`,
                   }}
                 ></div>
               </div>
@@ -657,10 +643,10 @@ const EmployeeTasksDashboardContent = () => {
               </div>
               <div className="text-lg text-yellow-500 font-semibold">{inProgressCount} Tasks</div>
               <div className="w-full h-2 bg-gray-200 rounded-full">
-                <div 
-                  className="h-full bg-yellow-500 rounded-full" 
-                  style={{ 
-                    width: `${totalTasksCount > 0 ? (inProgressCount / totalTasksCount) * 100 : 0}%` 
+                <div
+                  className="h-full bg-yellow-500 rounded-full"
+                  style={{
+                    width: `${totalTasksCount > 0 ? (inProgressCount / totalTasksCount) * 100 : 0}%`,
                   }}
                 ></div>
               </div>
@@ -671,20 +657,16 @@ const EmployeeTasksDashboardContent = () => {
                 <div className="text-sm text-gray-600 font-medium">Overdue</div>
                 <div className="flex flex-col justify-start items-start gap-2.5 p-1 rounded border border-neutral-200 h-5 overflow-hidden">
                   <div className="flex flex-row justify-center items-center gap-1 h-4">
-                    <div className="text-xs text-neutral-900 font-semibold">
-                      {overdueCount}
-                    </div>
+                    <div className="text-xs text-neutral-900 font-semibold">{overdueCount}</div>
                   </div>
                 </div>
               </div>
-              <div className="text-lg text-red-500 font-semibold">
-                {overdueCount} Tasks
-              </div>
+              <div className="text-lg text-red-500 font-semibold">{overdueCount} Tasks</div>
               <div className="w-full h-2 bg-gray-200 rounded-full">
-                <div 
-                  className="h-full bg-red-500 rounded-full" 
-                  style={{ 
-                    width: `${totalTasksCount > 0 ? (overdueCount / totalTasksCount) * 100 : 0}%` 
+                <div
+                  className="h-full bg-red-500 rounded-full"
+                  style={{
+                    width: `${totalTasksCount > 0 ? (overdueCount / totalTasksCount) * 100 : 0}%`,
                   }}
                 ></div>
               </div>
@@ -701,8 +683,12 @@ const EmployeeTasksDashboardContent = () => {
                 <div className="flex flex-col justify-start items-start gap-2 w-full">
                   <div className="text-base text-blue-900 font-medium">Completion Rate</div>
                   <div className="text-xs text-blue-700 font-medium">
-                    You have completed {completedCount} out of {totalTasksCount} tasks. 
-                    Your current completion rate is {totalTasksCount > 0 ? ((completedCount / totalTasksCount) * 100).toFixed(1) : 0}%.
+                    You have completed {completedCount} out of {totalTasksCount} tasks. Your current
+                    completion rate is{' '}
+                    {totalTasksCount > 0
+                      ? ((completedCount / totalTasksCount) * 100).toFixed(1)
+                      : 0}
+                    %.
                   </div>
                 </div>
               </div>
@@ -710,7 +696,14 @@ const EmployeeTasksDashboardContent = () => {
                 <div className="flex flex-col justify-start items-start gap-2 w-full">
                   <div className="text-base text-green-900 font-medium">Average Progress</div>
                   <div className="text-xs text-green-700 font-medium">
-                    Your average task progress is {tasks.length > 0 ? Math.round(tasks.reduce((sum, task) => sum + (task.progress_percentage || 0), 0) / tasks.length) : 0}%.
+                    Your average task progress is{' '}
+                    {tasks.length > 0
+                      ? Math.round(
+                          tasks.reduce((sum, task) => sum + (task.progress_percentage || 0), 0) /
+                            tasks.length
+                        )
+                      : 0}
+                    %.
                   </div>
                 </div>
               </div>
@@ -718,9 +711,10 @@ const EmployeeTasksDashboardContent = () => {
                 <div className="flex flex-col justify-start items-start gap-2 w-full">
                   <div className="text-base text-purple-900 font-medium">Priority Distribution</div>
                   <div className="text-xs text-purple-700 font-medium">
-                    High: {tasks.filter(t => t.priority === 'HIGH' || t.priority === 'URGENT').length} tasks, 
-                    Medium: {tasks.filter(t => t.priority === 'MEDIUM').length} tasks, 
-                    Low: {tasks.filter(t => t.priority === 'LOW').length} tasks.
+                    High:{' '}
+                    {tasks.filter((t) => t.priority === 'HIGH' || t.priority === 'URGENT').length}{' '}
+                    tasks, Medium: {tasks.filter((t) => t.priority === 'MEDIUM').length} tasks, Low:{' '}
+                    {tasks.filter((t) => t.priority === 'LOW').length} tasks.
                   </div>
                 </div>
               </div>

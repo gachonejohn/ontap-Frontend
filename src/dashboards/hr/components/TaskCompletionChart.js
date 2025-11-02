@@ -1,11 +1,6 @@
 import React from 'react';
 import { Bar } from 'react-chartjs-2';
-import {
-  Chart as ChartJS,
-  BarElement,
-  CategoryScale,
-  LinearScale,
-} from 'chart.js';
+import { Chart as ChartJS, BarElement, CategoryScale, LinearScale } from 'chart.js';
 
 ChartJS.register(BarElement, CategoryScale, LinearScale);
 
@@ -17,9 +12,9 @@ const TaskCompletionChart = ({ data }) => {
         label: 'Completion %',
         data: data.map((d) => d.completion),
         backgroundColor: '#00b5ad',
-        borderRadius: 6, 
-        barPercentage: 0.9,      
-        categoryPercentage: 0.8, 
+        borderRadius: 6,
+        barPercentage: 0.9,
+        categoryPercentage: 0.8,
       },
     ],
   };
@@ -30,17 +25,15 @@ const TaskCompletionChart = ({ data }) => {
     scales: {
       x: {
         grid: {
-          display: false, 
+          display: false,
         },
         border: {
-          display: true, 
+          display: true,
         },
         ticks: {
           font: {
             size: 12,
             weight: '500',
-           
-
           },
           color: '#333',
         },
@@ -49,10 +42,10 @@ const TaskCompletionChart = ({ data }) => {
         beginAtZero: true,
         max: 100,
         grid: {
-          display: false, 
+          display: false,
         },
         border: {
-          display: true, 
+          display: true,
         },
         ticks: {
           stepSize: 20,
@@ -60,8 +53,6 @@ const TaskCompletionChart = ({ data }) => {
             size: 12,
           },
           color: '#333',
-         
-
         },
       },
     },
@@ -76,8 +67,8 @@ const TaskCompletionChart = ({ data }) => {
   };
 
   return (
-<div style={{ height: '250px', width: '300px' }}> 
-  <Bar data={chartData} options={options} />
+    <div style={{ height: '250px', width: '300px' }}>
+      <Bar data={chartData} options={options} />
     </div>
   );
 };

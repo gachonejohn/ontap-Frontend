@@ -1,11 +1,11 @@
-import React, { useState } from "react";
-import CardModal from "./CardModal";
-import ShareCardModal from "./ShareCardModal";
-import EditCardModal from "./EditCardModal";
-import BusinessCardModal from "./BusinessCardModal";
-import CreateBusinessCardModal from "./CreateBusinessCardModal";
-import CardAnalyticsModal from "./CardAnalyticsModal";
-import ViewProfileModal from "./ViewProfileModal.js";
+import React, { useState } from 'react';
+import CardModal from './CardModal';
+import ShareCardModal from './ShareCardModal';
+import EditCardModal from './EditCardModal';
+import BusinessCardModal from './BusinessCardModal';
+import CreateBusinessCardModal from './CreateBusinessCardModal';
+import CardAnalyticsModal from './CardAnalyticsModal';
+import ViewProfileModal from './ViewProfileModal.js';
 
 const Cards = () => {
   const [isCardModalOpen, setIsCardModalOpen] = useState(false);
@@ -49,57 +49,57 @@ const Cards = () => {
   const sampleIdCards = [
     {
       id: 1,
-      company: "OnTap Technologies",
-      name: "Victor Smith",
-      position: "Product Designer",
-      employeeId: "1003E84155",
-      department: "Design & UX",
-      accessLevel: "Standard",
-      status: "Active",
-      expiryDate: "03/09/2028",
-      bgColor: "bg-red-700",
-      hoverBgColor: "hover:bg-red-800",
-      borderColor: "border-red-500"
+      company: 'OnTap Technologies',
+      name: 'Victor Smith',
+      position: 'Product Designer',
+      employeeId: '1003E84155',
+      department: 'Design & UX',
+      accessLevel: 'Standard',
+      status: 'Active',
+      expiryDate: '03/09/2028',
+      bgColor: 'bg-red-700',
+      hoverBgColor: 'hover:bg-red-800',
+      borderColor: 'border-red-500',
     },
     {
       id: 2,
-      company: "OnTap Technologies",
-      name: "Sarah Johnson",
-      position: "Product Designer",
-      employeeId: "1003E84155",
-      department: "Marketing",
-      accessLevel: "Standard",
-      status: "Active",
-      expiryDate: "03/09/2028",
-      bgColor: "bg-teal-500",
-      hoverBgColor: "hover:bg-teal-600",
-      borderColor: "border-emerald-300"
-    }
+      company: 'OnTap Technologies',
+      name: 'Sarah Johnson',
+      position: 'Product Designer',
+      employeeId: '1003E84155',
+      department: 'Marketing',
+      accessLevel: 'Standard',
+      status: 'Active',
+      expiryDate: '03/09/2028',
+      bgColor: 'bg-teal-500',
+      hoverBgColor: 'hover:bg-teal-600',
+      borderColor: 'border-emerald-300',
+    },
   ];
 
   const sampleBusinessCards = [
     {
       id: 1,
-      name: "Victor Smith",
-      position: "Product Designer",
+      name: 'Victor Smith',
+      position: 'Product Designer',
       scans: 245,
       connections: 18,
-      lastActivity: "2 hours ago",
-      status: "Active",
-      bgColor: "bg-red-700",
-      borderColor: "border-red-500"
+      lastActivity: '2 hours ago',
+      status: 'Active',
+      bgColor: 'bg-red-700',
+      borderColor: 'border-red-500',
     },
     {
       id: 2,
-      name: "Sarah Johnson",
-      position: "Product Designer",
+      name: 'Sarah Johnson',
+      position: 'Product Designer',
       scans: 189,
       connections: 24,
-      lastActivity: "5 hours ago",
-      status: "Active",
-      bgColor: "bg-teal-500",
-      borderColor: "border-emerald-300"
-    }
+      lastActivity: '5 hours ago',
+      status: 'Active',
+      bgColor: 'bg-teal-500',
+      borderColor: 'border-emerald-300',
+    },
   ];
 
   return (
@@ -107,9 +107,7 @@ const Cards = () => {
       {/* Cards Header */}
       <div className="flex flex-row justify-between items-center">
         <div className="flex flex-col justify-start items-start gap-1.5">
-          <div className="text-lg text-neutral-900 font-semibold">
-            My Cards
-          </div>
+          <div className="text-lg text-neutral-900 font-semibold">My Cards</div>
           <div className="text-sm text-gray-600 font-normal">
             Manage your digital business cards and track their performance.
           </div>
@@ -120,16 +118,9 @@ const Cards = () => {
             onClick={handleCreateBusinessCard}
           >
             <div className="flex justify-center items-center w-5 h-5">
-              <img
-                width="15.4px"
-                height="15.3px"
-                src="/images/addtask.png"
-                alt="Add icon"
-              />
+              <img width="15.4px" height="15.3px" src="/images/addtask.png" alt="Add icon" />
             </div>
-            <div className="text-sm text-white font-medium">
-              Create New Business Card
-            </div>
+            <div className="text-sm text-white font-medium">Create New Business Card</div>
           </button>
         )}
       </div>
@@ -142,16 +133,9 @@ const Cards = () => {
         >
           <div className="flex flex-row justify-center items-center gap-1">
             <div className="flex justify-center items-center h-5">
-              <img
-                width="16.6px"
-                height="13.1px"
-                src="/images/id.png"
-                alt="ID Card icon"
-              />
+              <img width="16.6px" height="13.1px" src="/images/id.png" alt="ID Card icon" />
             </div>
-            <div className="text-xs text-neutral-900 font-semibold tracking-wide">
-              ID Cards
-            </div>
+            <div className="text-xs text-neutral-900 font-semibold tracking-wide">ID Cards</div>
           </div>
         </div>
         <div
@@ -178,25 +162,21 @@ const Cards = () => {
       {activeCardTab === 'idCards' && (
         <div className="grid grid-cols-3 gap-6 w-full">
           {sampleIdCards.map((card) => (
-            <div key={card.id} className="flex flex-col justify-center items-center rounded-xl w-full shadow bg-white p-6 hover:shadow-lg transition-shadow duration-200">
+            <div
+              key={card.id}
+              className="flex flex-col justify-center items-center rounded-xl w-full shadow bg-white p-6 hover:shadow-lg transition-shadow duration-200"
+            >
               <div className="flex flex-col justify-start items-start gap-4 w-full">
-                <div className={`flex flex-col justify-start items-start gap-4 p-4 rounded-xl w-full h-[153px] ${card.bgColor} ${card.hoverBgColor} transition-colors duration-200`}>
+                <div
+                  className={`flex flex-col justify-start items-start gap-4 p-4 rounded-xl w-full h-[153px] ${card.bgColor} ${card.hoverBgColor} transition-colors duration-200`}
+                >
                   <div className="flex flex-row justify-between items-start w-full">
                     <div className="flex flex-col justify-start items-start gap-1">
-                      <div className="text-base text-white font-bold">
-                        {card.company}
-                      </div>
-                      <div className="text-sm text-rose-200 font-medium">
-                        Employee ID
-                      </div>
+                      <div className="text-base text-white font-bold">{card.company}</div>
+                      <div className="text-sm text-rose-200 font-medium">Employee ID</div>
                     </div>
                     <div className="flex justify-center items-center rounded-md w-10 h-10 bg-white/40 hover:bg-white/60 transition-colors duration-200">
-                      <img
-                        width="28px"
-                        height="28px"
-                        src="/images/qrcode.png"
-                        alt="QR Code icon"
-                      />
+                      <img width="28px" height="28px" src="/images/qrcode.png" alt="QR Code icon" />
                     </div>
                   </div>
                   <div className="flex flex-row justify-center items-center gap-3">
@@ -208,26 +188,16 @@ const Cards = () => {
                       height="45px"
                     />
                     <div className="flex flex-col justify-start items-start gap-0.5">
-                      <div className="text-sm text-white font-bold">
-                        {card.name}
-                      </div>
-                      <div className="text-xs text-rose-200 font-medium">
-                        {card.position}
-                      </div>
-                      <div className="text-xs text-rose-200 font-medium">
-                        ID: {card.employeeId}
-                      </div>
+                      <div className="text-sm text-white font-bold">{card.name}</div>
+                      <div className="text-xs text-rose-200 font-medium">{card.position}</div>
+                      <div className="text-xs text-rose-200 font-medium">ID: {card.employeeId}</div>
                     </div>
                   </div>
                 </div>
                 <div className="flex flex-row justify-between items-start w-full">
-                  <div className="text-base text-neutral-900 font-semibold">
-                    {card.name}
-                  </div>
+                  <div className="text-base text-neutral-900 font-semibold">{card.name}</div>
                   <div className="flex justify-center items-center rounded-lg px-2 h-6 bg-teal-500">
-                    <div className="text-xs text-white font-medium">
-                      {card.status}
-                    </div>
+                    <div className="text-xs text-white font-medium">{card.status}</div>
                   </div>
                 </div>
                 <div className="flex justify-center items-center rounded-lg w-full h-16 bg-gray-50">
@@ -236,17 +206,13 @@ const Cards = () => {
                       <div className="text-sm text-neutral-900 font-semibold">
                         {card.department}
                       </div>
-                      <div className="text-xs text-gray-500 font-medium">
-                        Department
-                      </div>
+                      <div className="text-xs text-gray-500 font-medium">Department</div>
                     </div>
                     <div className="flex flex-col justify-center items-center gap-0.5">
                       <div className="text-sm text-neutral-900 font-semibold">
                         {card.accessLevel}
                       </div>
-                      <div className="text-xs text-gray-500 font-medium">
-                        Access Level
-                      </div>
+                      <div className="text-xs text-gray-500 font-medium">Access Level</div>
                     </div>
                   </div>
                 </div>
@@ -308,9 +274,7 @@ const Cards = () => {
                         src="/images/preview.png"
                         alt="Preview icon"
                       />
-                      <div className="text-xs text-teal-500 font-medium">
-                        Preview
-                      </div>
+                      <div className="text-xs text-teal-500 font-medium">Preview</div>
                     </div>
                   </div>
                 </div>
@@ -323,10 +287,15 @@ const Cards = () => {
       {activeCardTab === 'businessCards' && (
         <div className="grid grid-cols-3 gap-4 w-full">
           {sampleBusinessCards.map((card) => (
-            <div key={card.id} className="flex flex-col justify-center items-center rounded-xl w-full shadow bg-white p-6 hover:shadow-lg transition-shadow duration-200">
+            <div
+              key={card.id}
+              className="flex flex-col justify-center items-center rounded-xl w-full shadow bg-white p-6 hover:shadow-lg transition-shadow duration-200"
+            >
               <div className="flex flex-col justify-start items-start gap-4 w-full">
                 {/* Card Header */}
-                <div className={`flex flex-col justify-start items-start gap-2 p-4 rounded-xl w-full h-28 ${card.bgColor} transition-colors duration-200`}>
+                <div
+                  className={`flex flex-col justify-start items-start gap-2 p-4 rounded-xl w-full h-28 ${card.bgColor} transition-colors duration-200`}
+                >
                   <div className="flex flex-row justify-between items-center w-full">
                     <div className="flex flex-row justify-center items-center gap-3">
                       <img
@@ -337,21 +306,12 @@ const Cards = () => {
                         height="45px"
                       />
                       <div className="flex flex-col justify-start items-start gap-0.5">
-                        <div className="text-sm text-white font-bold">
-                          {card.name}
-                        </div>
-                        <div className="text-xs text-green-100 font-medium">
-                          {card.position}
-                        </div>
+                        <div className="text-sm text-white font-bold">{card.name}</div>
+                        <div className="text-xs text-green-100 font-medium">{card.position}</div>
                       </div>
                     </div>
                     <div className="flex justify-center items-center rounded-md w-10 h-10 bg-white/40 hover:bg-white/60 transition-colors duration-200">
-                      <img
-                        width="28px"
-                        height="28px"
-                        src="/images/qrcode.png"
-                        alt="QR Code icon"
-                      />
+                      <img width="28px" height="28px" src="/images/qrcode.png" alt="QR Code icon" />
                     </div>
                   </div>
                   <div className="flex flex-row justify-start items-center gap-2">
@@ -365,9 +325,7 @@ const Cards = () => {
                             alt="LinkedIn icon"
                           />
                         </div>
-                        <div className="text-[10px] text-white font-medium">
-                          LinkedIn
-                        </div>
+                        <div className="text-[10px] text-white font-medium">LinkedIn</div>
                       </div>
                     </div>
                     <div className="flex justify-center items-center rounded w-[70px] h-5 bg-white/30">
@@ -380,9 +338,7 @@ const Cards = () => {
                             alt="Twitter icon"
                           />
                         </div>
-                        <div className="text-[10px] text-white font-medium">
-                          Twitter
-                        </div>
+                        <div className="text-[10px] text-white font-medium">Twitter</div>
                       </div>
                     </div>
                   </div>
@@ -394,9 +350,7 @@ const Cards = () => {
                     {card.name} - {card.position}
                   </div>
                   <div className="flex justify-center items-center rounded-lg px-2 h-6 bg-teal-500">
-                    <div className="text-xs text-white font-medium">
-                      {card.status}
-                    </div>
+                    <div className="text-xs text-white font-medium">{card.status}</div>
                   </div>
                 </div>
 
@@ -404,20 +358,14 @@ const Cards = () => {
                 <div className="flex justify-center items-center rounded-lg w-full h-16 bg-gray-50">
                   <div className="flex flex-row justify-between items-center w-full px-4">
                     <div className="flex flex-col justify-start items-center gap-0.5">
-                      <div className="text-sm text-neutral-900 font-semibold">
-                        {card.scans}
-                      </div>
-                      <div className="text-xs text-gray-500 font-medium">
-                        Scans
-                      </div>
+                      <div className="text-sm text-neutral-900 font-semibold">{card.scans}</div>
+                      <div className="text-xs text-gray-500 font-medium">Scans</div>
                     </div>
                     <div className="flex flex-col justify-center items-center gap-0.5">
                       <div className="text-sm text-neutral-900 font-semibold">
                         {card.connections}
                       </div>
-                      <div className="text-xs text-gray-500 font-medium">
-                        Connections
-                      </div>
+                      <div className="text-xs text-gray-500 font-medium">Connections</div>
                     </div>
                     <div
                       className="flex flex-col justify-center items-center gap-0.5 cursor-pointer hover:bg-gray-100 p-2 rounded transition-colors"
@@ -429,9 +377,7 @@ const Cards = () => {
                         src="/images/analytics.png"
                         alt="Analytics icon"
                       />
-                      <div className="text-xs text-gray-500 font-medium">
-                        Analytics
-                      </div>
+                      <div className="text-xs text-gray-500 font-medium">Analytics</div>
                     </div>
                   </div>
                 </div>
@@ -491,9 +437,7 @@ const Cards = () => {
                         src="/images/preview.png"
                         alt="Preview icon"
                       />
-                      <div className="text-xs text-teal-500 font-medium">
-                        Preview
-                      </div>
+                      <div className="text-xs text-teal-500 font-medium">Preview</div>
                     </div>
                   </div>
                 </div>

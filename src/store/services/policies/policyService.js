@@ -1,86 +1,83 @@
-
-import { apiSlice } from "../../api/apiSlice";
+import { apiSlice } from '../../api/apiSlice';
 
 export const attendanceApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    
-    
     getAttendancePolicies: builder.query({
-      query: ({ page, page_size,} = {}) => {
+      query: ({ page, page_size } = {}) => {
         const queryParams = {};
         if (page) queryParams.page = page;
         if (page_size) queryParams.page_size = page_size;
-       
+
         return {
           url: `attendance/work-schedule-rules/`,
-          method: "GET",
+          method: 'GET',
           params: queryParams,
         };
       },
     }),
-   
+
     createAttendancePolicy: builder.mutation({
       query: (data) => ({
         url: `attendance/work-schedule-rules/create/`,
-        method: "POST",
+        method: 'POST',
         body: data,
       }),
     }),
     updateAttendancePolicy: builder.mutation({
-      query: ({id, data}) => ({
+      query: ({ id, data }) => ({
         url: `attendance/work-schedule-rules/${id}/`,
-        method: "PATCH",
+        method: 'PATCH',
         body: data,
       }),
     }),
     deleteAttendancePolicy: builder.mutation({
       query: (id) => ({
         url: `attendance/work-schedule-rules/${id}/`,
-        method: "DELETE",
+        method: 'DELETE',
       }),
     }),
     createBreakCategory: builder.mutation({
       query: (data) => ({
         url: `attendance/breaks/breaktypes/create/`,
-        method: "POST",
+        method: 'POST',
         body: data,
       }),
     }),
     updateBreakCategory: builder.mutation({
-      query: ({id, data}) => ({
+      query: ({ id, data }) => ({
         url: `attendance/breaks/breaktypes/${id}/`,
-        method: "PATCH",
+        method: 'PATCH',
         body: data,
       }),
     }),
     deleteBreakCategory: builder.mutation({
       query: (id) => ({
         url: `attendance/breaks/breaktypes/${id}/`,
-        method: "DELETE",
+        method: 'DELETE',
       }),
     }),
     getBreakCategories: builder.query({
-      query: ({ page, page_size,} = {}) => {
+      query: ({ page, page_size } = {}) => {
         const queryParams = {};
         if (page) queryParams.page = page;
         if (page_size) queryParams.page_size = page_size;
-       
+
         return {
           url: `attendance/breaks/breaktypes/`,
-          method: "GET",
+          method: 'GET',
           params: queryParams,
         };
       },
     }),
     getBreakRules: builder.query({
-      query: ({ page, page_size,} = {}) => {
+      query: ({ page, page_size } = {}) => {
         const queryParams = {};
         if (page) queryParams.page = page;
         if (page_size) queryParams.page_size = page_size;
-       
+
         return {
           url: `attendance/breaks/breakrules/`,
-          method: "GET",
+          method: 'GET',
           params: queryParams,
         };
       },
@@ -88,74 +85,74 @@ export const attendanceApi = apiSlice.injectEndpoints({
     createBreakRule: builder.mutation({
       query: (data) => ({
         url: `attendance/breaks/breakrules/create/`,
-        method: "POST",
+        method: 'POST',
         body: data,
       }),
     }),
     updateBreakRule: builder.mutation({
-      query: ({id, data}) => ({
+      query: ({ id, data }) => ({
         url: `attendance/breaks/breakrules/${id}/`,
-        method: "PATCH",
+        method: 'PATCH',
         body: data,
       }),
     }),
     deleteBreakRule: builder.mutation({
       query: (id) => ({
         url: `attendance/breaks/breakrules/${id}/`,
-        method: "DELETE",
+        method: 'DELETE',
       }),
     }),
     getBreakTypesAssignments: builder.query({
-      query: ({ page, page_size,} = {}) => {
+      query: ({ page, page_size } = {}) => {
         const queryParams = {};
         if (page) queryParams.page = page;
         if (page_size) queryParams.page_size = page_size;
-       
+
         return {
           url: `attendance/breaks/breakassignments/`,
-          method: "GET",
+          method: 'GET',
           params: queryParams,
         };
       },
     }),
-   
+
     createBreakTypeAssignment: builder.mutation({
       query: (data) => ({
         url: `attendance/breaks/breakassignments/create/`,
-        method: "POST",
+        method: 'POST',
         body: data,
       }),
     }),
     updateBreakTypeAssignment: builder.mutation({
-      query: ({id, data}) => ({
+      query: ({ id, data }) => ({
         url: `attendance/breaks/breakassignments/${id}/`,
-        method: "PATCH",
+        method: 'PATCH',
         body: data,
       }),
     }),
     deleteBreakTypeAssignment: builder.mutation({
       query: (id) => ({
         url: `attendance/breaks/breakassignments/${id}/`,
-        method: "DELETE",
+        method: 'DELETE',
       }),
     }),
-      getEmployeeBreaks: builder.query({
-      query: ({ page, page_size,} = {}) => {
+    getEmployeeBreaks: builder.query({
+      query: ({ page, page_size } = {}) => {
         const queryParams = {};
         if (page) queryParams.page = page;
         if (page_size) queryParams.page_size = page_size;
-       
+
         return {
           url: `attendance/breaks/employeebreaks/latest/`,
-          method: "GET",
+          method: 'GET',
           params: queryParams,
         };
       },
     }),
-      createBreak: builder.mutation({
+    createBreak: builder.mutation({
       query: (data) => ({
         url: `attendance/breaks/employeebreaks/create/`,
-        method: "POST",
+        method: 'POST',
         body: data,
       }),
     }),
@@ -163,28 +160,27 @@ export const attendanceApi = apiSlice.injectEndpoints({
 });
 
 export const {
-useGetAttendancePoliciesQuery,
+  useGetAttendancePoliciesQuery,
 
-useGetBreakRulesQuery,
-useGetBreakCategoriesQuery,
-useCreateAttendancePolicyMutation,
-useUpdateAttendancePolicyMutation,
-useDeleteAttendancePolicyMutation,
+  useGetBreakRulesQuery,
+  useGetBreakCategoriesQuery,
+  useCreateAttendancePolicyMutation,
+  useUpdateAttendancePolicyMutation,
+  useDeleteAttendancePolicyMutation,
 
-useCreateBreakCategoryMutation,
-useUpdateBreakCategoryMutation,
-useDeleteBreakCategoryMutation,
+  useCreateBreakCategoryMutation,
+  useUpdateBreakCategoryMutation,
+  useDeleteBreakCategoryMutation,
 
-useCreateBreakRuleMutation,
-useUpdateBreakRuleMutation,
-useDeleteBreakRuleMutation,
+  useCreateBreakRuleMutation,
+  useUpdateBreakRuleMutation,
+  useDeleteBreakRuleMutation,
 
-useGetBreakTypesAssignmentsQuery,
-useCreateBreakTypeAssignmentMutation,
-useUpdateBreakTypeAssignmentMutation,
-useDeleteBreakTypeAssignmentMutation,
+  useGetBreakTypesAssignmentsQuery,
+  useCreateBreakTypeAssignmentMutation,
+  useUpdateBreakTypeAssignmentMutation,
+  useDeleteBreakTypeAssignmentMutation,
 
-useCreateBreakMutation,
-useGetEmployeeBreaksQuery
-
+  useCreateBreakMutation,
+  useGetEmployeeBreaksQuery,
 } = attendanceApi;

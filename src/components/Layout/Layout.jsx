@@ -1,16 +1,16 @@
-import React, { useState } from "react";
-import { Outlet } from "react-router-dom";
-import Sidebar from "./Sidebar";
-import Header from "./Header";
-import { useAppSelector } from "../../store/hooks";
-import { usePermissions } from "../../hooks/getPermissions";
-import PageLoadingSpinner from "../common/spinners/pageLoadingSpinner";
+import React, { useState } from 'react';
+import { Outlet } from 'react-router-dom';
+import Sidebar from './Sidebar';
+import Header from './Header';
+import { useAppSelector } from '../../store/hooks';
+import { usePermissions } from '../../hooks/getPermissions';
+import PageLoadingSpinner from '../common/spinners/pageLoadingSpinner';
 
 export default function DashboardLayout() {
   const { user, loading } = useAppSelector((state) => state.auth);
   const { isLoadingPermissions } = usePermissions();
 
-  const [sidebarOpen, setSidebarOpen] = useState(true); 
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const isLoading = loading || isLoadingPermissions;
 
@@ -30,7 +30,7 @@ export default function DashboardLayout() {
       {/* Main area */}
       <div
         className={`flex flex-col flex-1 w-full  bg-[#F9F9FA] transition-all duration-300 ${
-          sidebarOpen ? "ml-[272px]" : "ml-[64px]"
+          sidebarOpen ? 'ml-[272px]' : 'ml-[64px]'
         }`}
       >
         <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />

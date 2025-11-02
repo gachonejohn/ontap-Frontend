@@ -1,27 +1,27 @@
-import Select from "react-select";
+import Select from 'react-select';
 
 const EmploymentDetailsTab = ({ register, errors, setValue }) => {
   const handleContractTypeChange = (selected) => {
-    if (selected) setValue("contract.contract_type", selected.value);
+    if (selected) setValue('contract.contract_type', selected.value);
   };
 
   const handleWorkLocationChange = (selected) => {
-    if (selected) setValue("contract.work_location", selected.value);
+    if (selected) setValue('contract.work_location', selected.value);
   };
 
   const contractTypeOptions = [
-    { value: "Permanent", label: "Permanent" },
-    { value: "Contract", label: "Fixed Term" },
-    { value: "Probation", label: "Probation" },
-    { value: "Internship", label: "Internship" },
-    { value: "Volunteer", label: "Volunteer" },
-    { value: "Other", label: "Other" },
+    { value: 'Permanent', label: 'Permanent' },
+    { value: 'Contract', label: 'Fixed Term' },
+    { value: 'Probation', label: 'Probation' },
+    { value: 'Internship', label: 'Internship' },
+    { value: 'Volunteer', label: 'Volunteer' },
+    { value: 'Other', label: 'Other' },
   ];
 
   const workLocationOptions = [
-    { value: "On Site", label: "On Site" },
-    { value: "Remote", label: "Remote" },
-    { value: "Hybrid", label: "Hybrid" },
+    { value: 'On Site', label: 'On Site' },
+    { value: 'Remote', label: 'Remote' },
+    { value: 'Hybrid', label: 'Hybrid' },
   ];
 
   return (
@@ -30,12 +30,10 @@ const EmploymentDetailsTab = ({ register, errors, setValue }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Salary */}
           <div>
-            <label className="block text-[12px] font-medium mb-1">
-              Basic Salary
-            </label>
+            <label className="block text-[12px] font-medium mb-1">Basic Salary</label>
             <input
               type="number"
-              {...register("contract.basic_salary", { valueAsNumber: true })}
+              {...register('contract.basic_salary', { valueAsNumber: true })}
               className="w-full py-2 px-3 rounded-md border bg-white focus:outline-none focus:border-primary"
               placeholder="0.00"
             />
@@ -48,12 +46,10 @@ const EmploymentDetailsTab = ({ register, errors, setValue }) => {
 
           {/* Currency */}
           <div>
-            <label className="block text-[12px] font-medium mb-1">
-              Currency
-            </label>
+            <label className="block text-[12px] font-medium mb-1">Currency</label>
             <input
               type="text"
-              {...register("contract.salary_currency")}
+              {...register('contract.salary_currency')}
               className="w-full py-2 px-3 rounded-md border bg-white focus:outline-none focus:border-primary"
               placeholder="e.g KES"
             />
@@ -67,9 +63,7 @@ const EmploymentDetailsTab = ({ register, errors, setValue }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
           {/* Contract Type */}
           <div className="mt-3">
-            <label className="block text-[12px] font-medium mb-1">
-              Contract Type
-            </label>
+            <label className="block text-[12px] font-medium mb-1">Contract Type</label>
             <Select
               options={contractTypeOptions}
               onChange={handleContractTypeChange}
@@ -80,11 +74,11 @@ const EmploymentDetailsTab = ({ register, errors, setValue }) => {
                 menuPortal: (base) => ({ ...base, zIndex: 9999 }),
                 control: (base) => ({
                   ...base,
-                  minHeight: "36px",
-                  borderColor: "#d1d5db",
-                  boxShadow: "none",
-                  "&:hover": { borderColor: "#9ca3af" },
-                  backgroundColor: "#F3F4F6",
+                  minHeight: '36px',
+                  borderColor: '#d1d5db',
+                  boxShadow: 'none',
+                  '&:hover': { borderColor: '#9ca3af' },
+                  backgroundColor: '#F3F4F6',
                 }),
               }}
             />
@@ -110,11 +104,11 @@ const EmploymentDetailsTab = ({ register, errors, setValue }) => {
                 menuPortal: (base) => ({ ...base, zIndex: 9999 }),
                 control: (base) => ({
                   ...base,
-                  minHeight: "36px",
-                  borderColor: "#d1d5db",
-                  boxShadow: "none",
-                  "&:hover": { borderColor: "#9ca3af" },
-                  backgroundColor: "#F3F4F6",
+                  minHeight: '36px',
+                  borderColor: '#d1d5db',
+                  boxShadow: 'none',
+                  '&:hover': { borderColor: '#9ca3af' },
+                  backgroundColor: '#F3F4F6',
                 }),
               }}
             />
@@ -134,18 +128,16 @@ const EmploymentDetailsTab = ({ register, errors, setValue }) => {
             </label>
             <input
               type="date"
-              {...register("contract.start_date")}
+              {...register('contract.start_date')}
               className="w-full py-2 px-3  text-[12px] rounded-md border bg-white focus:outline-none focus:border-primary"
             />
           </div>
 
           <div>
-            <label className="block text-[12px] font-medium mb-1">
-              End Date
-            </label>
+            <label className="block text-[12px] font-medium mb-1">End Date</label>
             <input
               type="date"
-              {...register("contract.end_date")}
+              {...register('contract.end_date')}
               className="w-full py-2 px-3 text-[12px] rounded-md border bg-white focus:outline-none focus:border-primary"
             />
           </div>
@@ -153,12 +145,10 @@ const EmploymentDetailsTab = ({ register, errors, setValue }) => {
 
         {/* Supervisor */}
         <div className="mt-3">
-          <label className="block text-[12px] font-medium mb-1">
-            Supervisor
-          </label>
+          <label className="block text-[12px] font-medium mb-1">Supervisor</label>
           <input
             type="text"
-            {...register("contract.reporting_to")}
+            {...register('contract.reporting_to')}
             className="w-full py-2 px-3 rounded-md border bg-white focus:outline-none focus:border-primary"
             placeholder="supervisor name"
           />

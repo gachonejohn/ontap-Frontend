@@ -1,24 +1,24 @@
-import { CreateBreak } from "@components/attendance/breaks/CreateBreak";
-import { useGetEmployeeBreaksQuery } from "@store/services/policies/policyService";
-import { useState } from "react";
-import Countdown from "react-countdown";
-import { FiClock } from "react-icons/fi";
-import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
-import LeaveModal from "../../dashboards/employee/components/LeaveModal";
+import { CreateBreak } from '@components/attendance/breaks/CreateBreak';
+import { useGetEmployeeBreaksQuery } from '@store/services/policies/policyService';
+import { useState } from 'react';
+import Countdown from 'react-countdown';
+import { FiClock } from 'react-icons/fi';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import LeaveModal from '../../dashboards/employee/components/LeaveModal';
 import {
   useCheckInMutation,
   useCheckOutMutation,
   useGetTodayAttendaceQuery,
-} from "../../store/services/attendance/attendanceService";
-import { formatClockTime, formatHoursWorked } from "../../utils/dates";
-import ActionModal from "../common/Modals/ActionModal";
-import { isBreakActive } from "@utils/isBreakActive";
+} from '../../store/services/attendance/attendanceService';
+import { formatClockTime, formatHoursWorked } from '../../utils/dates';
+import ActionModal from '../common/Modals/ActionModal';
+import { isBreakActive } from '@utils/isBreakActive';
 
 const EmployLeaveDashboardContent = () => {
   const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("leaveManagement");
-  const [modalType, setModalType] = useState("");
+  const [activeTab, setActiveTab] = useState('leaveManagement');
+  const [modalType, setModalType] = useState('');
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -40,19 +40,20 @@ const EmployLeaveDashboardContent = () => {
   const [checkOut, { isLoading: isClockingOut }] = useCheckOutMutation();
 
   const [isNavigating, setIsNavigating] = useState(false);
-  console.log("attendanceData", attendanceData);
+  console.log('attendanceData', attendanceData);
+  console.log('breakData', breakData);
   const clockIn = attendanceData?.clock_in;
   const clockOut = attendanceData?.clock_out;
 
   const openClockInModal = () => {
-    setModalType("clockIn");
+    setModalType('clockIn');
     setIsModalOpen(true);
   };
-  console.log("breakData", breakData);
+  console.log('breakData', breakData);
   const openClockOutModal = (id) => {
-    console.log("Clicked ID:", id);
+    console.log('Clicked ID:', id);
     setSelectedItem(id);
-    setModalType("clockOut");
+    setModalType('clockOut');
     setIsModalOpen(true);
   };
 
@@ -66,42 +67,42 @@ const EmployLeaveDashboardContent = () => {
   const handleClockIn = async () => {
     try {
       const res = await checkIn().unwrap();
-      const msg = res?.message || "Clocked in successfully!";
+      const msg = res?.message || 'Clocked in successfully!';
       toast.success(msg);
 
       setIsNavigating(true);
       await refetch();
 
       setTimeout(() => {
-        navigate("/dashboard/tasks");
+        navigate('/dashboard/tasks');
       }, 300);
     } catch (error) {
-      console.log("error", error);
-      if (error && typeof error === "object" && "data" in error && error.data) {
+      console.log('error', error);
+      if (error && typeof error === 'object' && 'data' in error && error.data) {
         const errorData = error.data;
-        toast.error(errorData.error || "Error clocking in!.");
+        toast.error(errorData.error || 'Error clocking in!.');
       } else {
-        toast.error("Unexpected Error occured. Please try again.");
+        toast.error('Unexpected Error occured. Please try again.');
       }
       closeModal();
       setIsNavigating(false);
     }
   };
   const handleCheckOut = async () => {
-    console.log("selectedItem", selectedItem);
+    console.log('selectedItem', selectedItem);
     try {
       const res = await checkOut(selectedItem).unwrap();
-      const msg = res?.message || "Clocked out successfully!";
+      const msg = res?.message || 'Clocked out successfully!';
       toast.success(msg);
       setSelectedItem(null);
     } catch (error) {
-      console.log("error", error);
-      if (error && typeof error === "object" && "data" in error && error.data) {
+      console.log('error', error);
+      if (error && typeof error === 'object' && 'data' in error && error.data) {
         const errorData = error.data;
-        console.log("errorData", errorData);
-        toast.error(errorData.error || "Error clocking out!.");
+        console.log('errorData', errorData);
+        toast.error(errorData.error || 'Error clocking out!.');
       } else {
-        toast.error("Unexpected Error occured. Please try again.");
+        toast.error('Unexpected Error occured. Please try again.');
       }
     } finally {
       closeModal();
@@ -110,7 +111,7 @@ const EmployLeaveDashboardContent = () => {
   };
   const calculateBreakEndTime = (breakEndTime) => {
     // breakEndTime: e.g. "16:15:00"
-    const [hours, minutes, seconds] = breakEndTime.split(":").map(Number);
+    const [hours, minutes, seconds] = breakEndTime.split(':').map(Number);
 
     const now = new Date();
     const end = new Date(now);
@@ -127,9 +128,7 @@ const EmployLeaveDashboardContent = () => {
       {/* Leave Header */}
       <div className="flex flex-row justify-between items-center">
         <div className="flex flex-col">
-          <div className="text-lg text-neutral-900 font-semibold">
-            Leave & Attendance
-          </div>
+          <div className="text-lg text-neutral-900 font-semibold">Leave & Attendance</div>
           <div className="text-sm text-gray-600 font-normal">
             Manage your leave requests and track attendance
           </div>
@@ -147,9 +146,7 @@ const EmployLeaveDashboardContent = () => {
                 alt="Apply Leave icon"
               />
             </div>
-            <div className="text-sm text-white font-medium">
-              Apply for Leave
-            </div>
+            <div className="text-sm text-white font-medium">Apply for Leave</div>
           </div>
         </div>
       </div>
@@ -175,9 +172,7 @@ const EmployLeaveDashboardContent = () => {
               <div className="flex flex-col">
                 <div className="text-sm font-medium">Today's Status</div>
                 <div className="text-lg font-semibold">
-                  {clockIn
-                    ? `Clocked In: ${formatClockTime(clockIn)}`
-                    : "Not clocked In"}
+                  {clockIn ? `Clocked In: ${formatClockTime(clockIn)}` : 'Not clocked In'}
                 </div>
               </div>
               <div className="flex items-center justify-center p-1 rounded-2xl h-8 w-8  shadow-md">
@@ -201,12 +196,7 @@ const EmployLeaveDashboardContent = () => {
           <div className="flex justify-between items-center">
             <div className="text-sm text-gray-600 font-medium">Hours Today</div>
             <div className="flex items-center justify-center p-1 rounded-2xl h-8 w-8 bg-blue-100 shadow-sm">
-              <img
-                width="20px"
-                height="18px"
-                src="/images/payday.png"
-                alt="Payday icon"
-              />
+              <img width="20px" height="18px" src="/images/payday.png" alt="Payday icon" />
             </div>
           </div>
           <div className="text-lg text-neutral-900 font-semibold">
@@ -222,16 +212,11 @@ const EmployLeaveDashboardContent = () => {
           <div className="flex justify-between items-center">
             <div className="text-sm text-gray-600 font-medium">Status</div>
             <div className="flex items-center justify-center p-1 rounded-2xl h-8 w-8 bg-green-100 shadow-sm">
-              <img
-                width="20px"
-                height="18px"
-                src="/images/greenclock.png"
-                alt="Status icon"
-              />
+              <img width="20px" height="18px" src="/images/greenclock.png" alt="Status icon" />
             </div>
           </div>
           <div className="text-lg text-teal-500 font-semibold">
-            {attendanceData?.status || "Unknown"}
+            {attendanceData?.status || 'Unknown'}
           </div>
         </div>
 
@@ -283,31 +268,20 @@ const EmployLeaveDashboardContent = () => {
               {breakData ? (
                 isBreakActive(breakData.break_end) ? (
                   <div className="flex flex-col items-center gap-2 bg-blue-50 rounded-xl p-4 border shadow-sm">
-                    <div className="text-blue-800 font-semibold">
-                      On Break — Ends in:
-                    </div>
+                    <div className="text-blue-800 font-semibold">On Break — Ends in:</div>
 
                     <Countdown
                       key={breakData.id}
                       date={
-                        new Date(
-                          new Date().setHours(
-                            ...breakData.break_end.split(":").map(Number)
-                          )
-                        )
+                        new Date(new Date().setHours(...breakData.break_end.split(':').map(Number)))
                       }
                       renderer={({ minutes, seconds, completed }) => {
                         if (completed) {
-                          return (
-                            <span className="text-red-600 font-semibold">
-                              Break ended
-                            </span>
-                          );
+                          return <span className="text-red-600 font-semibold">Break ended</span>;
                         }
                         return (
                           <span className="text-lg font-semibold text-blue-700">
-                            {String(minutes).padStart(2, "0")}:
-                            {String(seconds).padStart(2, "0")}
+                            {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
                           </span>
                         );
                       }}
@@ -345,9 +319,7 @@ const EmployLeaveDashboardContent = () => {
             </>
           ) : (
             <div className="flex flex-col items-center gap-2 bg-amber-50 rounded-xl p-4 border shadow-sm">
-              <span className="text-base text-amber-700 font-medium">
-                Clocked out at
-              </span>
+              <span className="text-base text-amber-700 font-medium">Clocked out at</span>
               <span className="text-2xl font-bold text-amber-700">
                 {formatClockTime(attendanceData.clock_out)}
               </span>
@@ -360,13 +332,13 @@ const EmployLeaveDashboardContent = () => {
       <div className="flex rounded-lg border border-slate-100 h-10 bg-slate-50 overflow-hidden">
         <div
           className={`flex items-center justify-center h-10 w-1/2 cursor-pointer ${
-            activeTab === "leaveManagement" ? "bg-white" : ""
+            activeTab === 'leaveManagement' ? 'bg-white' : ''
           }`}
-          onClick={() => setActiveTab("leaveManagement")}
+          onClick={() => setActiveTab('leaveManagement')}
         >
           <div
             className={`text-xs text-neutral-900 ${
-              activeTab === "leaveManagement" ? "font-semibold" : "font-medium"
+              activeTab === 'leaveManagement' ? 'font-semibold' : 'font-medium'
             }`}
           >
             Leave Management
@@ -374,13 +346,13 @@ const EmployLeaveDashboardContent = () => {
         </div>
         <div
           className={`flex items-center justify-center h-10 w-1/2 cursor-pointer ${
-            activeTab === "leaveBalance" ? "bg-white" : ""
+            activeTab === 'leaveBalance' ? 'bg-white' : ''
           }`}
-          onClick={() => setActiveTab("leaveBalance")}
+          onClick={() => setActiveTab('leaveBalance')}
         >
           <div
             className={`text-xs text-neutral-900 ${
-              activeTab === "leaveBalance" ? "font-semibold" : "font-medium"
+              activeTab === 'leaveBalance' ? 'font-semibold' : 'font-medium'
             }`}
           >
             Leave Balance
@@ -388,27 +360,18 @@ const EmployLeaveDashboardContent = () => {
         </div>
       </div>
 
-      {activeTab === "leaveManagement" ? (
+      {activeTab === 'leaveManagement' ? (
         /* Leave Requests Table */
         <div className="flex flex-col rounded-xl w-full shadow-sm bg-white overflow-hidden">
           {/* Table Header */}
           <div className="flex flex-row justify-between items-center p-4 w-full h-20 border-b border-neutral-200">
-            <div className="text-lg text-neutral-900 font-medium">
-              My Leave Requests
-            </div>
+            <div className="text-lg text-neutral-900 font-medium">My Leave Requests</div>
             <div className="flex flex-row justify-center items-center gap-2 p-2 rounded-lg border border-neutral-200 w-[75px] h-11 bg-white cursor-pointer hover:bg-gray-50 transition-colors">
               <div className="flex items-center gap-1">
                 <div className="flex justify-center items-center h-5">
-                  <img
-                    width="16.3px"
-                    height="16.3px"
-                    src="/images/filter.png"
-                    alt="Filter icon"
-                  />
+                  <img width="16.3px" height="16.3px" src="/images/filter.png" alt="Filter icon" />
                 </div>
-                <div className="text-xs text-neutral-900 font-semibold">
-                  Filter
-                </div>
+                <div className="text-xs text-neutral-900 font-semibold">Filter</div>
               </div>
             </div>
           </div>
@@ -418,27 +381,13 @@ const EmployLeaveDashboardContent = () => {
             <table className="w-full">
               <thead>
                 <tr className="bg-slate-50">
-                  <th className="p-4 text-xs text-gray-500 font-medium text-left">
-                    Type
-                  </th>
-                  <th className="p-4 text-xs text-gray-500 font-medium text-left">
-                    Duration
-                  </th>
-                  <th className="p-4 text-xs text-gray-500 font-medium text-left">
-                    Days
-                  </th>
-                  <th className="p-4 text-xs text-gray-500 font-medium text-left">
-                    Status
-                  </th>
-                  <th className="p-4 text-xs text-gray-500 font-medium text-left">
-                    Applied On
-                  </th>
-                  <th className="p-4 text-xs text-gray-500 font-medium text-left">
-                    Approver
-                  </th>
-                  <th className="p-4 text-xs text-gray-500 font-medium text-left">
-                    Actions
-                  </th>
+                  <th className="p-4 text-xs text-gray-500 font-medium text-left">Type</th>
+                  <th className="p-4 text-xs text-gray-500 font-medium text-left">Duration</th>
+                  <th className="p-4 text-xs text-gray-500 font-medium text-left">Days</th>
+                  <th className="p-4 text-xs text-gray-500 font-medium text-left">Status</th>
+                  <th className="p-4 text-xs text-gray-500 font-medium text-left">Applied On</th>
+                  <th className="p-4 text-xs text-gray-500 font-medium text-left">Approver</th>
+                  <th className="p-4 text-xs text-gray-500 font-medium text-left">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -446,15 +395,12 @@ const EmployLeaveDashboardContent = () => {
                 <tr className="border-b border-neutral-200">
                   <td className="p-4">
                     <div className="flex justify-center items-center gap-2.5 py-1 px-5 rounded-lg h-9 bg-blue-50 min-w-[90px]">
-                      <div className="text-xs text-blue-900 font-medium">
-                        Annual Leave
-                      </div>
+                      <div className="text-xs text-blue-900 font-medium">Annual Leave</div>
                     </div>
                   </td>
                   <td className="p-4">
                     <div className="text-xs text-gray-800 font-normal">
-                      <span className="font-medium">2025-08-25</span> to
-                      2025-09-10
+                      <span className="font-medium">2025-08-25</span> to 2025-09-10
                     </div>
                   </td>
                   <td className="p-4">
@@ -472,16 +418,12 @@ const EmployLeaveDashboardContent = () => {
                             className="w-full h-full object-contain"
                           />
                         </div>
-                        <div className="text-xs text-yellow-800 font-medium">
-                          Pending
-                        </div>
+                        <div className="text-xs text-yellow-800 font-medium">Pending</div>
                       </div>
                     </div>
                   </td>
                   <td className="p-4">
-                    <div className="text-xs text-gray-800 font-medium">
-                      2025-08-10
-                    </div>
+                    <div className="text-xs text-gray-800 font-medium">2025-08-10</div>
                   </td>
                   <td className="p-4">
                     <div className="text-xs text-gray-800 font-medium">HR</div>
@@ -489,14 +431,10 @@ const EmployLeaveDashboardContent = () => {
                   <td className="p-4">
                     <div className="flex gap-2">
                       <div className="flex justify-center items-center gap-2.5 py-1 px-5 rounded-lg border border-neutral-200 h-9 min-w-[90px] cursor-pointer hover:bg-gray-50 transition-colors">
-                        <div className="text-xs text-gray-800 font-medium">
-                          View
-                        </div>
+                        <div className="text-xs text-gray-800 font-medium">View</div>
                       </div>
                       <div className="flex justify-center items-center gap-2.5 py-1 px-5 rounded-lg border border-neutral-200 h-9 min-w-[90px] cursor-pointer hover:bg-gray-50 transition-colors">
-                        <div className="text-xs text-red-600 font-medium">
-                          Cancel
-                        </div>
+                        <div className="text-xs text-red-600 font-medium">Cancel</div>
                       </div>
                     </div>
                   </td>
@@ -506,15 +444,12 @@ const EmployLeaveDashboardContent = () => {
                 <tr className="border-b border-neutral-200">
                   <td className="p-4">
                     <div className="flex justify-center items-center gap-2.5 py-1 px-5 rounded-lg h-9 bg-orange-50 min-w-[90px]">
-                      <div className="text-xs text-yellow-800 font-medium">
-                        Sick Leave
-                      </div>
+                      <div className="text-xs text-yellow-800 font-medium">Sick Leave</div>
                     </div>
                   </td>
                   <td className="p-4">
                     <div className="text-xs text-gray-800 font-normal">
-                      <span className="font-medium">2025-08-25</span> to
-                      2025-09-10
+                      <span className="font-medium">2025-08-25</span> to 2025-09-10
                     </div>
                   </td>
                   <td className="p-4">
@@ -532,16 +467,12 @@ const EmployLeaveDashboardContent = () => {
                             className="w-full h-full object-contain"
                           />
                         </div>
-                        <div className="text-xs text-green-800 font-medium">
-                          Approved
-                        </div>
+                        <div className="text-xs text-green-800 font-medium">Approved</div>
                       </div>
                     </div>
                   </td>
                   <td className="p-4">
-                    <div className="text-xs text-gray-800 font-medium">
-                      2025-08-10
-                    </div>
+                    <div className="text-xs text-gray-800 font-medium">2025-08-10</div>
                   </td>
                   <td className="p-4">
                     <div className="text-xs text-gray-800 font-medium">HR</div>
@@ -549,9 +480,7 @@ const EmployLeaveDashboardContent = () => {
                   <td className="p-4">
                     <div className="flex gap-2">
                       <div className="flex justify-center items-center gap-2.5 py-1 px-5 rounded-lg border border-neutral-200 h-9 min-w-[90px] cursor-pointer hover:bg-gray-50 transition-colors">
-                        <div className="text-xs text-gray-800 font-medium">
-                          View
-                        </div>
+                        <div className="text-xs text-gray-800 font-medium">View</div>
                       </div>
                     </div>
                   </td>
@@ -561,15 +490,12 @@ const EmployLeaveDashboardContent = () => {
                 <tr>
                   <td className="p-4">
                     <div className="flex justify-center items-center gap-2.5 py-1 px-5 rounded-lg h-9 bg-purple-50 min-w-[90px]">
-                      <div className="text-xs text-purple-900 font-medium">
-                        Personal Leave
-                      </div>
+                      <div className="text-xs text-purple-900 font-medium">Personal Leave</div>
                     </div>
                   </td>
                   <td className="p-4">
                     <div className="text-xs text-gray-800 font-normal">
-                      <span className="font-medium">2025-08-25</span> to
-                      2025-09-10
+                      <span className="font-medium">2025-08-25</span> to 2025-09-10
                     </div>
                   </td>
                   <td className="p-4">
@@ -587,16 +513,12 @@ const EmployLeaveDashboardContent = () => {
                             className="w-full h-full object-contain"
                           />
                         </div>
-                        <div className="text-xs text-orange-800 font-medium">
-                          Denied
-                        </div>
+                        <div className="text-xs text-orange-800 font-medium">Denied</div>
                       </div>
                     </div>
                   </td>
                   <td className="p-4">
-                    <div className="text-xs text-gray-800 font-medium">
-                      2025-08-10
-                    </div>
+                    <div className="text-xs text-gray-800 font-medium">2025-08-10</div>
                   </td>
                   <td className="p-4">
                     <div className="text-xs text-gray-800 font-medium">HR</div>
@@ -604,9 +526,7 @@ const EmployLeaveDashboardContent = () => {
                   <td className="p-4">
                     <div className="flex gap-2">
                       <div className="flex justify-center items-center gap-2.5 py-1 px-5 rounded-lg border border-neutral-200 h-9 min-w-[90px] cursor-pointer hover:bg-gray-50 transition-colors">
-                        <div className="text-xs text-gray-800 font-medium">
-                          View
-                        </div>
+                        <div className="text-xs text-gray-800 font-medium">View</div>
                       </div>
                     </div>
                   </td>
@@ -622,148 +542,96 @@ const EmployLeaveDashboardContent = () => {
           <div className="flex flex-row justify-between items-center gap-3 w-full h-[123px]">
             <div className="flex flex-col justify-between p-4 rounded-xl w-64 h-[121px] shadow-lg bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl">
               <div className="flex justify-between items-center">
-                <div className="text-sm text-gray-600 font-medium">
-                  Annual Leave
-                </div>
+                <div className="text-sm text-gray-600 font-medium">Annual Leave</div>
                 <div className="flex flex-col justify-start items-start gap-2.5 p-1 rounded border border-neutral-200 h-5 overflow-hidden">
                   <div className="flex flex-row justify-center items-center gap-1 h-4">
-                    <div className="text-xs text-neutral-900 font-semibold">
-                      8/25
-                    </div>
+                    <div className="text-xs text-neutral-900 font-semibold">8/25</div>
                   </div>
                 </div>
               </div>
               <div className="flex flex-col justify-start items-start gap-1.5 h-[53px] w-full">
                 <div className="flex flex-row justify-between items-center w-full h-4">
                   <div className="text-xs text-gray-600 font-medium">Used</div>
-                  <div className="text-xs text-neutral-900 font-medium">
-                    8 days
-                  </div>
+                  <div className="text-xs text-neutral-900 font-medium">8 days</div>
                 </div>
                 <div className="w-full h-2 bg-gray-200 rounded-full">
-                  <div
-                    className="h-full bg-blue-500 rounded-full"
-                    style={{ width: "32%" }}
-                  ></div>
+                  <div className="h-full bg-blue-500 rounded-full" style={{ width: '32%' }}></div>
                 </div>
                 <div className="flex flex-row justify-between items-center w-full h-3.5">
-                  <div className="text-xs text-gray-600 font-medium">
-                    Remaining
-                  </div>
-                  <div className="text-xs text-teal-500 font-medium">
-                    17 days
-                  </div>
+                  <div className="text-xs text-gray-600 font-medium">Remaining</div>
+                  <div className="text-xs text-teal-500 font-medium">17 days</div>
                 </div>
               </div>
             </div>
 
             <div className="flex flex-col justify-between p-4 rounded-xl w-64 h-[121px] shadow-lg bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl">
               <div className="flex justify-between items-center">
-                <div className="text-sm text-gray-600 font-medium">
-                  Sick Leave
-                </div>
+                <div className="text-sm text-gray-600 font-medium">Sick Leave</div>
                 <div className="flex flex-col justify-start items-start gap-2.5 p-1 rounded border border-neutral-200 h-5 overflow-hidden">
                   <div className="flex flex-row justify-center items-center gap-1 h-4">
-                    <div className="text-xs text-neutral-900 font-semibold">
-                      3/10
-                    </div>
+                    <div className="text-xs text-neutral-900 font-semibold">3/10</div>
                   </div>
                 </div>
               </div>
               <div className="flex flex-col justify-start items-start gap-1.5 h-[53px] w-full">
                 <div className="flex flex-row justify-between items-center w-full h-4">
                   <div className="text-xs text-gray-600 font-medium">Used</div>
-                  <div className="text-xs text-neutral-900 font-medium">
-                    3 days
-                  </div>
+                  <div className="text-xs text-neutral-900 font-medium">3 days</div>
                 </div>
                 <div className="w-full h-2 bg-gray-200 rounded-full">
-                  <div
-                    className="h-full bg-green-500 rounded-full"
-                    style={{ width: "30%" }}
-                  ></div>
+                  <div className="h-full bg-green-500 rounded-full" style={{ width: '30%' }}></div>
                 </div>
                 <div className="flex flex-row justify-between items-center w-full h-3.5">
-                  <div className="text-xs text-gray-600 font-medium">
-                    Remaining
-                  </div>
-                  <div className="text-xs text-teal-500 font-medium">
-                    7 days
-                  </div>
+                  <div className="text-xs text-gray-600 font-medium">Remaining</div>
+                  <div className="text-xs text-teal-500 font-medium">7 days</div>
                 </div>
               </div>
             </div>
 
             <div className="flex flex-col justify-between p-4 rounded-xl w-64 h-[121px] shadow-lg bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl">
               <div className="flex justify-between items-center">
-                <div className="text-sm text-gray-600 font-medium">
-                  Personal Leave
-                </div>
+                <div className="text-sm text-gray-600 font-medium">Personal Leave</div>
                 <div className="flex flex-col justify-start items-start gap-2.5 p-1 rounded border border-neutral-200 h-5 overflow-hidden">
                   <div className="flex flex-row justify-center items-center gap-1 w-8 h-4">
-                    <div className="text-xs text-neutral-900 font-semibold">
-                      2/5
-                    </div>
+                    <div className="text-xs text-neutral-900 font-semibold">2/5</div>
                   </div>
                 </div>
               </div>
               <div className="flex flex-col justify-start items-start gap-1.5 h-[53px] w-full">
                 <div className="flex flex-row justify-between items-center w-full h-4">
                   <div className="text-xs text-gray-600 font-medium">Used</div>
-                  <div className="text-xs text-neutral-900 font-medium">
-                    2 days
-                  </div>
+                  <div className="text-xs text-neutral-900 font-medium">2 days</div>
                 </div>
                 <div className="w-full h-2 bg-gray-200 rounded-full">
-                  <div
-                    className="h-full bg-purple-500 rounded-full"
-                    style={{ width: "40%" }}
-                  ></div>
+                  <div className="h-full bg-purple-500 rounded-full" style={{ width: '40%' }}></div>
                 </div>
                 <div className="flex flex-row justify-between items-center w-full h-3.5">
-                  <div className="text-xs text-gray-600 font-medium">
-                    Remaining
-                  </div>
-                  <div className="text-xs text-teal-500 font-medium">
-                    3 days
-                  </div>
+                  <div className="text-xs text-gray-600 font-medium">Remaining</div>
+                  <div className="text-xs text-teal-500 font-medium">3 days</div>
                 </div>
               </div>
             </div>
 
             <div className="flex flex-col justify-between p-4 rounded-xl w-64 h-[121px] shadow-lg bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl">
               <div className="flex justify-between items-center">
-                <div className="text-sm text-gray-600 font-medium">
-                  Maternity Leave
-                </div>
+                <div className="text-sm text-gray-600 font-medium">Maternity Leave</div>
                 <div className="flex flex-col justify-start items-start gap-2.5 p-1 rounded border border-neutral-200 h-5 overflow-hidden">
                   <div className="flex flex-row justify-center items-center gap-1 h-4">
-                    <div className="text-xs text-neutral-900 font-semibold">
-                      0/90
-                    </div>
+                    <div className="text-xs text-neutral-900 font-semibold">0/90</div>
                   </div>
                 </div>
               </div>
               <div className="flex flex-col justify-start items-start gap-1.5 h-[53px] w-full">
                 <div className="flex flex-row justify-between items-center w-full h-4">
                   <div className="text-xs text-gray-600 font-medium">Used</div>
-                  <div className="text-xs text-neutral-900 font-medium">
-                    0 days
-                  </div>
+                  <div className="text-xs text-neutral-900 font-medium">0 days</div>
                 </div>
                 <div className="w-full h-2 bg-gray-200 rounded-full">
-                  <div
-                    className="h-full bg-pink-500 rounded-full"
-                    style={{ width: "0%" }}
-                  ></div>
+                  <div className="h-full bg-pink-500 rounded-full" style={{ width: '0%' }}></div>
                 </div>
                 <div className="flex flex-row justify-between items-center w-full h-3.5">
-                  <div className="text-xs text-gray-600 font-medium">
-                    Remaining
-                  </div>
-                  <div className="text-xs text-teal-500 font-medium">
-                    90 days
-                  </div>
+                  <div className="text-xs text-gray-600 font-medium">Remaining</div>
+                  <div className="text-xs text-teal-500 font-medium">90 days</div>
                 </div>
               </div>
             </div>
@@ -772,44 +640,33 @@ const EmployLeaveDashboardContent = () => {
           {/* Leave Policy Section */}
           <div className="flex flex-col justify-start items-start gap-6 h-[334px] w-full">
             <div className="flex flex-row justify-start items-center gap-4 py-4 h-14 w-full">
-              <div className="text-lg text-neutral-900 font-medium">
-                Leave Policy
-              </div>
+              <div className="text-lg text-neutral-900 font-medium">Leave Policy</div>
             </div>
             <div className="flex flex-col justify-start items-start gap-4 h-64 w-full">
               <div className="flex justify-start items-center p-3 rounded-lg w-full h-[74px] bg-blue-50">
                 <div className="flex flex-col justify-start items-start gap-2 w-full">
-                  <div className="text-base text-blue-900 font-medium">
-                    Annual leave
-                  </div>
+                  <div className="text-base text-blue-900 font-medium">Annual leave</div>
                   <div className="text-xs text-blue-700 font-medium">
-                    You are entitled to 25 days of annual leave per year. Unused
-                    leave can be carried forward to the next year (maximum 5
-                    days).
+                    You are entitled to 25 days of annual leave per year. Unused leave can be
+                    carried forward to the next year (maximum 5 days).
                   </div>
                 </div>
               </div>
               <div className="flex justify-start items-center p-3 rounded-lg w-full h-[74px] bg-orange-50">
                 <div className="flex flex-col justify-start items-start gap-2 w-full">
-                  <div className="text-base text-yellow-800 font-medium">
-                    Sick leave
-                  </div>
+                  <div className="text-base text-yellow-800 font-medium">Sick leave</div>
                   <div className="text-xs text-orange-700 font-medium">
-                    You can take up to 10 days of sick leave per year. Medical
-                    certificate required for leaves longer than 2 consecutive
-                    days.
+                    You can take up to 10 days of sick leave per year. Medical certificate required
+                    for leaves longer than 2 consecutive days.
                   </div>
                 </div>
               </div>
               <div className="flex justify-start items-center p-3 rounded-lg w-full h-[74px] bg-purple-50">
                 <div className="flex flex-col justify-start items-start gap-2 w-full">
-                  <div className="text-base text-purple-900 font-medium">
-                    Personal Leave
-                  </div>
+                  <div className="text-base text-purple-900 font-medium">Personal Leave</div>
                   <div className="text-xs text-purple-700 font-medium">
-                    You are entitled to 5 days of personal leave per year for
-                    urgent personal matters that cannot be scheduled outside
-                    work hours.
+                    You are entitled to 5 days of personal leave per year for urgent personal
+                    matters that cannot be scheduled outside work hours.
                   </div>
                 </div>
               </div>
@@ -832,29 +689,27 @@ const EmployLeaveDashboardContent = () => {
       <ActionModal
         isOpen={isModalOpen}
         onClose={closeModal}
-        actionType={modalType === "clockIn" ? "submit" : "delete"}
-        onDelete={modalType === "clockIn" ? handleClockIn : handleCheckOut}
+        actionType={modalType === 'clockIn' ? 'submit' : 'delete'}
+        onDelete={modalType === 'clockIn' ? handleClockIn : handleCheckOut}
         isDeleting={isClockingIn || isClockingOut}
-        title={
-          modalType === "clockIn" ? "Confirm Clock In" : "Confirm Clock Out"
-        }
+        title={modalType === 'clockIn' ? 'Confirm Clock In' : 'Confirm Clock Out'}
         confirmationMessage={
-          modalType === "clockIn"
-            ? "Are you sure you want to clock in now?"
-            : "Are you sure you want to clock out now?"
+          modalType === 'clockIn'
+            ? 'Are you sure you want to clock in now?'
+            : 'Are you sure you want to clock out now?'
         }
         extraInfo={
-          modalType === "clockOut"
+          modalType === 'clockOut'
             ? {
                 pending: attendanceData?.pending_tasks ?? 0,
                 inProgress: attendanceData?.in_progress_tasks ?? 0,
-                link: "/dashboard/tasks",
-                linkText: "Go to Tasks Dashboard",
+                link: '/dashboard/tasks',
+                linkText: 'Go to Tasks Dashboard',
               }
             : null
         }
         deleteMessage="This action will update your attendance records."
-        actionText={modalType === "clockIn" ? "Clock In" : "Clock Out"}
+        actionText={modalType === 'clockIn' ? 'Clock In' : 'Clock Out'}
       />
     </div>
   );

@@ -1,11 +1,11 @@
-import { useLocation } from "react-router-dom";
+import { useLocation } from 'react-router-dom';
 
 const SettingsLayout = ({ children, customTitle, customDescription, customActions }) => {
   const location = useLocation();
 
   const defaultContent = {
-    title: "Organization Settings",
-    description: "Configure policies, departments, positions, leave and roles."
+    title: 'Organization Settings',
+    description: 'Configure policies, departments, positions, leave and roles.',
   };
 
   return (

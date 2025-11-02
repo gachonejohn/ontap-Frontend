@@ -8,7 +8,6 @@ export default function MainLayout() {
     <div className="flex h-screen bg-gray-100">
       <Sidebar />
       <main className="flex-grow overflow-auto p-6">
-
         <Routes>
           <Route path="/" element={<Dashboard />} />
           {/* Add more routes here  */}

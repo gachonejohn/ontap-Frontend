@@ -60,8 +60,8 @@ const LeaveDistributionChart = () => {
           display: false,
         },
         stacked: false,
-        categoryPercentage: 0.5, 
-        barPercentage: 0.4,      
+        categoryPercentage: 0.5,
+        barPercentage: 0.4,
         ticks: {
           font: {
             size: 12,
@@ -97,4 +97,3 @@ const LeaveDistributionChart = () => {
 };
 
 export default LeaveDistributionChart;
-

@@ -1,13 +1,13 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 
 const DropdownAuthenticationModal = ({ isOpen, onClose, onAuthenticate, position }) => {
-  const [password, setPassword] = useState("");
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     onAuthenticate(password);
-    setPassword("");
+    setPassword('');
   };
 
   const togglePasswordVisibility = () => {
@@ -17,8 +17,8 @@ const DropdownAuthenticationModal = ({ isOpen, onClose, onAuthenticate, position
   if (!isOpen) return null;
 
   return (
-    <div 
-      className="fixed z-50" 
+    <div
+      className="fixed z-50"
       style={{
         top: `${position.top + 30}px`,
         right: `${window.innerWidth - position.right}px`,
@@ -27,25 +27,16 @@ const DropdownAuthenticationModal = ({ isOpen, onClose, onAuthenticate, position
       <div className="bg-white rounded-lg p-4 w-[300px] shadow-xl border border-gray-200">
         <div className="flex flex-col gap-3">
           <div className="flex items-center gap-2">
-            <img
-              width="16px"
-              height="16px"
-              src="/images/password.png"
-              alt="Password icon"
-            />
-            <div className="text-sm font-medium text-neutral-900">
-              Enter Password
-            </div>
+            <img width="16px" height="16px" src="/images/password.png" alt="Password icon" />
+            <div className="text-sm font-medium text-neutral-900">Enter Password</div>
           </div>
-          
+
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
-              <label className="text-xs text-zinc-500 font-medium mb-1 block">
-                Password
-              </label>
+              <label className="text-xs text-zinc-500 font-medium mb-1 block">Password</label>
               <div className="relative">
                 <input
-                  type={showPassword ? "text" : "password"}
+                  type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full p-2 pr-10 rounded border border-gray-300 text-sm focus:outline-none focus:ring-1 focus:ring-teal-500"
@@ -61,13 +52,13 @@ const DropdownAuthenticationModal = ({ isOpen, onClose, onAuthenticate, position
                   <img
                     width="16px"
                     height="16px"
-                    src={showPassword ? "/images/eye-slash.png" : "/images/eye.png"}
-                    alt={showPassword ? "Hide password" : "Show password"}
+                    src={showPassword ? '/images/eye-slash.png' : '/images/eye.png'}
+                    alt={showPassword ? 'Hide password' : 'Show password'}
                   />
                 </button>
               </div>
             </div>
-            
+
             <div className="flex gap-2">
               <button
                 type="button"

@@ -1,10 +1,10 @@
-import { createSlice } from "@reduxjs/toolkit";
-import { jwtDecode } from "jwt-decode";
-import Cookies from "js-cookie";
+import { createSlice } from '@reduxjs/toolkit';
+import { jwtDecode } from 'jwt-decode';
+import Cookies from 'js-cookie';
 
 const initialState = {
-  accessToken: "",
-  refreshToken: "",
+  accessToken: '',
+  refreshToken: '',
   user: null,
   tokenExpiry: null,
   loading: false,
@@ -12,7 +12,7 @@ const initialState = {
 };
 
 const authSlice = createSlice({
-  name: "auth",
+  name: 'auth',
   initialState,
   reducers: {
     userLoading: (state) => {
@@ -32,13 +32,13 @@ const authSlice = createSlice({
     },
 
     userLoggedOut: (state) => {
-      state.accessToken = "";
-      state.refreshToken = "";
+      state.accessToken = '';
+      state.refreshToken = '';
       state.user = null;
       state.tokenExpiry = null;
       state.loading = false;
-      Cookies.remove("accessToken");
-      Cookies.remove("refreshToken");
+      Cookies.remove('accessToken');
+      Cookies.remove('refreshToken');
     },
 
     userLoginFailed: (state, action) => {
@@ -48,8 +48,8 @@ const authSlice = createSlice({
 
     loadUser: (state) => {
       state.loading = true;
-      const accessToken = Cookies.get("accessToken");
-      const refreshToken = Cookies.get("refreshToken");
+      const accessToken = Cookies.get('accessToken');
+      const refreshToken = Cookies.get('refreshToken');
 
       if (accessToken && refreshToken) {
         const decodedToken = jwtDecode(accessToken);
@@ -59,8 +59,8 @@ const authSlice = createSlice({
         state.tokenExpiry = decodedToken.exp * 1000;
         state.loading = false;
       } else {
-        state.accessToken = "";
-        state.refreshToken = "";
+        state.accessToken = '';
+        state.refreshToken = '';
         state.user = null;
         state.tokenExpiry = null;
       }
@@ -69,12 +69,7 @@ const authSlice = createSlice({
   },
 });
 
-export const {
-  userLoggedIn,
-  userLoggedOut,
-  userLoginFailed,
-  loadUser,
-  userLoading,
-} = authSlice.actions;
+export const { userLoggedIn, userLoggedOut, userLoginFailed, loadUser, userLoading } =
+  authSlice.actions;
 
 export default authSlice.reducer;

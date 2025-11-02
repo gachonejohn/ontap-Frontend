@@ -10,68 +10,68 @@ export default function Trainings() {
   const [showNewEmployeeModal, setShowNewEmployeeModal] = useState(false);
 
   const courseInfo = {
-    title: "Leadership Skills",
-    category: "Professional Development",
-    difficulty: "Intermediate",
-    duration: "45 minutes",
-    instructor: "John Doe",
+    title: 'Leadership Skills',
+    category: 'Professional Development',
+    difficulty: 'Intermediate',
+    duration: '45 minutes',
+    instructor: 'John Doe',
   };
-  
+
   const modules = [
     {
-      title: "Introduction",
-      description: "Module overview",
-      files: [{ name: "intro.pdf" }, { name: "overview.mp4" }],
+      title: 'Introduction',
+      description: 'Module overview',
+      files: [{ name: 'intro.pdf' }, { name: 'overview.mp4' }],
     },
     {
-      title: "Effective Communication",
-      description: "Communication strategies",
-      files: [{ name: "slides.pptx" }],
+      title: 'Effective Communication',
+      description: 'Communication strategies',
+      files: [{ name: 'slides.pptx' }],
     },
   ];
-  
-  const targetAudience = "Team Leads, Managers";
-  
+
+  const targetAudience = 'Team Leads, Managers';
+
   const currentTrainings = [
     {
-      title: "Leadership Skills Development",
-      user: "Sarah Chen",
-      duration: "4 hours",
+      title: 'Leadership Skills Development',
+      user: 'Sarah Chen',
+      duration: '4 hours',
       rating: 4.5,
       progressPercent: 70,
-      nextModule: "Effective Communication",
+      nextModule: 'Effective Communication',
       modulesCompleted: 1,
       totalModules: 4,
-      dueDate: "30 Aug 2025",
+      dueDate: '30 Aug 2025',
     },
     {
-      title: "Effective Communication",
-      user: "Sarah Chen",
-      duration: "4 hours",
+      title: 'Effective Communication',
+      user: 'Sarah Chen',
+      duration: '4 hours',
       rating: 4.5,
       progressPercent: 60,
-      nextModule: "Effective Communication",
+      nextModule: 'Effective Communication',
       modulesCompleted: 1,
       totalModules: 4,
-      dueDate: "30 Aug 2025",
+      dueDate: '30 Aug 2025',
     },
     {
-      title: "Leadership Skills Development",
-      user: "Sarah Chen",
-      duration: "4 hours",
+      title: 'Leadership Skills Development',
+      user: 'Sarah Chen',
+      duration: '4 hours',
       rating: 4.5,
       progressPercent: 55,
-      nextModule: "Effective Communication",
+      nextModule: 'Effective Communication',
       modulesCompleted: 1,
       totalModules: 4,
-      dueDate: "30 Aug 2025",
+      dueDate: '30 Aug 2025',
     },
   ];
 
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
     setUploadedFiles(selectedFiles);
-    console.log("Selected files:", selectedFiles);
+    console.log('Selected files:', selectedFiles);
   };
 
   return (
@@ -167,7 +167,9 @@ export default function Trainings() {
             className={`flex items-center justify-center h-10 w-1/2 cursor-pointer ${activeTab === 'myCourses' ? 'bg-white' : ''}`}
             onClick={() => setActiveTab('myCourses')}
           >
-            <div className={`text-xs text-neutral-900 ${activeTab === 'myCourses' ? 'font-semibold' : 'font-medium'}`}>
+            <div
+              className={`text-xs text-neutral-900 ${activeTab === 'myCourses' ? 'font-semibold' : 'font-medium'}`}
+            >
               My Courses
             </div>
           </div>
@@ -175,7 +177,9 @@ export default function Trainings() {
             className={`flex items-center justify-center h-10 w-1/2 cursor-pointer ${activeTab === 'courseCatalog' ? 'bg-white' : ''}`}
             onClick={() => setActiveTab('courseCatalog')}
           >
-            <div className={`text-xs text-neutral-900 ${activeTab === 'courseCatalog' ? 'font-semibold' : 'font-medium'}`}>
+            <div
+              className={`text-xs text-neutral-900 ${activeTab === 'courseCatalog' ? 'font-semibold' : 'font-medium'}`}
+            >
               Course Catalog
             </div>
           </div>
@@ -183,54 +187,28 @@ export default function Trainings() {
 
         {/* Tab Content */}
         <div className="flex flex-col gap-4">
-          {activeTab === "myCourses" ? (
+          {activeTab === 'myCourses' ? (
             currentTrainings.map((course, index) => (
-              <div
-                key={index}
-                className="flex flex-col gap-4 p-6 rounded-xl shadow-sm bg-white"
-              >
+              <div key={index} className="flex flex-col gap-4 p-6 rounded-xl shadow-sm bg-white">
                 {/* Header Row */}
                 <div className="flex justify-between items-start">
                   <div className="flex flex-col gap-2">
-                    <div className="text-sm text-neutral-900 font-semibold">
-                      {course.title}
-                    </div>
+                    <div className="text-sm text-neutral-900 font-semibold">{course.title}</div>
                     <div className="flex items-center gap-4">
                       {/* Instructor */}
                       <div className="flex items-center gap-1">
-                        <img
-                          width="12"
-                          height="12"
-                          src="/images/user.png"
-                          alt="Instructor icon"
-                        />
-                        <span className="text-xs text-gray-600 font-medium">
-                          {course.user}
-                        </span>
+                        <img width="12" height="12" src="/images/user.png" alt="Instructor icon" />
+                        <span className="text-xs text-gray-600 font-medium">{course.user}</span>
                       </div>
                       {/* Duration */}
                       <div className="flex items-center gap-1">
-                        <img
-                          width="12"
-                          height="12"
-                          src="/images/clock.png"
-                          alt="Duration icon"
-                        />
-                        <span className="text-xs text-gray-600 font-medium">
-                          {course.duration}
-                        </span>
+                        <img width="12" height="12" src="/images/clock.png" alt="Duration icon" />
+                        <span className="text-xs text-gray-600 font-medium">{course.duration}</span>
                       </div>
                       {/* Rating */}
                       <div className="flex items-center gap-1">
-                        <img
-                          width="15"
-                          height="15"
-                          src="/images/star.png"
-                          alt="Rating icon"
-                        />
-                        <span className="text-xs text-gray-600 font-medium">
-                          {course.rating}
-                        </span>
+                        <img width="15" height="15" src="/images/star.png" alt="Rating icon" />
+                        <span className="text-xs text-gray-600 font-medium">{course.rating}</span>
                       </div>
                     </div>
                   </div>
@@ -292,13 +270,11 @@ export default function Trainings() {
               onClick={() => setShowNewEmployeeModal(false)}
               className="absolute top-4 right-4 text-gray-500 hover:text-black text-xl font-bold"
             >
-              × 
+              ×
             </button>
 
             {/* Modal Header */}
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">
-              Upload New Training Course
-            </h2>
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Upload New Training Course</h2>
 
             {/* Step Navigation */}
             <div className="flex mb-6 text-sm border rounded-lg overflow-hidden">
@@ -347,9 +323,7 @@ export default function Trainings() {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">
-                      Category
-                    </label>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Category</label>
                     <select className="w-full border border-gray-200 rounded-lg p-2 text-sm">
                       <option>Select category</option>
                     </select>
@@ -403,9 +377,7 @@ export default function Trainings() {
               <div className="space-y-6">
                 {/* Course Materials Upload */}
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-700 mb-2">
-                    Course Materials
-                  </h3>
+                  <h3 className="text-sm font-semibold text-gray-700 mb-2">Course Materials</h3>
                   <div className="border border-dashed border-gray-300 rounded-lg p-6 text-center bg-gray-50">
                     <img
                       src="/images/upload_file.png"
@@ -459,22 +431,45 @@ export default function Trainings() {
                   <h3 className="text-lg font-semibold text-gray-700 mb-4">Course Preview</h3>
                   <div className="grid grid-cols-2 gap-6">
                     <div>
-                      <h4 className="text-base font-semibold text-gray-700 mb-3">Course Information</h4>
+                      <h4 className="text-base font-semibold text-gray-700 mb-3">
+                        Course Information
+                      </h4>
                       <ul className="text-sm text-gray-600 space-y-2">
-                        <li><strong>Title:</strong> {courseInfo.title || 'Not specified'}</li>
-                        <li><strong>Category:</strong> {courseInfo.category || 'Not specified'}</li>
-                        <li><strong>Difficulty:</strong> {courseInfo.difficulty || 'Not specified'}</li>
-                        <li><strong>Duration:</strong> {courseInfo.duration || 'Not specified'}</li>
-                        <li><strong>Instructor:</strong> {courseInfo.instructor || 'Not specified'}</li>
+                        <li>
+                          <strong>Title:</strong> {courseInfo.title || 'Not specified'}
+                        </li>
+                        <li>
+                          <strong>Category:</strong> {courseInfo.category || 'Not specified'}
+                        </li>
+                        <li>
+                          <strong>Difficulty:</strong> {courseInfo.difficulty || 'Not specified'}
+                        </li>
+                        <li>
+                          <strong>Duration:</strong> {courseInfo.duration || 'Not specified'}
+                        </li>
+                        <li>
+                          <strong>Instructor:</strong> {courseInfo.instructor || 'Not specified'}
+                        </li>
                       </ul>
                     </div>
                     <div>
-                      <h4 className="text-base font-semibold text-gray-700 mb-3">Content Summary</h4>
+                      <h4 className="text-base font-semibold text-gray-700 mb-3">
+                        Content Summary
+                      </h4>
                       <ul className="text-sm text-gray-600 space-y-2">
-                        <li><strong>Modules:</strong> {modules.length}</li>
-                        <li><strong>Course Files:</strong> {courseFiles.length}</li>
-                        <li><strong>Total Module Files:</strong> {modules.reduce((acc, mod) => acc + mod.files.length, 0)}</li>
-                        <li><strong>Target Audience:</strong> {targetAudience || 'Not specified'}</li>
+                        <li>
+                          <strong>Modules:</strong> {modules.length}
+                        </li>
+                        <li>
+                          <strong>Course Files:</strong> {courseFiles.length}
+                        </li>
+                        <li>
+                          <strong>Total Module Files:</strong>{' '}
+                          {modules.reduce((acc, mod) => acc + mod.files.length, 0)}
+                        </li>
+                        <li>
+                          <strong>Target Audience:</strong> {targetAudience || 'Not specified'}
+                        </li>
                       </ul>
                     </div>
                   </div>

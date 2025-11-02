@@ -1,15 +1,14 @@
-import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
-import Select from "react-select";
-import { useGetEmployeesQuery } from "../../store/services/employees/employeesService";
-import { useGetDepartmentsQuery } from "../../store/services/companies/departmentsService";
+import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import Select from 'react-select';
+import { useGetEmployeesQuery } from '../../store/services/employees/employeesService';
+import { useGetDepartmentsQuery } from '../../store/services/companies/departmentsService';
 
 const LogTaskModal = ({ isOpen, onClose, onSubmit }) => {
   const taskPermissions = useSelector((state) => {
     const permissions = state.auth.user?.role?.permissions;
     return permissions?.find(
-      (p) =>
-        p.feature_code === "task" || p.feature_code === "task_management"
+      (p) => p.feature_code === 'task' || p.feature_code === 'task_management'
     );
   });
 
@@ -17,16 +16,16 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit }) => {
   const currentUser = useSelector((state) => state.auth.user);
 
   const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    status: "TO_DO",
-    priority: "",
+    title: '',
+    description: '',
+    status: 'TO_DO',
+    priority: '',
     assignees: [],
-    department: "",
-    start_date: "",
-    due_date: "",
+    department: '',
+    start_date: '',
+    due_date: '',
     progress_percentage: 0,
-    estimated_hours: "",
+    estimated_hours: '',
     is_urgent: false,
     requires_approval: false,
     files: [],
@@ -45,19 +44,19 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit }) => {
   const departments = departmentsData || [];
 
   const statusMap = {
-    TO_DO: "To Do",
-    IN_PROGRESS: "In Progress",
-    UNDER_REVIEW: "Under Review",
-    COMPLETED: "Completed",
-    CANCELLED: "Cancelled",
-    ON_HOLD: "On Hold",
+    TO_DO: 'To Do',
+    IN_PROGRESS: 'In Progress',
+    UNDER_REVIEW: 'Under Review',
+    COMPLETED: 'Completed',
+    CANCELLED: 'Cancelled',
+    ON_HOLD: 'On Hold',
   };
 
   const priorityMap = {
-    LOW: "Low",
-    MEDIUM: "Medium",
-    HIGH: "High",
-    URGENT: "Urgent",
+    LOW: 'Low',
+    MEDIUM: 'Medium',
+    HIGH: 'High',
+    URGENT: 'Urgent',
   };
 
   const statusOptions = Object.entries(statusMap).map(([key, value]) => ({
@@ -79,18 +78,18 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit }) => {
     if (isOpen) {
       const userId = currentUser?.user?.id || currentUser?.id;
       const initialAssignees = canViewAll ? [] : [userId];
-      
+
       setFormData({
-        title: "",
-        description: "",
-        status: "TO_DO",
-        priority: "",
+        title: '',
+        description: '',
+        status: 'TO_DO',
+        priority: '',
         assignees: initialAssignees,
-        department: "",
-        start_date: "",
-        due_date: "",
+        department: '',
+        start_date: '',
+        due_date: '',
         progress_percentage: 0,
-        estimated_hours: "",
+        estimated_hours: '',
         is_urgent: false,
         requires_approval: false,
         files: [],
@@ -104,30 +103,30 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit }) => {
     const errors = {};
 
     if (!formData.title || formData.title.trim().length === 0) {
-      errors.title = "Task title is required";
+      errors.title = 'Task title is required';
     }
 
     if (!formData.priority) {
-      errors.priority = "Priority is required";
+      errors.priority = 'Priority is required';
     }
 
     if (!formData.description || formData.description.trim().length === 0) {
-      errors.description = "Description is required";
+      errors.description = 'Description is required';
     }
 
     if (!formData.start_date) {
-      errors.start_date = "Start date is required";
+      errors.start_date = 'Start date is required';
     }
 
     if (!formData.due_date) {
-      errors.due_date = "Due date is required";
+      errors.due_date = 'Due date is required';
     }
 
     if (formData.start_date && formData.due_date) {
       const startDate = new Date(formData.start_date);
       const dueDate = new Date(formData.due_date);
       if (dueDate < startDate) {
-        errors.due_date = "Due date cannot be before start date";
+        errors.due_date = 'Due date cannot be before start date';
       }
     }
 
@@ -139,16 +138,16 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit }) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: type === 'checkbox' ? checked : value,
     }));
 
     if (formErrors[name]) {
-      setFormErrors((prev) => ({ ...prev, [name]: "" }));
+      setFormErrors((prev) => ({ ...prev, [name]: '' }));
     }
   };
 
   const handleMultipleAssigneesChange = (selectedOptions) => {
-    const selectedValues = selectedOptions ? selectedOptions.map(o => o.value) : [];
+    const selectedValues = selectedOptions ? selectedOptions.map((o) => o.value) : [];
     setFormData((prev) => ({
       ...prev,
       assignees: selectedValues,
@@ -156,7 +155,7 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit }) => {
   };
 
   const handleDepartmentChange = (selected) => {
-    setFormData((prev) => ({ ...prev, department: selected?.value || "" }));
+    setFormData((prev) => ({ ...prev, department: selected?.value || '' }));
   };
 
   const handleFileChange = (e) => {
@@ -173,15 +172,15 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit }) => {
 
   const handleCreateTask = async (e) => {
     e.preventDefault();
-    
+
     console.log('=== FORM SUBMISSION START ===');
     console.log('Form data before validation:', formData);
-    
+
     if (!validateForm()) {
       console.log('Form validation failed');
       return;
     }
-    
+
     if (!onSubmit) {
       console.log('No onSubmit function provided');
       return;
@@ -191,7 +190,7 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit }) => {
 
     try {
       const userId = currentUser?.user?.id || currentUser?.id;
-      
+
       const payload = {
         title: formData.title.trim(),
         description: formData.description.trim(),
@@ -217,7 +216,7 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit }) => {
 
       await onSubmit(payload);
     } catch (err) {
-      console.error("Error in handleCreateTask:", err);
+      console.error('Error in handleCreateTask:', err);
     } finally {
       setIsSubmitting(false);
     }
@@ -235,8 +234,20 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit }) => {
             className="flex justify-center items-center w-7 h-7 hover:bg-gray-100 rounded-full"
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M12 4L4 12" stroke="#4B5563" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M4 4L12 12" stroke="#4B5563" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path
+                d="M12 4L4 12"
+                stroke="#4B5563"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M4 4L12 12"
+                stroke="#4B5563"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           </button>
         </div>
@@ -251,7 +262,7 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit }) => {
               onChange={handleChange}
               placeholder="Enter task title"
               className={`w-full p-3 rounded-lg border bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 ${
-                formErrors.title ? "border-red-500" : "border-neutral-200"
+                formErrors.title ? 'border-red-500' : 'border-neutral-200'
               }`}
             />
             {formErrors.title && <p className="text-red-500 text-xs mt-1">{formErrors.title}</p>}
@@ -267,7 +278,9 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit }) => {
                 className="w-full p-3 rounded-lg border border-neutral-200 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
               >
                 {statusOptions.map(({ key, value }) => (
-                  <option key={key} value={key}>{value}</option>
+                  <option key={key} value={key}>
+                    {value}
+                  </option>
                 ))}
               </select>
             </div>
@@ -278,15 +291,19 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit }) => {
                 value={formData.priority}
                 onChange={handleChange}
                 className={`w-full p-3 rounded-lg border bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 ${
-                  formErrors.priority ? "border-red-500" : "border-neutral-200"
+                  formErrors.priority ? 'border-red-500' : 'border-neutral-200'
                 }`}
               >
                 <option value="">Select Priority</option>
                 {priorityOptions.map(({ key, value }) => (
-                  <option key={key} value={key}>{value}</option>
+                  <option key={key} value={key}>
+                    {value}
+                  </option>
                 ))}
               </select>
-              {formErrors.priority && <p className="text-red-500 text-xs mt-1">{formErrors.priority}</p>}
+              {formErrors.priority && (
+                <p className="text-red-500 text-xs mt-1">{formErrors.priority}</p>
+              )}
             </div>
           </div>
 
@@ -299,10 +316,12 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit }) => {
               placeholder="Enter task description"
               rows="3"
               className={`w-full p-3 rounded-lg border bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 ${
-                formErrors.description ? "border-red-500" : "border-neutral-200"
+                formErrors.description ? 'border-red-500' : 'border-neutral-200'
               }`}
             />
-            {formErrors.description && <p className="text-red-500 text-xs mt-1">{formErrors.description}</p>}
+            {formErrors.description && (
+              <p className="text-red-500 text-xs mt-1">{formErrors.description}</p>
+            )}
           </div>
 
           <div className="flex flex-col gap-2 w-full">
@@ -318,7 +337,13 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit }) => {
               <div className="flex flex-col items-center gap-2">
                 <img width="29" height="34" src="/images/upload.png" alt="Upload icon" />
                 <div className="text-xs text-gray-500/70">
-                  {formData.files.length > 0 ? `${formData.files.length} file(s) selected` : <>Upload or <span className="text-blue-600">browse</span></>}
+                  {formData.files.length > 0 ? (
+                    `${formData.files.length} file(s) selected`
+                  ) : (
+                    <>
+                      Upload or <span className="text-blue-600">browse</span>
+                    </>
+                  )}
                 </div>
               </div>
             </label>
@@ -328,9 +353,18 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit }) => {
             {formData.files.length > 0 && (
               <div className="mt-2 space-y-2">
                 {formData.files.map((file, index) => (
-                  <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                  <div
+                    key={index}
+                    className="flex items-center justify-between p-2 bg-gray-50 rounded-lg"
+                  >
                     <span className="text-xs text-gray-700 truncate flex-1">{file.name}</span>
-                    <button type="button" onClick={() => removeFile(index)} className="ml-2 text-red-500 hover:text-red-700 text-xs font-medium">Remove</button>
+                    <button
+                      type="button"
+                      onClick={() => removeFile(index)}
+                      className="ml-2 text-red-500 hover:text-red-700 text-xs font-medium"
+                    >
+                      Remove
+                    </button>
                   </div>
                 ))}
               </div>
@@ -343,29 +377,55 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit }) => {
               <Select
                 isMulti
                 options={employeeOptions}
-                value={employeeOptions.filter(option => formData.assignees.includes(option.value))}
+                value={employeeOptions.filter((option) =>
+                  formData.assignees.includes(option.value)
+                )}
                 onChange={handleMultipleAssigneesChange}
                 placeholder="Select assignees..."
                 menuPortalTarget={document.body}
                 menuPlacement="auto"
                 styles={{
                   menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-                  control: (base) => ({ ...base, minHeight: "48px", borderColor: "#d1d5db", borderRadius: "8px", "&:hover": { borderColor: "#9ca3af" }, "&:focus-within": { borderColor: "#14b8a6", boxShadow: "0 0 0 2px rgba(20,184,166,0.2)" } }),
-                  multiValue: (base) => ({ ...base, backgroundColor: "#e0f2fe", borderRadius: "6px" }),
-                  multiValueLabel: (base) => ({ ...base, color: "#0369a1", fontWeight: "500" }),
-                  multiValueRemove: (base) => ({ ...base, color: "#0369a1", ":hover": { backgroundColor: "#bae6fd", color: "#0c4a6e" } }),
+                  control: (base) => ({
+                    ...base,
+                    minHeight: '48px',
+                    borderColor: '#d1d5db',
+                    borderRadius: '8px',
+                    '&:hover': { borderColor: '#9ca3af' },
+                    '&:focus-within': {
+                      borderColor: '#14b8a6',
+                      boxShadow: '0 0 0 2px rgba(20,184,166,0.2)',
+                    },
+                  }),
+                  multiValue: (base) => ({
+                    ...base,
+                    backgroundColor: '#e0f2fe',
+                    borderRadius: '6px',
+                  }),
+                  multiValueLabel: (base) => ({ ...base, color: '#0369a1', fontWeight: '500' }),
+                  multiValueRemove: (base) => ({
+                    ...base,
+                    color: '#0369a1',
+                    ':hover': { backgroundColor: '#bae6fd', color: '#0c4a6e' },
+                  }),
                 }}
               />
               <div className="text-xs text-gray-500 mt-1">
-                {formData.assignees.length > 0 ? `${formData.assignees.length} assignee(s) selected` : "Select one or more assignees"}
+                {formData.assignees.length > 0
+                  ? `${formData.assignees.length} assignee(s) selected`
+                  : 'Select one or more assignees'}
               </div>
             </div>
           )}
 
           {!canViewAll && (
             <div className="flex flex-col gap-2 w-full p-3 bg-blue-50 rounded-lg">
-              <div className="text-sm text-blue-900 font-medium">This task will be assigned to you</div>
-              <div className="text-xs text-blue-700">{currentUser?.first_name} {currentUser?.last_name}</div>
+              <div className="text-sm text-blue-900 font-medium">
+                This task will be assigned to you
+              </div>
+              <div className="text-xs text-blue-700">
+                {currentUser?.first_name} {currentUser?.last_name}
+              </div>
             </div>
           )}
 
@@ -374,13 +434,27 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit }) => {
               <label className="text-sm text-neutral-900 font-medium">Department</label>
               <Select
                 options={departments.map((d) => ({ value: d.id, label: d.name }))}
-                value={departments.map((d) => ({ value: d.id, label: d.name })).find(opt => opt.value === formData.department) || null}
+                value={
+                  departments
+                    .map((d) => ({ value: d.id, label: d.name }))
+                    .find((opt) => opt.value === formData.department) || null
+                }
                 onChange={handleDepartmentChange}
                 menuPortalTarget={document.body}
                 menuPlacement="auto"
                 styles={{
                   menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-                  control: (base) => ({ ...base, minHeight: "48px", borderColor: "#d1d5db", borderRadius: "8px", "&:hover": { borderColor: "#9ca3af" }, "&:focus-within": { borderColor: "#14b8a6", boxShadow: "0 0 0 2px rgba(20,184,166,0.2)" } }),
+                  control: (base) => ({
+                    ...base,
+                    minHeight: '48px',
+                    borderColor: '#d1d5db',
+                    borderRadius: '8px',
+                    '&:hover': { borderColor: '#9ca3af' },
+                    '&:focus-within': {
+                      borderColor: '#14b8a6',
+                      boxShadow: '0 0 0 2px rgba(20,184,166,0.2)',
+                    },
+                  }),
                 }}
               />
             </div>
@@ -389,26 +463,64 @@ const LogTaskModal = ({ isOpen, onClose, onSubmit }) => {
           <div className="flex flex-row gap-4 w-full">
             <div className="flex flex-col gap-2 w-full">
               <label className="text-sm text-neutral-900 font-medium">Start Date *</label>
-              <input type="date" name="start_date" value={formData.start_date} onChange={handleChange} className={`w-full p-3 rounded-lg border bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 ${formErrors.start_date ? "border-red-500" : "border-neutral-200"}`}/>
-              {formErrors.start_date && <p className="text-red-500 text-xs mt-1">{formErrors.start_date}</p>}
+              <input
+                type="date"
+                name="start_date"
+                value={formData.start_date}
+                onChange={handleChange}
+                className={`w-full p-3 rounded-lg border bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 ${formErrors.start_date ? 'border-red-500' : 'border-neutral-200'}`}
+              />
+              {formErrors.start_date && (
+                <p className="text-red-500 text-xs mt-1">{formErrors.start_date}</p>
+              )}
             </div>
             <div className="flex flex-col gap-2 w-full">
               <label className="text-sm text-neutral-900 font-medium">Due Date *</label>
-              <input type="date" name="due_date" value={formData.due_date} onChange={handleChange} className={`w-full p-3 rounded-lg border bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 ${formErrors.due_date ? "border-red-500" : "border-neutral-200"}`}/>
-              {formErrors.due_date && <p className="text-red-500 text-xs mt-1">{formErrors.due_date}</p>}
+              <input
+                type="date"
+                name="due_date"
+                value={formData.due_date}
+                onChange={handleChange}
+                className={`w-full p-3 rounded-lg border bg-white focus:outline-none focus:ring-2 focus:ring-teal-500 ${formErrors.due_date ? 'border-red-500' : 'border-neutral-200'}`}
+              />
+              {formErrors.due_date && (
+                <p className="text-red-500 text-xs mt-1">{formErrors.due_date}</p>
+              )}
             </div>
           </div>
 
-          <button type="submit" disabled={isSubmitting} className={`w-full py-3 rounded-lg text-white font-normal mt-4 transition-colors ${isSubmitting ? "bg-teal-400 cursor-not-allowed" : "bg-teal-500 hover:bg-teal-600"}`}>
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className={`w-full py-3 rounded-lg text-white font-normal mt-4 transition-colors ${isSubmitting ? 'bg-teal-400 cursor-not-allowed' : 'bg-teal-500 hover:bg-teal-600'}`}
+          >
             {isSubmitting ? (
               <div className="flex justify-center items-center gap-2">
                 <span>Creating Task</span>
-                <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                <svg
+                  className="animate-spin h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                  ></path>
                 </svg>
               </div>
-            ) : "Create Task"}
+            ) : (
+              'Create Task'
+            )}
           </button>
         </form>
       </div>

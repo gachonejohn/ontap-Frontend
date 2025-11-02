@@ -1,23 +1,23 @@
-import { useMemo, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useMemo, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
-import { toast } from "react-toastify";
-import ActionModal from "../../../common/Modals/ActionModal";
+import { toast } from 'react-toastify';
+import ActionModal from '../../../common/Modals/ActionModal';
 
-import ButtonDropdown from "@components/common/ActionsPopover";
-import { PAGE_SIZE } from "@constants/constants";
-import { useFilters } from "@hooks/useFIlters";
+import ButtonDropdown from '@components/common/ActionsPopover';
+import { PAGE_SIZE } from '@constants/constants';
+import { useFilters } from '@hooks/useFIlters';
 import {
-    useDeleteAttendancePolicyMutation,
-    useGetAttendancePoliciesQuery,
-} from "@store/services/policies/policyService";
-import { formatClockTime } from "@utils/dates";
-import { LuArchiveX } from "react-icons/lu";
-import DataTable from "../../../common/DataTable";
-import Pagination from "../../../common/pagination";
-import ContentSpinner from "../../../common/spinners/dataLoadingSpinner";
-import { EditAttendacePolicy } from "./EditWorkRule";
-import { CreateAttendacePolicy } from "./NewWorkRule";
+  useDeleteAttendancePolicyMutation,
+  useGetAttendancePoliciesQuery,
+} from '@store/services/policies/policyService';
+import { formatClockTime } from '@utils/dates';
+import { LuArchiveX } from 'react-icons/lu';
+import DataTable from '../../../common/DataTable';
+import Pagination from '../../../common/pagination';
+import ContentSpinner from '../../../common/spinners/dataLoadingSpinner';
+import { EditAttendacePolicy } from './EditWorkRule';
+import { CreateAttendacePolicy } from './NewWorkRule';
 const AttendancePolicies = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -25,14 +25,14 @@ const AttendancePolicies = () => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  const currentPageParam = parseInt(searchParams.get("page") || "1", 10);
+  const currentPageParam = parseInt(searchParams.get('page') || '1', 10);
 
   const { filters, currentPage, handlePageChange } = useFilters({
     initialFilters: {},
     initialPage: currentPageParam,
     navigate,
     debounceTime: 100,
-    debouncedFields: [""],
+    debouncedFields: [''],
   });
 
   const queryParams = useMemo(
@@ -52,9 +52,8 @@ const AttendancePolicies = () => {
   } = useGetAttendancePoliciesQuery(queryParams, {
     refetchOnMountOrArgChange: true,
   });
-  console.log("attendanceRulesData", attendanceRulesData);
-  const [deleteAttendancePolicy, { isLoading: deleting }] =
-    useDeleteAttendancePolicyMutation();
+  console.log('attendanceRulesData', attendanceRulesData);
+  const [deleteAttendancePolicy, { isLoading: deleting }] = useDeleteAttendancePolicyMutation();
 
   const openDeleteModal = (id) => {
     setSelectedItem(id);
@@ -69,52 +68,46 @@ const AttendancePolicies = () => {
   const handleDeleteProgram = async () => {
     try {
       await deleteAttendancePolicy(selectedItem).unwrap();
-      toast.success("Policy deleted successfully!");
+      toast.success('Policy deleted successfully!');
       closeDeleteModal();
       refetch();
     } catch (error) {
-      console.log("error", error);
-      if (error && typeof error === "object" && error.data) {
-        toast.error(error.data.error || "Error deleting role.");
+      console.log('error', error);
+      if (error && typeof error === 'object' && error.data) {
+        toast.error(error.data.error || 'Error deleting role.');
       } else {
-        toast.error("Unexpected error occurred. Please try again.");
+        toast.error('Unexpected error occurred. Please try again.');
       }
     }
   };
 
   const columns = [
     {
-      header: "Type",
-      accessor: "rule_type",
+      header: 'Type',
+      accessor: 'rule_type',
       cell: (item) => <span>{item.rule_type}</span>,
     },
     {
-      header: "Time",
-      accessor: "rule_time",
+      header: 'Time',
+      accessor: 'rule_time',
       cell: (item) => (
-        <span className="text-xs font-medium">
-          {formatClockTime(item.rule_time)}
-        </span>
+        <span className="text-xs font-medium">{formatClockTime(item.rule_time)}</span>
       ),
     },
 
     {
-      header: "Grace Minutes",
-      accessor: "grace_minutes",
-      cell: (item) => (
-        <span className="text-xs font-medium">{item.grace_minutes}</span>
-      ),
+      header: 'Grace Minutes',
+      accessor: 'grace_minutes',
+      cell: (item) => <span className="text-xs font-medium">{item.grace_minutes}</span>,
     },
     {
-      header: "Description",
-      accessor: "description",
-      cell: (item) => (
-        <span className="text-xs font-medium">{item.description}</span>
-      ),
+      header: 'Description',
+      accessor: 'description',
+      cell: (item) => <span className="text-xs font-medium">{item.description}</span>,
     },
     {
-      header: "Actions",
-      accessor: "id",
+      header: 'Actions',
+      accessor: 'id',
       cell: (item) => (
         <>
           <ButtonDropdown>
@@ -150,9 +143,9 @@ const AttendancePolicies = () => {
         </div>
       ) : error ? (
         <div className="bg-red-50 p-4 rounded-md text-red-800 text-center">
-          {"status" in error && error.data?.error
+          {'status' in error && error.data?.error
             ? error.data.error
-            : "An error occurred while fetching roles."}
+            : 'An error occurred while fetching roles.'}
         </div>
       ) : attendanceRulesData && attendanceRulesData.results.length > 0 ? (
         <DataTable

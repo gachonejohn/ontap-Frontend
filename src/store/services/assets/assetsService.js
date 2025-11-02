@@ -1,8 +1,7 @@
-import { apiSlice } from "../../api/apiSlice";
+import { apiSlice } from '../../api/apiSlice';
 
 export const assetsApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-  
     getProperties: builder.query({
       query: ({ page, page_size, category } = {}) => {
         const queryParams = {};
@@ -11,18 +10,12 @@ export const assetsApi = apiSlice.injectEndpoints({
         if (category) queryParams.category = category;
         return {
           url: `assets/properties/`,
-          method: "GET",
+          method: 'GET',
           params: queryParams,
         };
       },
     }),
-   
-    
-
-    
   }),
 });
 
-export const {
-useGetPropertiesQuery,
-} = assetsApi;
+export const { useGetPropertiesQuery } = assetsApi;

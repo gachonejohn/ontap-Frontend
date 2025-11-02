@@ -1,24 +1,24 @@
-import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
-import { Controller, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { FiArrowLeft } from "react-icons/fi";
+import { useEffect, useState } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import { Controller, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { FiArrowLeft } from 'react-icons/fi';
 import {
   useGetRolesPermissionsQuery,
   useCreateUpdateRolePermissionMutation,
-} from "../../store/services/roles/rolesService";
-import ContentSpinner from "../common/spinners/dataLoadingSpinner";
-import  { toast } from "react-toastify";
+} from '../../store/services/roles/rolesService';
+import ContentSpinner from '../common/spinners/dataLoadingSpinner';
+import { toast } from 'react-toastify';
 const PERMISSION_FIELDS = [
-  { key: "can_view", label: "View" },
-  { key: "can_create", label: "Create" },
-  { key: "can_edit", label: "Edit" },
-  { key: "can_delete", label: "Delete" },
-  { key: "can_approve", label: "Approve" },
-  { key: "can_export", label: "Export" },
-  { key: "can_print", label: "Print" },
-  { key: "can_view_all", label: "View All" },
+  { key: 'can_view', label: 'View' },
+  { key: 'can_create', label: 'Create' },
+  { key: 'can_edit', label: 'Edit' },
+  { key: 'can_delete', label: 'Delete' },
+  { key: 'can_approve', label: 'Approve' },
+  { key: 'can_export', label: 'Export' },
+  { key: 'can_print', label: 'Print' },
+  { key: 'can_view_all', label: 'View All' },
 ];
 
 // Zod schema for validation
@@ -40,16 +40,10 @@ const permissionsSchema = z.object({
 
 const RolesDetails = () => {
   const { id } = useParams();
-  const {
-    data: role,
-    isLoading,
-    error,
-    refetch,
-  } = useGetRolesPermissionsQuery(id);
+  const { data: role, isLoading, error, refetch } = useGetRolesPermissionsQuery(id);
 
   const [createUpdateRolePermission, { isLoading: isUpdating }] =
     useCreateUpdateRolePermissionMutation();
-
 
   const { control, handleSubmit, reset, getValues } = useForm({
     resolver: zodResolver(permissionsSchema),
@@ -87,14 +81,12 @@ const RolesDetails = () => {
         data: { permissions: filteredPermissions },
       }).unwrap();
 
-      
-      toast.success("Permissions updated successfully");
-     
+      toast.success('Permissions updated successfully');
+
       refetch();
     } catch (error) {
-  console.error(error);
-  toast.error("Failed to update permissions" || error.data.error);
-     
+      console.error(error);
+      toast.error('Failed to update permissions' || error.data.error);
     } finally {
       refetch();
     }
@@ -112,12 +104,8 @@ const RolesDetails = () => {
     return (
       <div className="max-w-6xl mx-auto p-6">
         <div className="text-center py-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            Error Loading Data
-          </h2>
-          <p className="text-gray-600">
-            An error occurred while loading permissions data.
-          </p>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Error Loading Data</h2>
+          <p className="text-gray-600">An error occurred while loading permissions data.</p>
         </div>
       </div>
     );
@@ -125,17 +113,12 @@ const RolesDetails = () => {
 
   return (
     <div className="min-h-screen p-4 bg-white  ">
-      <Link
-        to="/dashboard/settings"
-        className="flex items-center space-x-2 mb-6"
-      >
+      <Link to="/dashboard/settings" className="flex items-center space-x-2 mb-6">
         <FiArrowLeft className="text-xl" />
         <span>Back</span>
       </Link>
 
-      <h1 className="text-xl font-bold mb-4">
-        {role.name}
-      </h1>
+      <h1 className="text-xl font-bold mb-4">{role.name}</h1>
 
       <form
         onSubmit={handleSubmit(onSubmit)}
@@ -171,11 +154,9 @@ const RolesDetails = () => {
           disabled={isUpdating}
           className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-700 disabled:opacity-50"
         >
-          {isUpdating ? "Updating..." : "Update Permissions"}
+          {isUpdating ? 'Updating...' : 'Update Permissions'}
         </button>
       </form>
-
-     
     </div>
   );
 };

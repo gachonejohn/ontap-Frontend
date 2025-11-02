@@ -9,7 +9,7 @@ export const isBreakActive = (breakEnd) => {
   if (!breakEnd) return false; // if break_end is null, not active
 
   const now = new Date();
-  const [endHour, endMinute, endSecond] = breakEnd.split(":").map(Number);
+  const [endHour, endMinute, endSecond] = breakEnd.split(':').map(Number);
   const endTime = new Date();
   endTime.setHours(endHour, endMinute, endSecond || 0, 0);
 

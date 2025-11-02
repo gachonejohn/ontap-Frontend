@@ -1,22 +1,21 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { EmployeePaymentMethodSchema } from "@schemas/employees/employmentSchema";
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { FiEdit, FiUserPlus } from "react-icons/fi";
-import { IoCloseOutline } from "react-icons/io5";
-import Select from "react-select";
-import { toast } from "react-toastify";
-import { paymentMethodOptions } from "../../../../constants/constants";
-import { useUpdatePaymentMethodMutation } from "../../../../store/services/employees/employeesService";
-import SubmitCancelButtons from "../../../common/Buttons/ActionButton";
-import CreateUpdateButton from "../../../common/Buttons/CreateUpdateButton";
-import { getApiErrorMessage } from "@utils/errorHandler";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { EmployeePaymentMethodSchema } from '@schemas/employees/employmentSchema';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { FiEdit, FiUserPlus } from 'react-icons/fi';
+import { IoCloseOutline } from 'react-icons/io5';
+import Select from 'react-select';
+import { toast } from 'react-toastify';
+import { paymentMethodOptions } from '../../../../constants/constants';
+import { useUpdatePaymentMethodMutation } from '../../../../store/services/employees/employeesService';
+import SubmitCancelButtons from '../../../common/Buttons/ActionButton';
+import CreateUpdateButton from '../../../common/Buttons/CreateUpdateButton';
+import { getApiErrorMessage } from '@utils/errorHandler';
 
 export const UpdatePymentMethodInfo = ({ refetchData, data }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const [updatePaymentMethod, { isLoading: isUpdating }] =
-    useUpdatePaymentMethodMutation();
+  const [updatePaymentMethod, { isLoading: isUpdating }] = useUpdatePaymentMethodMutation();
 
   const {
     register,
@@ -28,15 +27,15 @@ export const UpdatePymentMethodInfo = ({ refetchData, data }) => {
   } = useForm({
     resolver: zodResolver(EmployeePaymentMethodSchema),
     defaultValues: {
-      method: data?.method ?? "",
-      bank_name: data?.bank_name ?? "",
-      mobile_number: data?.mobile_number ?? "",
-      is_primary: data?.is_primary ?? "",
-      account_number: data?.account_number ?? "",
+      method: data?.method ?? '',
+      bank_name: data?.bank_name ?? '',
+      mobile_number: data?.mobile_number ?? '',
+      is_primary: data?.is_primary ?? '',
+      account_number: data?.account_number ?? '',
     },
   });
   useEffect(() => {
-    console.log("Form Errors:", errors);
+    console.log('Form Errors:', errors);
   }, [errors]);
   const onSubmit = async (formData) => {
     try {
@@ -44,14 +43,11 @@ export const UpdatePymentMethodInfo = ({ refetchData, data }) => {
         id: data.id,
         data: formData,
       }).unwrap();
-      toast.success("Payment Method Details updated successfully!");
+      toast.success('Payment Method Details updated successfully!');
       handleCloseModal();
       refetchData();
     } catch (error) {
-      const message = getApiErrorMessage(
-        error,
-        "Error Updating payment method info."
-      );
+      const message = getApiErrorMessage(error, 'Error Updating payment method info.');
       toast.error(message);
     } finally {
       refetchData();
@@ -59,7 +55,7 @@ export const UpdatePymentMethodInfo = ({ refetchData, data }) => {
   };
   const handleMethodTypeChange = (selected) => {
     if (selected) {
-      setValue("method", selected.value);
+      setValue('method', selected.value);
     }
   };
 
@@ -103,9 +99,7 @@ export const UpdatePymentMethodInfo = ({ refetchData, data }) => {
             >
               {/* Header - sticky */}
               <div className="sticky top-0 bg-white z-40 flex px-4 justify-between items-center py-4 border-b border-gray-100">
-                <p className="text-sm md:text-lg lg:text-lg font-semibold">
-                  Edit Payment Method
-                </p>
+                <p className="text-sm md:text-lg lg:text-lg font-semibold">Edit Payment Method</p>
                 <IoCloseOutline
                   size={20}
                   className="cursor-pointer hover:text-gray-600"
@@ -135,18 +129,16 @@ export const UpdatePymentMethodInfo = ({ refetchData, data }) => {
                       menuPortal: (base) => ({ ...base, zIndex: 9999 }),
                       control: (base) => ({
                         ...base,
-                        minHeight: "36px",
-                        borderColor: "#d1d5db",
-                        boxShadow: "none",
-                        "&:hover": { borderColor: "#9ca3af" },
-                        backgroundColor: "#F3F4F6",
+                        minHeight: '36px',
+                        borderColor: '#d1d5db',
+                        boxShadow: 'none',
+                        '&:hover': { borderColor: '#9ca3af' },
+                        backgroundColor: '#F3F4F6',
                       }),
                     }}
                   />
                   {errors.method && (
-                    <p className="text-red-500 text-[12px] mt-1">
-                      {errors.method.message}
-                    </p>
+                    <p className="text-red-500 text-[12px] mt-1">{errors.method.message}</p>
                   )}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -157,13 +149,11 @@ export const UpdatePymentMethodInfo = ({ refetchData, data }) => {
                     <input
                       type="text"
                       placeholder="A2345"
-                      {...register("account_number")}
+                      {...register('account_number')}
                       className="w-full py-2 px-4 rounded-md border bg-slate-50 focus:outline-none focus:border-primary focus:bg-white placeholder:text-[12px]"
                     />
                     {errors.account_number && (
-                      <p className="text-red-500 text-sm mt-1">
-                        {errors.account_number.message}
-                      </p>
+                      <p className="text-red-500 text-sm mt-1">{errors.account_number.message}</p>
                     )}
                   </div>
                   <div>
@@ -173,13 +163,11 @@ export const UpdatePymentMethodInfo = ({ refetchData, data }) => {
                     <input
                       type="text"
                       placeholder="E.g. KES"
-                      {...register("bank_name")}
+                      {...register('bank_name')}
                       className="w-full py-2 px-4 rounded-md border bg-slate-50 focus:outline-none focus:border-primary focus:bg-white placeholder:text-[12px]"
                     />
                     {errors.bank_name && (
-                      <p className="text-red-500 text-sm mt-1">
-                        {errors.bank_name.message}
-                      </p>
+                      <p className="text-red-500 text-sm mt-1">{errors.bank_name.message}</p>
                     )}
                   </div>
                 </div>
@@ -191,13 +179,11 @@ export const UpdatePymentMethodInfo = ({ refetchData, data }) => {
                   <input
                     type="number"
                     placeholder="+254"
-                    {...register("mobile_number")}
+                    {...register('mobile_number')}
                     className="w-full py-2 px-4 rounded-md border bg-slate-50 focus:outline-none focus:border-primary focus:bg-white placeholder:text-[12px]"
                   />
                   {errors.mobile_number && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {errors.mobile_number.message}
-                    </p>
+                    <p className="text-red-500 text-sm mt-1">{errors.mobile_number.message}</p>
                   )}
                 </div>
 
@@ -206,12 +192,9 @@ export const UpdatePymentMethodInfo = ({ refetchData, data }) => {
                     type="checkbox"
                     id="is_primary"
                     className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
-                    {...register("is_primary")}
+                    {...register('is_primary')}
                   />
-                  <label
-                    htmlFor="is_primary"
-                    className="ml-2 text-sm font-medium text-gray-700"
-                  >
+                  <label htmlFor="is_primary" className="ml-2 text-sm font-medium text-gray-700">
                     Is Primary
                   </label>
                 </div>
