@@ -868,6 +868,7 @@ const EmployeeDashboardContent = () => {
         onClose={() => setIsTaskModalOpen(false)}
         task={selectedTask}
         refetch={refetchTasks}
+        onSubmit={handleCreateTask}
       />
 
       <DropdownAuthenticationModal
