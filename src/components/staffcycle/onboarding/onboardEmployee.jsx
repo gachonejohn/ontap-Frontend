@@ -124,7 +124,7 @@ export const OnboardEmployee = ({ refetchData }) => {
                   <Select
                     options={employeesData?.map((item) => ({
                       value: item.id,
-                      label: `${item.user.first_name} ${item.user.last_name} (${item.department.name})`,
+                      label: `${item.user.first_name} ${item.user.last_name} (${item.department?.name})`,
                     }))}
                     menuPortalTarget={document.body}
                     menuPlacement="auto"
@@ -178,7 +178,7 @@ export const OnboardEmployee = ({ refetchData }) => {
                     options={templatesData?.map((item) => ({
                       value: item.id,
                       label: item.name,
-                      department: item.department.name,
+                      department: item.department?.name,
                       duration: item.duration_in_days,
                       steps: item.steps.length,
                       type: item.template_type,
@@ -280,7 +280,7 @@ export const OnboardEmployee = ({ refetchData }) => {
                   <Select
                     options={employeesData?.map((item) => ({
                       value: item.id,
-                      label: `${item.user.first_name} ${item.user.last_name} (${item.department.name})`,
+                      label: `${item.user.first_name} ${item.user.last_name} (${item.department?.name})`,
                     }))}
                     menuPortalTarget={document.body}
                     menuPlacement="auto"
