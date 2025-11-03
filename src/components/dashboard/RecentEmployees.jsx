@@ -7,7 +7,7 @@ import { FiEdit, FiUserMinus } from 'react-icons/fi';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { PAGE_SIZE } from '../../constants/constants';
 import { useFilters } from '../../hooks/useFIlters';
-import { useGetEmployeesQuery } from '../../store/services/employees/employeesService';
+import { useGetRecentHiresQuery } from '../../store/services/employees/employeesService';
 import { YearMonthCustomDate } from '../../utils/dates';
 import DataTable from '../common/DataTable';
 import Pagination from '../common/pagination';
@@ -17,7 +17,7 @@ const RecentEmployees = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  const currentPageParam = parseInt(searchParams.get('page') || '1', 10);
+  // const currentPageParam = parseInt(searchParams.get('page') || '1', 10);
 
   const { filters, currentPage, handleFilterChange, handlePageChange } = useFilters({
     initialFilters: {
@@ -25,7 +25,7 @@ const RecentEmployees = () => {
       department: searchParams.get('department') || '',
       status: searchParams.get('status') || '',
     },
-    initialPage: currentPageParam,
+    // initialPage: currentPageParam,
     navigate,
     debounceTime: 100,
     debouncedFields: ['employee_no'],
@@ -33,8 +33,8 @@ const RecentEmployees = () => {
 
   const queryParams = useMemo(
     () => ({
-      page: currentPage,
-      page_size: PAGE_SIZE,
+      // page: currentPage,
+      // page_size: PAGE_SIZE,
       ...filters,
     }),
     [currentPage, filters]
@@ -45,7 +45,7 @@ const RecentEmployees = () => {
     isLoading: loadingData,
     error,
     refetch,
-  } = useGetEmployeesQuery(queryParams, { refetchOnMountOrArgChange: true });
+  } =  useGetRecentHiresQuery(queryParams, { refetchOnMountOrArgChange: true });
 
   const { data: departmentsData } = useGetDepartmentsQuery(queryParams, {
     refetchOnMountOrArgChange: true,
@@ -223,16 +223,16 @@ const RecentEmployees = () => {
           />
         ) : (
           <NoDataFound message="No Employees found" />
-        )}
+        )} 
 
-        {employeesData && employeesData.count > 0 && (
+        {/* {employeesData && employeesData.count > 0 && (
           <Pagination
             currentPage={currentPage}
             totalItems={employeesData.count}
             pageSize={PAGE_SIZE}
             onPageChange={handlePageChange}
           />
-        )}
+        )}  */}
       </div>
     </>
   );
