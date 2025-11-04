@@ -136,7 +136,7 @@ const StepDetailModal = ({ stepId, onClose }) => {
           {/* Header - sticky */}
           <div className="sticky top-0 bg-white z-40 flex px-4 justify-between items-center py-4 border-b border-gray-100">
             <p className="text-sm md:text-lg lg:text-lg font-semibold">
-              {step.step.title}
+              {step.title}
             </p>
             <button
               onClick={onClose}
@@ -180,7 +180,7 @@ const StepDetailModal = ({ stepId, onClose }) => {
             <div>
               <h3 className="text-sm font-medium text-gray-700 mb-2">Description</h3>
               <p className="text-sm text-gray-600 bg-slate-50 p-3 rounded-md border">
-                {step.step.description}
+                {step.description}
               </p>
             </div>
 
@@ -230,7 +230,7 @@ const StepDetailModal = ({ stepId, onClose }) => {
                 </label>
                 <div className="bg-slate-50 p-3 rounded-md border">
                   <span className={`inline-block text-xs px-2 py-1 rounded ${PRIORITY_COLORS[step.step.priority]}`}>
-                    {getPriorityLabel(step.step.priority)}
+                    {getPriorityLabel(step.priority)}
                   </span>
                 </div>
               </div>
@@ -265,7 +265,7 @@ const StepDetailModal = ({ stepId, onClose }) => {
                   Duration
                 </label>
                 <div className="text-sm font-medium text-gray-900 bg-slate-50 p-3 rounded-md border inline-block">
-                  {step.step.duration_in_days} {step.step.duration_in_days === 1 ? 'day' : 'days'}
+                  {step.duration_in_days} {step.duration_in_days === 1 ? 'day' : 'days'}
                 </div>
               </div>
             </div>
