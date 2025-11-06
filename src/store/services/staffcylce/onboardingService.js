@@ -16,10 +16,11 @@ export const onbardingApi = apiSlice.injectEndpoints({
       },
     }),
     getOnboardingTemplates: builder.query({
-      query: ({ page, page_size } = {}) => {
+      query: ({ page, page_size,search } = {}) => {
         const queryParams = {};
         if (page) queryParams.page = page;
         if (page_size) queryParams.page_size = page_size;
+        if (search) queryParams.search = search;
 
         return {
           url: `onboarding/templates/`,

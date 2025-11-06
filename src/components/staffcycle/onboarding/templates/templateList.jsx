@@ -16,7 +16,7 @@ import {
 } from '@store/services/staffcylce/onboardingService';
 import { getApiErrorMessage } from '@utils/errorHandler';
 import { toast } from 'react-toastify';
-import { EditTemplate } from './EditTemplate';
+import { EditTemplate } from './Edit';
 import { NewTemplate } from './NewTemplate';
 const Templates = () => {
   const [searchParams] = useSearchParams();
@@ -158,8 +158,8 @@ const Templates = () => {
                 <div className="flex flex-col gap-4">
                   <span className="border-b font-inter font-light text-sm pb-1 ">Actions</span>
                   <ButtonDropdown>
-                    <EditTemplate data={item} refetchData={refetch} />
-                    <button
+                    <EditTemplate template={item} refetchData={refetch} />
+                    {/* <button
                       className="flex items-center space-x-2 font-inter
   "
                       onClick={() => navigate(`/dashboard/onboarding/templates/${item.id}`)}
@@ -167,7 +167,7 @@ const Templates = () => {
                     >
                       <FiEye className="text-sm text-gray-600" />
                       <span className="text-sm">View Steps</span>
-                    </button>
+                    </button> */}
                     <button
                       className="flex items-center space-x-2 font-inter"
                       onClick={() => openDeleteModal(item.id)}
