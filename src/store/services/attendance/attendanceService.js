@@ -51,6 +51,19 @@ export const attendanceApi = apiSlice.injectEndpoints({
         };
       },
     }),
+    getAttendanceConsistency: builder.query({
+      query: ({  month,   } = {}) => {
+        const queryParams = {};
+       
+        if (month) queryParams.month = month;
+     
+        return {
+          url: `attendance/consistency/`,
+          method: 'GET',
+          params: queryParams,
+        };
+      },
+    }),
     getTodayClockIns: builder.query({
       query: ({ page, page_size, employee_no } = {}) => {
         const queryParams = {};
@@ -86,4 +99,5 @@ export const {
   useGetTodayClockInsQuery,
   useGetAttendaceQuery,
   useGetAttendanceTrendsQuery,
+  useGetAttendanceConsistencyQuery,
 } = attendanceApi;

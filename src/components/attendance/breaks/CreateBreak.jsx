@@ -7,6 +7,7 @@ import {
 } from '@store/services/policies/policyService';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { FiClock } from 'react-icons/fi';
 import { IoCloseOutline } from 'react-icons/io5';
 import Select from 'react-select';
 import { toast } from 'react-toastify';
@@ -71,10 +72,12 @@ export const CreateBreak = ({ refetchData }) => {
     <>
       <button
         onClick={handleOpenModal}
-        className="min-w-[150px] h-[50px] 
-             text-orange-500 rounded-md border  border-orange-500 shadow-md hover:bg-orange-100 transition-colors"
+        className="px-4 py-2 text-white rounded-md border 
+             flex items-center space-x-2
+              bg-orange-400   transition-colors"
       >
-        StartBreak
+        <FiClock />
+        <span>Take a Break</span>
       </button>
       {isOpen && (
         <div
