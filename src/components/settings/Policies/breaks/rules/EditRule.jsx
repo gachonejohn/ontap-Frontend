@@ -22,11 +22,11 @@ export const EditBreakRule = ({ data, refetchData }) => {
     resolver: zodResolver(CreateBreakRuleSchema),
     defaultValues: {
       name: data?.name ?? '',
-      max_breaks_per_day: data?.max_breaks_per_day ?? 0,
-      max_total_break_minutes: data?.max_total_break_minutes ?? 0,
+      // max_breaks_per_day: data?.max_breaks_per_day ?? 0,
+      // max_total_break_minutes: data?.max_total_break_minutes ?? 0,
       default_max_duration_minutes: data?.default_max_duration_minutes ?? 0,
-      default_grace_period_minutes: data?.default_grace_period_minutes ?? 0,
-      enforce_strictly: data?.enforce_strictly ?? false,
+      // default_grace_period_minutes: data?.default_grace_period_minutes ?? 0,
+      // enforce_strictly: data?.enforce_strictly ?? false,
     },
   });
 
@@ -102,7 +102,7 @@ export const EditBreakRule = ({ data, refetchData }) => {
                 </div>
 
                 {/* Max Breaks per Day */}
-                <div>
+                {/* <div>
                   <label className="block text-sm font-medium mb-2">Max Breaks per Day</label>
                   <input
                     type="number"
@@ -113,10 +113,10 @@ export const EditBreakRule = ({ data, refetchData }) => {
                   {errors.max_breaks_per_day && (
                     <p className="text-red-500 text-sm">{errors.max_breaks_per_day.message}</p>
                   )}
-                </div>
+                </div> */}
 
                 {/* Max Total Break Minutes */}
-                <div>
+                {/* <div>
                   <label className="block text-sm font-medium mb-2">Max Total Break Minutes</label>
                   <input
                     type="number"
@@ -127,7 +127,7 @@ export const EditBreakRule = ({ data, refetchData }) => {
                   {errors.max_total_break_minutes && (
                     <p className="text-red-500 text-sm">{errors.max_total_break_minutes.message}</p>
                   )}
-                </div>
+                </div> */}
 
                 {/* Default Max Duration */}
                 <div>
@@ -150,7 +150,7 @@ export const EditBreakRule = ({ data, refetchData }) => {
                 </div>
 
                 {/* Default Grace Period */}
-                <div>
+                {/* <div>
                   <label className="block text-sm font-medium mb-2">
                     Default Grace Period (Minutes)
                   </label>
@@ -167,10 +167,10 @@ export const EditBreakRule = ({ data, refetchData }) => {
                       {errors.default_grace_period_minutes.message}
                     </p>
                   )}
-                </div>
+                </div> */}
 
                 {/* Enforce Strictly */}
-                <div className="flex items-center space-x-2">
+                {/* <div className="flex items-center space-x-2">
                   <input
                     type="checkbox"
                     id="enforce_strictly"
@@ -183,7 +183,7 @@ export const EditBreakRule = ({ data, refetchData }) => {
                   >
                     Enforce Strictly
                   </label>
-                </div>
+                </div> */}
 
                 {/* Buttons */}
                 <div className="sticky bottom-0 bg-white z-40 flex gap-4 justify-between items-center py-2 mt-4">
