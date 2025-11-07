@@ -4,9 +4,12 @@ import StaffOnboardingLayout from './layout';
 export default function MainOnboardingDashboardContent() {
   const location = useLocation();
   const isTemplatesView = location.pathname.includes('/templates');
-  const isStepsView = location.pathname.includes('steps');
+  // const isStepsView = location.pathname.includes('steps');
   return (
-    <StaffOnboardingLayout isTemplatesView={isTemplatesView} isStepsView={isStepsView}>
+    <StaffOnboardingLayout 
+    isTemplatesView={isTemplatesView} 
+    // isStepsView={isStepsView}
+    >
       <Outlet />
     </StaffOnboardingLayout>
   );

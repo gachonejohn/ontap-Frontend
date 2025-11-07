@@ -18,6 +18,22 @@ export const employeesApi = apiSlice.injectEndpoints({
       },
     }),
 
+     getRecentHires: builder.query({
+      query: ({ page, page_size, search, status, department } = {}) => {
+        const queryParams = {};
+        if (page) queryParams.page = page;
+        if (page_size) queryParams.page_size = page_size;
+        if (search) queryParams.search = search;
+        if (status) queryParams.status = status;
+        if (department) queryParams.department = department;
+        return {
+          url: `employees/recent-hires/`,
+          method: 'GET',
+          params: queryParams,
+        };
+      },
+    }),
+
     getEmployeeDetails: builder.query({
       query: (id) => ({
         url: `employees/staff/${id}/`,
@@ -298,4 +314,5 @@ export const {
   useGetTimezonesQuery,
   useSetTimezoneMutation,
   useGetProfileInfoQuery,
+  useGetRecentHiresQuery,
 } = employeesApi;

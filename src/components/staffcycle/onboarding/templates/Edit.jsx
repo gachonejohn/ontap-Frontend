@@ -1,4 +1,3 @@
-
 import SubmitCancelButtons from '@components/common/Buttons/ActionButton';
 import CreateUpdateButton from '@components/common/Buttons/CreateUpdateButton';
 import { onboardingstepPriorityOptions } from '@constants/constants';
@@ -6,21 +5,21 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { createTemplateSchema } from '@schemas/onboarding/onboardingSchema';
 import { useGetDepartmentsQuery } from '@store/services/companies/departmentsService';
 import { useGetEmployeesQuery } from '@store/services/employees/employeesService';
-import { useCreateTemplateMutation } from '@store/services/staffcylce/onboardingService';
+import { useUpdateTemplateMutation } from '@store/services/staffcylce/onboardingService';
 import { getApiErrorMessage } from '@utils/errorHandler';
 import { useEffect, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
-import { FiPlus, FiTrash2 } from 'react-icons/fi';
+import { FiEdit2, FiEdit3, FiPlus, FiTrash2 } from 'react-icons/fi';
 import { IoCloseOutline } from 'react-icons/io5';
 import Select from 'react-select';
 import { toast } from 'react-toastify';
 
-export const NewTemplate = ({ refetchData }) => {
+export const EditTemplate = ({ template, refetchData }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [createTemplate, { isLoading: isCreating }] = useCreateTemplateMutation();
-  const { data: departments } = useGetDepartmentsQuery({}, { refetchOnMountOrArgChange: true });
-  const { data: employeesData } = useGetEmployeesQuery({}, { refetchOnMountOrArgChange: true });
-
+  const [updateTemplate, { isLoading: isUpdating }] = useUpdateTemplateMutation();
+  const { data: departments } = useGetDepartmentsQuery();
+  const { data: employeesData } = useGetEmployeesQuery();
+  console.log('template', template);
   const {
     register,
     handleSubmit,
@@ -31,44 +30,61 @@ export const NewTemplate = ({ refetchData }) => {
   } = useForm({
     resolver: zodResolver(createTemplateSchema),
     defaultValues: {
-      steps: [],
+      template_name: template?.template_name ?? '',
+      department: template?.department.id ?? undefined,
+      description: template?.description ?? '',
+      duration_in_days: template?.duration_in_days ?? 1,
+      steps: template?.steps || [],
     },
   });
   useEffect(() => {
     console.log('Form Errors:', errors);
   }, [errors]);
-
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'steps',
   });
 
+  useEffect(() => {
+    if (template) {
+      reset({
+        ...template,
+        department: template?.department?.id ?? undefined,
+        steps:
+          template?.steps?.map((step) => ({
+            ...step,
+            assignee: step.assignee?.id ?? undefined,
+          })) || [],
+      });
+    }
+  }, [template, reset]);
+
+  const handleOpenModal = () => setIsOpen(true);
+  const handleCloseModal = () => {
+    reset(template);
+    setIsOpen(false);
+  };
+
   const onSubmit = async (formData) => {
-    const payLoad = {
+    console.log('Submitting form data:', formData);
+      const payLoad = {
       template_type: 'Onboarding',
       ...formData,
     };
     if (!payLoad.steps || payLoad.steps.length === 0) {
     delete payLoad.steps; 
   }
-console.log('Payload:', payLoad);
     try {
-      await createTemplate(payLoad).unwrap();
-      toast.success('Template created successfully!');
+      await updateTemplate({
+        id: template.id,
+        data: payLoad,
+      }).unwrap();
+      toast.success('Template updated successfully!');
       handleCloseModal();
       refetchData();
     } catch (error) {
-      const message = getApiErrorMessage(error, 'Error creating template.');
-      toast.error(message);
-    } finally {
-      refetchData();
+      toast.error(getApiErrorMessage(error, 'Error updating template.'));
     }
-  };
-
-  const handleOpenModal = () => setIsOpen(true);
-  const handleCloseModal = () => {
-    reset();
-    setIsOpen(false);
   };
 
   const handleDepartmentChange = (selected) => {
@@ -77,53 +93,46 @@ console.log('Payload:', payLoad);
       setValue('department', item_id);
     }
   };
-const handleEmployeeChange = (index, selected) => {
-  setValue(`steps.${index}.assignee`, selected ? Number(selected.value) : undefined);
-};
+  const handlePriorityType = (selected, index) =>
+    setValue(`steps.${index}.priority`, selected ? selected.value : '');
 
-const handlePriorityType = (index, selected) => {
-  setValue(`steps.${index}.priority`, selected ? selected.value : '');
-};
-
- 
+  const handleEmployeeChange = (selected, index) =>
+    setValue(`steps.${index}.assignee`, selected ? Number(selected.value) : undefined);
 
   return (
     <>
       <CreateUpdateButton
         onClick={handleOpenModal}
-        label="New Template"
-        icon={<FiPlus className="w-4 h-4" />}
-        className="bg-primary text-white px-4 py-2 rounded-md transition-all duration-200 shadow-sm hover:shadow-md hover:bg-primary-600 focus:ring-primary-500 focus:ring-offset-1"
+        // title="Add New"
+        label="Edit"
+        icon={<FiEdit3 className="text-sm text-gray-600" />}
+        className="flex items-center space-x-2 px-4 py-2 w-full font-inter hover:bg-gray-100"
       />
 
       {isOpen && (
         <div
-          className="relative z-50 animate-fadeIn"
+          className="relative z-50"
           aria-labelledby="modal-title"
           role="dialog"
           aria-modal="true"
         >
           <div
             onClick={handleCloseModal}
-            className="fixed inset-0 bg-black bg-opacity-50 transition-opacity animate-fadeIn cursor-pointer"
+            className="fixed inset-0 bg-black bg-opacity-50 transition-opacity cursor-pointer"
           />
 
-          <div className="fixed inset-0 min-h-full z-50 w-screen flex flex-col text-center md:items-center justify-center overflow-y-auto p-2 md:p-3 pointer-events-none">
+          <div className="fixed inset-0 flex items-center justify-center z-50 p-2 md:p-3">
             <div
-              className="relative font-inter transform animate-fadeIn max-h-[90vh] overflow-y-auto 
-              rounded-2xl bg-white text-left shadow-xl transition-all w-full 
-              sm:max-w-c-500 md:max-w-c-500 px-3 pointer-events-auto"
+              className="relative font-inter max-h-[90vh] overflow-y-auto bg-white 
+              rounded-2xl shadow-xl w-full sm:max-w-c-500 md:max-w-c-500 px-3"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="sticky top-0 bg-white z-40 flex px-4 justify-between items-center py-4">
-                <p className="text-sm md:text-lg lg:text-lg font-semibold">
-                  Create Onboarding Template
-                </p>
+                <p className="text-sm md:text-lg font-semibold">Edit Onboarding Template</p>
                 <IoCloseOutline size={20} className="cursor-pointer" onClick={handleCloseModal} />
               </div>
 
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 gap-4 p-4">
-                {/* Template Info */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium mb-2">
@@ -131,11 +140,8 @@ const handlePriorityType = (index, selected) => {
                     </label>
                     <input
                       type="text"
-                      placeholder="e.g., Engineering Onboarding"
                       {...register('name')}
-                      className="w-full py-2 px-4 
-                    rounded-md border border-gray-400
-                     focus:outline-none bg-input focus:border-primary focus:bg-white placeholder:text-sm"
+                      className="w-full py-2 px-4 rounded-md border border-gray-400 focus:outline-none bg-input focus:border-primary focus:bg-white"
                     />
                     {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
                   </div>
@@ -147,6 +153,10 @@ const handlePriorityType = (index, selected) => {
                         value: item.id,
                         label: item.name,
                       }))}
+                      defaultValue={{
+                        label: template.department.name,
+                        value: template.department.id,
+                      }}
                       menuPortalTarget={document.body}
                       menuPlacement="auto"
                       styles={{
@@ -171,35 +181,18 @@ const handlePriorityType = (index, selected) => {
                       }}
                       onChange={handleDepartmentChange}
                     />
-                    {errors.department && (
-                      <p className="text-red-500 text-sm mt-1">{errors.department.message}</p>
-                    )}
                   </div>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium mb-2">Description</label>
                   <textarea
-                    placeholder="Brief description..."
                     {...register('description')}
                     className="w-full py-2 px-4 bg-input rounded-md border border-gray-400 focus:outline-none focus:border-primary focus:bg-white placeholder:text-sm"
                   />
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Duration (Days)</label>
-                    <input
-                      type="text"
-                      {...register('duration_in_days')}
-                      placeholder="e.g., 30"
-                      className="w-full py-2 px-4 bg-input rounded-md border border-gray-400 focus:outline-none focus:border-primary focus:bg-white placeholder:text-sm"
-                    />
-                    {errors.duration_in_days && (
-                      <p className="text-red-500 text-sm">{errors.duration_in_days.message}</p>
-                    )}
-                  </div>
-                </div>
 
+                {/* Steps */}
                 <div className="border-t pt-4">
                   <div className="flex justify-between items-center mb-3">
                     <p className="font-semibold text-sm">Onboarding Tasks</p>
@@ -211,50 +204,45 @@ const handlePriorityType = (index, selected) => {
                           assignee: undefined,
                           description: '',
                           duration_in_days: 1,
-                          category: '',
                           priority: '',
                           step_order: fields.length + 1,
                         })
                       }
-                      className="flex bg-primary items-center gap-1 p-2
-                       rounded-md text-sm text-white "
+                      className="flex bg-primary items-center gap-1 p-2 rounded-md text-sm text-white"
                     >
                       <FiPlus /> Add Task
                     </button>
                   </div>
 
-                  {fields.length === 0 && (
-                    <p className="text-gray-500 text-sm">No tasks added yet.</p>
-                  )}
-
                   {fields.map((field, index) => (
                     <div
                       key={field.id}
-                      className="border rounded-xl p-3 mb-3 flex items-start gap-4  relative"
+                      className="border rounded-xl p-3 mb-3 flex items-start gap-4 relative"
                     >
-                      <div>
+                      <div className="flex-1">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                           <div>
                             <label className="text-sm font-medium mb-1 block">Task Title</label>
                             <input
                               type="text"
                               {...register(`steps.${index}.title`)}
-                              placeholder="Enter task title"
-                              className="w-full py-2 px-3 
-                    rounded-md border border-gray-400
-                     focus:outline-none bg-input focus:border-primary focus:bg-white placeholder:text-sm"
+                              className="w-full py-2 px-3 rounded-md border border-gray-400 focus:outline-none bg-input focus:border-primary focus:bg-white"
                             />
                           </div>
-
-                          <div className="">
-                            <label className="block text-sm font-medium mb-2">
-                              Default Assignee
-                            </label>
+                          <div>
+                            <label className="text-sm font-medium mb-1 block">Assignee</label>
                             <Select
-                              options={employeesData?.map((item) => ({
-                                value: item.id,
-                                label: `${item.user.first_name} ${item.user.last_name} (${item.department.name})`,
+                              defaultValue={employeesData
+                                ?.map((e) => ({
+                                  value: e.id,
+                                  label: `${e.user.first_name} ${e.user.last_name}`,
+                                }))
+                                .find((opt) => opt.value === field.assignee)}
+                              options={employeesData?.map((e) => ({
+                                value: e.id,
+                                label: `${e.user.first_name} ${e.user.last_name}`,
                               }))}
+                              onChange={(sel) => handleEmployeeChange(sel, index)}
                               menuPortalTarget={document.body}
                               menuPlacement="auto"
                               styles={{
@@ -277,11 +265,7 @@ const handlePriorityType = (index, selected) => {
                                   backgroundColor: '#F3F3F5',
                                 }),
                               }}
-                              onChange={(selected) => handleEmployeeChange(index, selected)}
                             />
-                            {errors.assignee && (
-                              <p className="text-red-500 text-sm mt-1">{errors.assignee.message}</p>
-                            )}
                           </div>
                         </div>
 
@@ -289,10 +273,7 @@ const handlePriorityType = (index, selected) => {
                           <label className="text-sm font-medium mb-1 block">Description</label>
                           <textarea
                             {...register(`steps.${index}.description`)}
-                            placeholder="Task details..."
-                            className="w-full py-2 px-3 
-                    rounded-md border border-gray-400
-                     focus:outline-none bg-input focus:border-primary focus:bg-white placeholder:text-sm"
+                            className="w-full py-2 px-3 rounded-md border border-gray-400 focus:outline-none bg-input focus:border-primary focus:bg-white"
                           />
                         </div>
 
@@ -302,16 +283,19 @@ const handlePriorityType = (index, selected) => {
                             <input
                               type="number"
                               {...register(`steps.${index}.duration_in_days`)}
-                              className="w-full py-2 px-3 
-                    rounded-md border border-gray-400
-                     focus:outline-none bg-input focus:border-primary focus:bg-white placeholder:text-sm"
+                              className="w-full py-2 px-3 rounded-md border border-gray-400 focus:outline-none bg-input focus:border-primary focus:bg-white"
                             />
                           </div>
-
-                          <div className="">
-                            <label className="block text-sm font-medium mb-1">Priority</label>
+                          <div>
+                            <label className="text-sm font-medium mb-1 block">Priority</label>
                             <Select
+                              defaultValue={
+                                onboardingstepPriorityOptions.find(
+                                  (opt) => opt.value === field.priority
+                                ) || null
+                              }
                               options={onboardingstepPriorityOptions}
+                              onChange={(sel) => handlePriorityType(sel, index)}
                               menuPortalTarget={document.body}
                               menuPlacement="auto"
                               styles={{
@@ -334,21 +318,14 @@ const handlePriorityType = (index, selected) => {
                                   backgroundColor: '#F3F3F5',
                                 }),
                               }}
-                             onChange={(selected) => handlePriorityType(index, selected)}
                             />
-                            {errors.priority && (
-                              <p className="text-red-500 text-sm mt-1">{errors.priority.message}</p>
-                            )}
                           </div>
-                          <div className="">
-                            <label className="text-sm font-medium mb-1  block">Step Order</label>
+                          <div>
+                            <label className="text-sm font-medium mb-1 block">Step Order</label>
                             <input
                               type="number"
                               {...register(`steps.${index}.step_order`)}
-                              placeholder="e.g., 1, 2, 3"
-                              className="w-full py-2 px-3 
-                    rounded-md border border-gray-400
-                     focus:outline-none bg-input focus:border-primary focus:bg-white placeholder:text-sm"
+                              className="w-full py-2 px-3 rounded-md border border-gray-400 focus:outline-none bg-input focus:border-primary focus:bg-white"
                             />
                           </div>
                         </div>
@@ -356,7 +333,7 @@ const handlePriorityType = (index, selected) => {
                       <button
                         type="button"
                         onClick={() => remove(index)}
-                        className=" text-red-500 hover:text-red-700"
+                        className="text-red-500 hover:text-red-700"
                       >
                         <FiTrash2 size={18} />
                       </button>
@@ -367,7 +344,7 @@ const handlePriorityType = (index, selected) => {
                 <SubmitCancelButtons
                   onCancel={handleCloseModal}
                   isSubmitting={isSubmitting}
-                  isProcessing={isCreating}
+                  isProcessing={isUpdating}
                 />
               </form>
             </div>

@@ -151,7 +151,7 @@ export const NewStep = ({ refetchData }) => {
                     <Select
                       options={employeesData?.map((item) => ({
                         value: item.id,
-                        label: `${item.user.first_name} ${item.user.last_name} (${item.department.name})`,
+                        label: `${item.user.first_name} ${item.user.last_name} (${item.department?.name})`,
                       }))}
                       menuPortalTarget={document.body}
                       menuPlacement="auto"

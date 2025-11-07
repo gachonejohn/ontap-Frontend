@@ -19,7 +19,7 @@ const StepCard = ({ step, onClick }) => {
     >
       <div className="flex items-start justify-between mb-3">
         <h3 className="text-sm font-medium text-gray-900 flex-1 pr-2">
-          {step.step.title}
+          {step.title}
         </h3>
         <button 
           className="text-gray-400 hover:text-gray-600 flex-shrink-0"
@@ -33,7 +33,7 @@ const StepCard = ({ step, onClick }) => {
       </div>
 
       <p className="text-xs text-gray-600 mb-3 line-clamp-2">
-        {step.step.description}
+        {step.description}
       </p>
 
       {/* {step.step.category_name && (
@@ -64,7 +64,7 @@ const StepCard = ({ step, onClick }) => {
 
       <div className="mt-3 space-y-1">
         <div className="text-xs text-gray-500">
-          <span className="font-medium">Assigned to:</span> {step.step.assignee.full_name}
+          <span className="font-medium">Assigned to:</span> {step.assignee.full_name}
         </div>
         <div className="text-xs text-gray-500">
           <span className="font-medium">Coordinator:</span> {step.coordinator_name}

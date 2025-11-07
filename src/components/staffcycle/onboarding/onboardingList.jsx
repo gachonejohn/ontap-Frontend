@@ -55,7 +55,7 @@ const OnboardingList = () => {
   const departmentsOptions =
     departmentsData?.map((item) => ({
       value: item.id,
-      label: `${item.name}`,
+      label: `${item?.name}`,
     })) || [];
 
   const handleDepartmentChange = (selectedOption) => {
@@ -162,7 +162,7 @@ const OnboardingList = () => {
                         </div>
                         <div className="flex items-center gap-2">
                           <FiList className="w-4 h-4" />
-                          <span>{emp.department.name}</span>
+                          <span>{emp?.department?.name}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <FiClock className="w-4 h-4" />
