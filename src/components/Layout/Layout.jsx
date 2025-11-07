@@ -23,18 +23,18 @@ export default function DashboardLayout() {
   }
 
   return (
-    <div className="flex w-full min-h-screen overflow-auto">
-      {/* Sidebar (role aware) */}
+    <div className="flex w-full min-h-screen overflow-x-hidden">
+      {/* Sidebar */}
       <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
-      {/* Main area */}
+      {/* Main area and Navbar */}
       <div
-        className={`flex flex-col flex-1 w-full  bg-[#F9F9FA] transition-all duration-300 ${
+        className={`flex flex-col flex-1 min-w-0 bg-[#F9F9FA] transition-all duration-300 ${
           sidebarOpen ? 'ml-[272px]' : 'ml-[64px]'
         }`}
       >
         <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-        <div className="flex-1 px-4 pt-[45px] mt-[62px] pb-8 bg-gray-100/50">
+        <div className="flex-1 px-4 pt-[45px] mt-[62px] pb-8 bg-gray-100/50 overflow-x-hidden">
           <Outlet />
         </div>
       </div>

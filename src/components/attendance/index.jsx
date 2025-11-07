@@ -1,7 +1,6 @@
 import ContentSpinner from "@components/common/spinners/dataLoadingSpinner";
 import { useLocation } from "react-router-dom";
 import { useAppSelector } from "../../store/hooks";
-import MainAttendanceDashboardContent from "./mainAttendanceDashboardContent";
 import EmployeeAttendanceDashboardContent from "./EmployeeAttendanceDashboardContent";
 
 
@@ -29,15 +28,7 @@ if (loading) {
     );
   }
 
-//   if (canViewAll) {
-//     return (
-//       <div className="flex flex-col gap-6">
-    
-//           <MainAttendanceDashboardContent />
-      
-//       </div>
-//     );
-//   } else if (canView) {
+
   if (canView) {
     return (
       <div className="flex flex-col gap-6">
