@@ -389,7 +389,7 @@ const refetchInfo = () => {
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 min-h-[300px]">
         {/* Attendance Trends */}
-        <div className="">
+       <div className='p-5 overflow-hidden max-w-full'>
           <AttendanceTrendsChart data={data} isLoading={isLoading} />
         </div>
 

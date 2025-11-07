@@ -19,7 +19,6 @@ export default function AttendanceSummaryChart({ data, isLoading }) {
   const summary = data.summary || {};
   const period = data.period || {};
 
-  // Define consistent colors per label (frontend controlled)
   const colorMap = {
     Present: "#10B981",
     Late: "#F59E0B",
@@ -41,18 +40,25 @@ export default function AttendanceSummaryChart({ data, isLoading }) {
       type: "bar",
       toolbar: { show: false },
       fontFamily: "Outfit, sans-serif",
+      parentHeightOffset: 0,
     },
     plotOptions: {
-           bar: { borderRadius: 6, borderRadiusApplication: 'end', columnWidth: '35%' },
-
+      bar: {
+        borderRadius: 6,
+        borderRadiusApplication: "end",
+        columnWidth: "25%",
+        distributed: true, 
+      },
     },
     dataLabels: {
       enabled: false,
-      style: { fontSize: "12px", fontWeight: "600" },
     },
     xaxis: {
       categories,
-      labels: { style: { colors: "#6b7280" } },
+      labels: { 
+        style: { colors: "#6b7280" },
+        trim: true
+      },
       title: { text: "Status", style: { fontWeight: 500 } },
     },
     yaxis: {
@@ -61,15 +67,20 @@ export default function AttendanceSummaryChart({ data, isLoading }) {
       tickAmount: 4,
       labels: { style: { colors: "#6b7280" } },
     },
-    colors,
+    colors, 
     tooltip: {
       y: { formatter: (val) => `${val} days` },
     },
     legend: { show: false },
-    grid: { strokeDashArray: 4 },
+    grid: { 
+      strokeDashArray: 4,
+      padding: {
+        left: 0,
+        right: 0
+      }
+    }
   };
 
-  // Helper for summary display
   const summaryMetrics = [
     { key: "present", label: "Present", color: colorMap["Present"] },
     { key: "late", label: "Late", color: colorMap["Late"] },
@@ -78,65 +89,65 @@ export default function AttendanceSummaryChart({ data, isLoading }) {
   ];
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-sm">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-4">
-        <div>
-          {/* <h2 className="text-base font-semibold text-gray-800">
-            Monthly Attendance Summary
-          </h2> */}
-          <div className="mt-4 flex items-center gap-3">
-            <span className="text-sm text-gray-500">
-              {period?.month || "Current Month"} &nbsp;
+    <div className="w-full max-w-full">
+   
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
+        <div className="min-w-0 flex-shrink">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-sm text-gray-500 whitespace-nowrap">
+              {period?.month || "Current Month"}
             </span>
-            <span className="text-sm text-gray-500">
+            <span className="text-sm text-gray-500 whitespace-nowrap">
               ({YearMonthCustomDate(period?.start_date)}
             </span>
             <span>
-              <FiArrowRight className="text-gray-400" />
+              <FiArrowRight className="text-gray-400 flex-shrink-0" />
             </span>
-            <span className="text-sm text-gray-500">
+            <span className="text-sm text-gray-500 whitespace-nowrap">
               {YearMonthCustomDate(period?.end_date)})
             </span>
           </div>
         </div>
-        <span className="text-sm text-gray-500">
+        <span className="text-sm text-gray-500 whitespace-nowrap flex-shrink-0">
           Total days: <strong>{period?.days}</strong>
         </span>
       </div>
 
-      {/* Summary Metrics */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-        {summaryMetrics.map((metric) => {
-          const value = summary[metric.key]?.count ?? 0;
-          const percentage = summary[metric.key]?.percentage ?? 0;
+      <div className="w-full flex justify-center mb-6 overflow-x-auto">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 min-w-0">
+          {summaryMetrics.map((metric) => {
+            const value = summary[metric.key]?.count ?? 0;
+            const percentage = summary[metric.key]?.percentage ?? 0;
 
-          return (
-            <div
-              key={metric.key}
-              className="flex flex-col items-center justify-center bg-gray-50 rounded-lg py-3 shadow-sm"
-            >
-              <span
-                className="w-3 h-3 rounded-full mb-1"
-                style={{ backgroundColor: metric.color }}
-              ></span>
-              <span className="text-sm text-gray-600">{metric.label}</span>
-              <span className="text-lg font-semibold text-gray-900">
-                {value}
-              </span>
-              <span className="text-xs text-gray-500">{percentage}%</span>
-            </div>
-          );
-        })}
+            return (
+              <div
+                key={metric.key}
+                className="flex flex-col p-2 items-center justify-center bg-white/80 border border-gray-100 backdrop-blur-sm rounded-lg py-3 shadow-sm min-w-0"
+              >
+                <span
+                  className="w-3 h-3 rounded-full mb-1 flex-shrink-0"
+                  style={{ backgroundColor: metric.color }}
+                />
+                <span className="text-sm text-gray-600 truncate w-full text-center px-1">{metric.label}</span>
+                <span className="text-lg font-semibold text-gray-900">{value}</span>
+                <span className="text-xs text-gray-500">{percentage}%</span>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
-      {/* Chart */}
-      <ReactApexChart
-        options={options}
-        series={series}
-        type="bar"
-        height={320}
-      />
+      {/* Chart with strict overflow prevention */}
+      <div className="w-full overflow-hidden" style={{ maxWidth: '100%' }}>
+        <div style={{ width: '100%', minWidth: 0 }}>
+          <ReactApexChart
+            options={options}
+            series={series}
+            type="bar"
+            height={250}
+          />
+        </div>
+      </div>
 
       {/* Legend */}
       <div className="mt-4 flex flex-wrap gap-4 items-center justify-center">
@@ -146,10 +157,10 @@ export default function AttendanceSummaryChart({ data, isLoading }) {
             className="flex items-center gap-2 text-sm text-gray-600"
           >
             <span
-              className="w-3 h-3 rounded-full inline-block"
+              className="w-3 h-3 rounded-full inline-block flex-shrink-0"
               style={{ backgroundColor: colorMap[item.label] }}
             />
-            <span className="font-medium">{item.label}</span>
+            <span className="font-medium whitespace-nowrap">{item.label}</span>
             <span className="text-gray-500">•</span>
             <span className="text-gray-700 font-semibold">{item.count}</span>
           </div>

@@ -37,6 +37,7 @@ module.exports = {
           800: '#065F46',
           900: '#064E3B',
           950: '#022C22',
+          dark: '#135C57',
         },
 
         secondary: {
