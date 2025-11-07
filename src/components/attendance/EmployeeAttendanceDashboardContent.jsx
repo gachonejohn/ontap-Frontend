@@ -13,12 +13,15 @@ import { toast } from 'react-toastify';
 import {
   useCheckInMutation,
   useCheckOutMutation,
-  useGetAttendanceConsistencyQuery,
+  useGetWeeklyAttendanceQuery,
   useGetTodayAttendaceQuery,
 } from '../../store/services/attendance/attendanceService';
 import ActionModal from '../common/Modals/ActionModal';
 import AttendanceSummaryChart from './charts/ConsistencyChart';
 import MetricsCard from './metricsCard';
+import WeeklyAttendanceChart from './charts/WeeklyAttendace';
+import { periodOptions } from '@constants/constants';
+import FilterSelect from '@components/common/FilterSelect';
 
 const EmployeeAttendanceDashboardContent = () => {
   const [searchParams] = useSearchParams();
@@ -42,26 +45,29 @@ const EmployeeAttendanceDashboardContent = () => {
 
   const currentPageParam = parseInt(searchParams.get('page') || '1', 10);
 
-  const { filters, handleFilterChange } = useFilters({
-    initialFilters: {
-      search: searchParams.get('month') || '',
-    },
-    initialPage: currentPageParam,
-    navigate,
-    debounceTime: 100,
-    debouncedFields: [''],
-  });
-  const handleMonthChange = (selectedOption) => {
+const { filters, handleFilterChange } = useFilters({
+  initialFilters: {
+ 
+    period: searchParams.get('period') || '',
+  },
+  initialPage: currentPageParam,
+  navigate,
+  debounceTime: 100,
+  debouncedFields: ['period'],
+});
+
+
+
+ const handlePeriodChange = (selectedOption) => {
     handleFilterChange({
-      department: selectedOption ? selectedOption.value : '',
+      period: selectedOption ? selectedOption.value : '',
     });
   };
-
   const {
     data: attendanceConsistencyData,
     isLoading: loadingConsistency,
     error: errorLoadingConsistency,
-  } = useGetAttendanceConsistencyQuery(filters, { refetchOnMountOrArgChange: true });
+  } = useGetWeeklyAttendanceQuery(filters, { refetchOnMountOrArgChange: true });
   const [checkIn, { isLoading: isClockingIn }] = useCheckInMutation();
   const [checkOut, { isLoading: isClockingOut }] = useCheckOutMutation();
 
@@ -411,30 +417,42 @@ const EmployeeAttendanceDashboardContent = () => {
           <span className="text-sm">Request Overtime</span>
         </button>
       </div>
-      <div className="bg-white w-full overflow-hidden rounded-xl shadow-sm">
-        <div className="flex justify-between p-5 items-center mb-6 border-b pb-4">
-          <h2 className="text-base  font-semibold text-gray-800">Your Attendance Consistency</h2>
-          <div className="flex items-center gap-2">
-            <label htmlFor="month" className="text-sm text-gray-600">
-              Select Month:
-            </label>
-            <input
-              type="month"
-              id="month"
-              name="month"
-              placeholder="Select Month"
-              value={filters.month || ''}
-              onChange={(e) => handleFilterChange({ month: e.target.value })}
-              className="border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-gray-700 focus:ring-none focus:border-primary focus:outline-none"
-            />
-          </div>
+      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div className="flex justify-between items-center p-5 border-b">
+          <h2 className="text-base font-semibold text-gray-800">Your Attendance Consistency</h2>
+
+          {/* Filters */}
+         
+          <div className="flex flex-col gap-3 lg:p-0
+         lg:flex-row md:flex-row md:items-center md:space-x-2 lg:items-center lg:space-x-5">
+        
+          <FilterSelect
+            options={periodOptions}
+            value={
+              periodOptions.find((option) => option.value === filters.period) || {
+                value: '',
+                label: 'Period',
+              }
+            }
+            onChange={handlePeriodChange}
+            placeholder=""
+            defaultLabel="Reset Period"
+          />
         </div>
-       <div className='p-5 overflow-hidden max-w-full'>
-          <AttendanceSummaryChart data={attendanceConsistencyData} isLoading={loadingConsistency} />
+     
         </div>
 
-        
+        <div className="p-5">
+          <WeeklyAttendanceChart
+            data={attendanceConsistencyData}
+            isLoading={loadingConsistency}
+            selectedPeriod={filters.period}
+            
+          />
+        </div>
       </div>
+
+     
 
       <ActionModal
         isOpen={isModalOpen}

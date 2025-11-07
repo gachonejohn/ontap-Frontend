@@ -88,31 +88,31 @@ const BreakPolicies = () => {
       accessor: 'name',
       cell: (item) => <span>{item.name}</span>,
     },
+    // {
+    //   header: 'Max Breaks Per day',
+    //   accessor: 'name',
+    //   cell: (item) => <span>{item.max_breaks_per_day}</span>,
+    // },
+    // {
+    //   header: 'Max Total Duration(Minutes)',
+    //   accessor: 'name',
+    //   cell: (item) => <span>{item.max_total_break_minutes}</span>,
+    // },
     {
-      header: 'Max Breaks Per day',
-      accessor: 'name',
-      cell: (item) => <span>{item.max_breaks_per_day}</span>,
-    },
-    {
-      header: 'Max Total Duration(Minutes)',
-      accessor: 'name',
-      cell: (item) => <span>{item.max_total_break_minutes}</span>,
-    },
-    {
-      header: 'Default Max Break Duration(Minutes)',
+      header: 'Max Break Duration(Minutes)',
       accessor: 'name',
       cell: (item) => <span>{item.default_max_duration_minutes}</span>,
     },
-    {
-      header: 'Default Grace Duration(Minutes)',
-      accessor: 'name',
-      cell: (item) => <span>{item.default_grace_period_minutes}</span>,
-    },
-    {
-      header: 'Enforce Strictly',
-      accessor: 'enforce_strictly',
-      cell: (item) => <span>{item.enforce_strictly === true ? 'Enforced' : 'Not Enforced'}</span>,
-    },
+    // {
+    //   header: 'Default Grace Duration(Minutes)',
+    //   accessor: 'name',
+    //   cell: (item) => <span>{item.default_grace_period_minutes}</span>,
+    // },
+    // {
+    //   header: 'Enforce Strictly',
+    //   accessor: 'enforce_strictly',
+    //   cell: (item) => <span>{item.enforce_strictly === true ? 'Enforced' : 'Not Enforced'}</span>,
+    // },
     {
       header: 'Actions',
       accessor: 'id',
