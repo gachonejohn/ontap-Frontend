@@ -104,3 +104,11 @@ export const onboardingstepPriorityOptions = [
   { value: 'MEDIUM', label: 'Medium' },
   { value: 'LOW', label: 'Low' },
 ];
+
+
+export const leavesStatusOptions = [
+  { value: 'PENDING', label: 'PENDING' },
+  { value: 'APPROVED', label: 'APPROVED' },
+  { value: 'REJECTED', label: 'REJECTED' },
+  { value: 'CANCELLED', label: 'CANCELLED' },
+];

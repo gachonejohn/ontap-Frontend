@@ -35,6 +35,13 @@ const menuItems = [
     whiteIcon: "/images/whitetask.png",
   },
   {
+    code: "records",
+    id: "records",
+    label: "Records",
+    icon: "/images/records.png",
+    whiteIcon: "/images/records.png",
+  },
+  {
     code: "trainings",
     id: "trainings",
     label: "Trainings",

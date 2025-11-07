@@ -24,6 +24,9 @@ import OnboardingList from "@components/staffcycle/onboarding/onboardingList";
 import Templates from "@components/staffcycle/onboarding/templates/templateList";
 import TemplateDetails from "@components/staffcycle/onboarding/templates/templateDetails";
 import Steps from "@components/staffcycle/onboarding/steps";
+import AttendanceRecords from "./components/records/AttendanceRecords";
+import LeavesRecords from "@components/records/LeavesRecords";
+import RecordsPage from "./components/records/RecordsPage";
 
 function App() {
   return (
@@ -57,6 +60,8 @@ function App() {
             <Route path="trainings" element={<HRTrainings />} />
             <Route path="cards" element={<CardsContent />} />
             <Route path="announcements" element={<AnnouncementsHR />} />
+            {/* <Route path="records" element={<AttendanceRecords />} /> */}
+            <Route path="records" element={<RecordsPage />} />
 
             {/* Settings */}
             <Route path="settings" element={<Settings />} />

@@ -43,15 +43,22 @@ export const leavesApi = apiSlice.injectEndpoints({
 
     // Get leave requests - WORKS FOR BOTH ADMIN AND EMPLOYEES
     getLeaveRequests: builder.query({
-      query: ({ page, page_size, status } = {}) => {
-        const params = new URLSearchParams();
-        if (page) params.append("page", page);
-        if (page_size) params.append("page_size", page_size);
-        if (status) params.append("status", status);
+      query: ({ page, page_size, status, search, department, start_date, end_date } = {}) => {
+        const queryParams = {};
+        if (page) queryParams.append("page", page);
+        if (page_size) queryParams.append("page_size", page_size);
+        if (status) queryParams.append("status", status);
+        if (search) queryParams.append("search", search);
+        // if (department) queryParams.append("department", department);
+        if (department) queryParams.department = department;
+
+        if (start_date) queryParams.append("start_date", start_date);
+        if (end_date) queryParams.append("end_date", end_date);
 
         return {
-          url: `leaves/requests/?${params.toString()}`,
+          url: `leaves/requests/?${queryParams.toString()}`,
           method: "GET",
+          params: queryParams,
         };
       },
       providesTags: ["LeaveRequests"],
