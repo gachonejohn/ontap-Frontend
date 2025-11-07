@@ -9,6 +9,7 @@ import SearchBar from './SearchBar';
 
 const OnboardingStepsBoard = ({ onBack }) => {
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState(search);
   const [statusFilter, setStatusFilter] = useState('');
   const [selectedStepId, setSelectedStepId] = useState(null);
   const [page, setPage] = useState(1);
@@ -16,9 +17,20 @@ const OnboardingStepsBoard = ({ onBack }) => {
   const [hasMore, setHasMore] = useState(true);
   const isFetchingRef = useRef(false);
 
+  useEffect(() => {
+    setPage(1);
+    setAllSteps([]);
+    // setHasMore(true);
+  }, [search, statusFilter]);
+
+  useEffect(() => {
+  const handler = setTimeout(() => setDebouncedSearch(search), 400);
+  return () => clearTimeout(handler);
+}, [search]);
+
   const { data, isLoading, isFetching, isError, error } = useGetOnboardStepsQuery({
     page,
-    search: search || undefined,
+    search: debouncedSearch || undefined,
     status: statusFilter || undefined,
   });
 

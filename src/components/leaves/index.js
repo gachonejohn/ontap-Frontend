@@ -14,7 +14,7 @@ export default function LeaveContent() {
   const isAttendanceRoute = location.pathname.includes('/attendance');
 
   const leavePermissions = user?.role?.permissions?.find(
-    (p) => p.feature_code === "leave"
+    (p) => p.feature_code === "leaves"
   );
   
   const attendancePermissions = user?.role?.permissions?.find(

@@ -110,3 +110,11 @@ export const periodOptions = [
   { label: "Last Week", value: "last_week" },
   { label: "Last 7 Days", value: "last_7_days" },
 ];
+
+
+export const leavesStatusOptions = [
+  { value: 'PENDING', label: 'PENDING' },
+  { value: 'APPROVED', label: 'APPROVED' },
+  { value: 'REJECTED', label: 'REJECTED' },
+  { value: 'CANCELLED', label: 'CANCELLED' },
+];
