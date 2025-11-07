@@ -105,6 +105,12 @@ export const onboardingstepPriorityOptions = [
   { value: 'LOW', label: 'Low' },
 ];
 
+export const periodOptions = [
+  { label: "This Week", value: "current_week" },
+  { label: "Last Week", value: "last_week" },
+  { label: "Last 7 Days", value: "last_7_days" },
+];
+
 
 export const leavesStatusOptions = [
   { value: 'PENDING', label: 'PENDING' },

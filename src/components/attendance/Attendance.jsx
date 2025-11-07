@@ -157,47 +157,7 @@ const AttendanceList = () => {
       accessor: 'total_break_minutes',
       cell: (item) => <span className="text-[12px] ">{item?.total_break_minutes ?? ''}</span>,
     },
-    // {
-    //     header: "Departure",
-    //     accessor: "departure_status",
-    //     cell: (item) => {
-    //       let color = "text-gray-600";
-    //       if (item.departure_status?.includes("Early")) color = "text-orange-500";
-    //       else if (item.departure_status?.includes("Late")) color = "text-red-500";
-
-    //       return (
-    //         <div className="flex flex-col">
-    //           <span className={`text-xs font-medium ${color}`}>
-    //             {/* {item.departure_status ?? "-"} */}
-    //           </span>
-    //           <span className="text-[12px] text-gray-500">
-    //             {item.departure_difference ?? ""}
-    //           </span>
-    //         </div>
-    //       );
-    //     },
-    //   },
-
-    // {
-    //   header: "Overtime",
-    //   accessor: "overtime",
-    //   cell: (item) => {
-    //     if (item.departure_status === "Overtime") {
-    //       return (
-    //         <div className="flex flex-col">
-    //           {/* <span className="text-xs font-medium text-blue-600">
-    //         {item.departure_status}
-    //       </span> */}
-    //           <span className="text-[11px] text-gray-500">
-    //             {item.departure_difference ?? ""}
-    //           </span>
-    //         </div>
-    //       );
-    //     }
-    //     return <span className="text-xs text-gray-400">-</span>;
-    //   },
-    // },
-
+    
     {
       header: 'Status',
       accessor: 'status',

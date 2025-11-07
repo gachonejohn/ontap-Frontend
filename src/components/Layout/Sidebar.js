@@ -49,7 +49,7 @@ const menuItems = [
     whiteIcon: "/images/trainings.png",
   },
   {
-    code: "leave",
+    code: "leaves",
     id: "leaves",
     label: "Leave",
     icon: "/images/leave.png",

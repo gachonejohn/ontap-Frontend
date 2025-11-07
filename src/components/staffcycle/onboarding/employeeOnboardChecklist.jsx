@@ -11,7 +11,7 @@ export const EmployeeCheckList = ({ id }) => {
   const { data, isLoading, error, refetch } = useGetEmployeeOnboardingCheckListQuery(id, {
     skip: !isOpen,
   });
-
+console.log("data", data);
   const defaultProfile = '/images/avatar/default-avatar.jpg';
   const API_BASE_URL = process.env.REACT_APP_SERVER_URI;
 
@@ -172,7 +172,7 @@ export const EmployeeCheckList = ({ id }) => {
                   <div className="space-y-3">
                     {steps.map((item) => {
                       let profilePic =
-                        item?.onboarding_template_step?.onboarding_step?.assignee?.user
+                        item?.assignee?.user
                           ?.profile_picture;
 
                       if (profilePic && !profilePic.startsWith('http')) {
@@ -200,15 +200,15 @@ export const EmployeeCheckList = ({ id }) => {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-start justify-between gap-2 mb-1">
                               <h3 className="font-medium text-gray-900 text-sm">
-                                {item.onboarding_template_step.onboarding_step.title}
+                                {item?.title }
                               </h3>
                               {getPriorityBadge(
-                                item.onboarding_template_step.onboarding_step.priority
+                                item?.priority
                               )}
                             </div>
 
                             <p className="text-sm text-gray-600 mb-2">
-                              {item.onboarding_template_step.onboarding_step.description}
+                              {item?.description }
                             </p>
 
                             <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500">
@@ -216,7 +216,7 @@ export const EmployeeCheckList = ({ id }) => {
                                 <div className="w-5 h-5 rounded-full overflow-hidden border border-gray-200 flex items-center justify-center bg-gray-100">
                                   <img
                                     src={profilePic}
-                                    alt={`${item?.onboarding_template_step?.onboarding_step?.assignee?.user?.first_name} ${item?.onboarding_template_step?.onboarding_step?.assignee?.user?.last_name}`}
+                                    alt={`${item?.assignee?.user?.first_name} ${item?.assignee?.user?.last_name}`}
                                     className="w-full h-full object-cover"
                                     onError={(e) => {
                                       e.currentTarget.src = defaultProfile;
@@ -224,7 +224,10 @@ export const EmployeeCheckList = ({ id }) => {
                                   />
                                 </div>
                                 <span>
-                                  {item.onboarding_template_step.onboarding_step.assignee.full_name}
+                                  {item.assignee && item.assignee.full_name
+                                    ? `${item.assignee.full_name}`
+                                    : 'Unassigned'}
+                                  {/* {item.assignee.full_name} */}
                                 </span>
                               </div>
                               <div className="flex items-center gap-1">
@@ -238,7 +241,7 @@ export const EmployeeCheckList = ({ id }) => {
                               <div className="flex items-center gap-1">
                                 <FiClock className="w-3.5 h-3.5" />
                                 <span>
-                                  {item.onboarding_template_step.onboarding_step.duration_in_days}{' '}
+                                  {item.duration_in_days}{' '}
                                   days
                                 </span>
                               </div>
