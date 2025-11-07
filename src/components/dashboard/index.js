@@ -1,11 +1,20 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { toast } from "react-toastify";
 import ActionsDropdown from '../../dashboards/hr/components/ActionsDropdown';
 import TaskCompletionChart from './charts/TaskCompletionChart';
 import TrainingProgressChart from '../../dashboards/hr/components/TrainingProgressChart';
 import { useAppSelector } from '../../store/hooks';
 import EmployeeDashboardContent from '../employees/EmployeeContent';
 import { useGetEmployeesQuery } from '@store/services/employees/employeesService';
+import { 
+  useGetLeaveRequestsQuery, 
+  useApproveLeaveRequestMutation, 
+  useRejectLeaveRequestMutation 
+} from '@store/services/leaves/leaveService';
 import RecentEmployees from './RecentEmployees';
+import { CustomDate } from '../../utils/dates';
+import LeaveDetails from '../leaves/LeaveDetails';
+import ActionModal from '../common/Modals/ActionModal';
 
 export default function Dashboard() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -13,12 +22,35 @@ export default function Dashboard() {
   const [showAddEmployeeModal, setShowAddEmployeeModal] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
+  // Leave management states
+  const [modalType, setModalType] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [isLeaveDetailsModalOpen, setIsLeaveDetailsModalOpen] = useState(false);
+  const [selectedLeaveId, setSelectedLeaveId] = useState(null);
+
   const { user } = useAppSelector((state) => state.auth);
   const {
     data: employeesData,
-    isLoading,
-    error,
+    isLoading: employeesLoading,
+    error: employeesError,
   } = useGetEmployeesQuery({}, { refetchOnMountOrArgChange: true });
+
+  // Fetch leave requests - get first page and take only 2 latest records
+  const {
+    data: leaveRequestsData,
+    isLoading: leaveRequestsLoading,
+    error: leaveRequestsError,
+    refetch: refetchLeaveRequests
+  } = useGetLeaveRequestsQuery({
+    page: 1,
+    ordering: '-created_at' // Order by most recent first
+  });
+
+  // Leave mutations
+  const [approveLeaveRequest] = useApproveLeaveRequestMutation();
+  const [rejectLeaveRequest] = useRejectLeaveRequestMutation();
 
   // Get dashboard permission
   const dashboardPermission = user?.role?.permissions?.find((p) => p.feature_code === 'dashboard');
@@ -30,6 +62,35 @@ export default function Dashboard() {
   // Employees data
   const employees = employeesData?.results || [];
   const totalCount = employeesData?.count || 0;
+
+  // Leave requests data - take only first 2 records from the response
+  const allLeaveRequests = leaveRequestsData?.results || [];
+  const latestLeaveRequests = allLeaveRequests.slice(0, 2); // Take only first 2 records
+  const totalLeaveRequestsCount = leaveRequestsData?.count || 0;
+
+  // Count pending leave requests for the stats card (from all requests, not just the 2 displayed)
+  const pendingLeaveRequestsCount = allLeaveRequests.filter(
+    request => request.status === 'PENDING'
+  ).length;
+
+  // Process leave requests for display
+  const processLeaveRequests = (data) => {
+    if (!data || data.length === 0) return [];
+    
+    return data.map(request => ({
+      id: request.id,
+      name: request.employee_name || "Unknown Employee",
+      days: `${parseFloat(request.days) || 0} days`,
+      type: request.leave_type_name || request.leave_policy_name || "Leave",
+      date: `${CustomDate(request.start_date)} - ${CustomDate(request.end_date)}`,
+      reason: request.reason || "No reason provided",
+      status: request.status || "PENDING",
+      created_at: request.created_at,
+      rawData: request
+    }));
+  };
+
+  const processedLeaveRequests = processLeaveRequests(latestLeaveRequests);
 
   // --- Hire calculations ---
   const getNewHiresThisMonth = () => {
@@ -72,6 +133,57 @@ export default function Dashboard() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Handle leave request status change
+  const handleStatusChange = async (id, newStatus) => {
+    setActionLoading(true);
+    try {
+      if (newStatus === "APPROVED") {
+        await approveLeaveRequest(id).unwrap();
+        toast.success("Leave request approved successfully!");
+      } else if (newStatus === "REJECTED") {
+        await rejectLeaveRequest(id).unwrap();
+        toast.success("Leave request rejected successfully!");
+      }
+      
+      // Refetch leave requests to update the UI
+      await refetchLeaveRequests();
+    } catch (error) {
+      console.error("Error updating leave request:", error);
+      toast.error("Failed to update leave request. Please try again.");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // Handle view details
+  const handleViewDetails = (leaveId) => {
+    setSelectedLeaveId(leaveId);
+    setIsLeaveDetailsModalOpen(true);
+  };
+
+  // Open action modal
+  const openActionModal = (type, id) => {
+    setSelectedItem(id);
+    setModalType(type);
+    setIsModalOpen(true);
+  };
+
+  // Close modal
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedItem(null);
+  };
+
+  // Handle confirm action from modal
+  const handleConfirmAction = async () => {
+    if (modalType === "approve" && selectedItem) {
+      await handleStatusChange(selectedItem, "APPROVED");
+    } else if (modalType === "reject" && selectedItem) {
+      await handleStatusChange(selectedItem, "REJECTED");
+    }
+    closeModal();
+  };
+
   const taskCompletionData = [
     { department: 'Engineering', completion: 85 },
     { department: 'Design', completion: 35 },
@@ -91,22 +203,35 @@ export default function Dashboard() {
     alert(`Clicked: ${segment.label} - ${segment.value}%`);
   };
 
-  const leaveRequests = [
-    {
-      name: 'Alex Kumar',
-      days: '10 days',
-      type: 'Annual Leave',
-      date: 'Sep 08-15',
-      reason: 'Holiday vacation',
-    },
-    {
-      name: 'Maria Garcia',
-      days: '3 days',
-      type: 'Sick Leave',
-      date: 'Sep 08-15',
-      reason: 'Medical appointment',
-    },
-  ];
+  // Get status badge styles
+  const getStatusStyles = (status) => {
+    switch (status) {
+      case 'PENDING':
+        return 'bg-orange-100 text-orange-800 border-orange-200';
+      case 'APPROVED':
+        return 'bg-green-100 text-green-800 border-green-200';
+      case 'REJECTED':
+      case 'DECLINED':
+        return 'bg-red-100 text-red-800 border-red-200';
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+  };
+
+  // Format status for display
+  const formatStatus = (status) => {
+    switch (status) {
+      case 'PENDING':
+        return 'Pending';
+      case 'APPROVED':
+        return 'Approved';
+      case 'REJECTED':
+      case 'DECLINED':
+        return 'Rejected';
+      default:
+        return status;
+    }
+  };
 
   return (
     <div className="flex flex-col gap-6">
@@ -172,7 +297,7 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Card 3 - Pending Leave Requests (static for now) */}
+            {/* Card 3 - Pending Leave Requests (now dynamic) */}
             <div
               className="flex flex-col justify-between p-4 rounded-xl h-[120px] 
              bg-white transition-transform duration-200 hover:-translate-y-1 shadow-sm border hover:shadow-md"
@@ -180,8 +305,12 @@ export default function Dashboard() {
               <div className="flex justify-between items-center">
                 <div className="flex flex-col">
                   <div className="text-sm text-gray-600 font-medium">Pending Leave Requests</div>
-                  <div className="mt-2 text-lg text-neutral-900 font-semibold">8</div>
-                  <div className="mt-1 text-xs text-gray-600 font-normal">+3 vs last month</div>
+                  <div className="mt-2 text-lg text-neutral-900 font-semibold">
+                    {pendingLeaveRequestsCount}
+                  </div>
+                  <div className="mt-1 text-xs text-gray-600 font-normal">
+                    {leaveRequestsLoading ? 'Loading...' : '+0 vs last month'}
+                  </div>
                 </div>
                 <div className="flex items-center justify-center p-1 rounded-2xl h-8 w-8 bg-orange-500 shadow-sm">
                   <img
@@ -218,38 +347,92 @@ export default function Dashboard() {
           {/* Table + Leave Requests */}
           <div className="flex flex-col lg:flex-row gap-6 w-full">
             <RecentEmployees />
+            
+            {/* Leave Requests Section */}
             <div className="flex flex-col gap-4 p-4 rounded-xl shadow-sm bg-white w-full lg:w-[300px]">
-              <div className="text-lg text-neutral-900 font-semibold">Leave Requests</div>
-              {leaveRequests.map((req, index) => (
-                <div
-                  key={index}
-                  className="flex flex-col gap-3 p-3 rounded-lg border border-gray-200"
-                >
-                  <div className="flex justify-between items-center">
-                    <div className="text-sm text-neutral-900 font-medium">{req.name}</div>
-                    <span className="px-2 py-1 rounded-md bg-gray-100 text-xs text-gray-700">
-                      {req.days}
-                    </span>
-                  </div>
-                  <div className="text-xs text-gray-600">{req.type}</div>
-                  <div className="text-xs text-gray-600">
-                    <span className="font-medium">Dates:</span> {req.date}
-                  </div>
-                  <div className="text-xs text-gray-600">
-                    <span className="font-medium">Reason:</span> {req.reason}
-                  </div>
-                  <div className="flex gap-2">
-                    <button className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 rounded-md bg-green-500 text-white text-xs hover:bg-green-600">
-                      <img src="/images/approve.png" alt="Approve" className="w-4 h-4" />
-                      Approve
-                    </button>
-                    <button className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 rounded-md border border-red-400 text-red-500 text-xs hover:bg-red-50">
-                      <img src="/images/reject.png" alt="Reject" className="w-4 h-4" />
-                      Reject
-                    </button>
-                  </div>
+              <div className="flex justify-between items-center">
+                <div className="text-lg text-neutral-900 font-semibold">Latest Leave Requests</div>
+                {leaveRequestsLoading && (
+                  <div className="text-xs text-gray-500">Loading...</div>
+                )}
+              </div>
+              
+              {leaveRequestsError ? (
+                <div className="text-sm text-red-500 text-center py-4">
+                  Failed to load leave requests
                 </div>
-              ))}
+              ) : processedLeaveRequests.length === 0 ? (
+                <div className="text-sm text-gray-500 text-center py-4">
+                  No leave requests found
+                </div>
+              ) : (
+                processedLeaveRequests.map((req) => (
+                  <div
+                    key={req.id}
+                    className="flex flex-col gap-3 p-3 rounded-lg border border-gray-200"
+                  >
+                    <div className="flex justify-between items-center">
+                      <div className="text-sm text-neutral-900 font-medium">{req.name}</div>
+                      <span className="px-2 py-1 rounded-md bg-gray-100 text-xs text-gray-700">
+                        {req.days}
+                      </span>
+                    </div>
+                    
+                    <div className="flex justify-between items-center">
+                      <div className="text-xs text-gray-600">{req.type}</div>
+                      <span className={`px-2 py-1 rounded-md border text-xs ${getStatusStyles(req.status)}`}>
+                        {formatStatus(req.status)}
+                      </span>
+                    </div>
+                    
+                    <div className="text-xs text-gray-600">
+                      <span className="font-medium">Dates:</span> {req.date}
+                    </div>
+                    <div className="text-xs text-gray-600">
+                      <span className="font-medium">Reason:</span> {req.reason}
+                    </div>
+                    
+                    {/* Show action buttons only for pending requests */}
+                    {req.status === 'PENDING' && (
+                      <div className="flex gap-2">
+                        <button 
+                          onClick={() => openActionModal("approve", req.id)}
+                          disabled={actionLoading}
+                          className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 rounded-md bg-green-500 text-white text-xs hover:bg-green-600 disabled:bg-green-300 transition-colors"
+                        >
+                          <img src="/images/approve.png" alt="Approve" className="w-4 h-4" />
+                          {actionLoading ? 'Processing...' : 'Approve'}
+                        </button>
+                        <button 
+                          onClick={() => openActionModal("reject", req.id)}
+                          disabled={actionLoading}
+                          className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 rounded-md border border-red-400 text-red-500 text-xs hover:bg-red-50 disabled:bg-gray-100 transition-colors"
+                        >
+                          <img src="/images/reject.png" alt="Reject" className="w-4 h-4" />
+                          {actionLoading ? 'Processing...' : 'Reject'}
+                        </button>
+                      </div>
+                    )}
+                    
+                    {/* Show view details for non-pending requests */}
+                    {req.status !== 'PENDING' && (
+                      <button 
+                        onClick={() => handleViewDetails(req.id)}
+                        className="w-full py-1.5 rounded-md border border-gray-300 text-gray-600 text-xs hover:bg-gray-50 transition-colors"
+                      >
+                        View Details
+                      </button>
+                    )}
+                  </div>
+                ))
+              )}
+              
+              {/* Show message if there are more requests available */}
+              {totalLeaveRequestsCount > 2 && (
+                <div className="text-xs text-gray-500 text-center pt-2 border-t">
+                  {totalLeaveRequestsCount - 2} more requests available in Leave section
+                </div>
+              )}
             </div>
           </div>
 
@@ -397,6 +580,33 @@ export default function Dashboard() {
               </div>
             </div>
           </div>
+
+          {/* Action Modal */}
+          <ActionModal
+            isOpen={isModalOpen}
+            onClose={closeModal}
+            actionType={modalType === "approve" ? "submit" : "delete"}
+            onDelete={handleConfirmAction}
+            isDeleting={actionLoading}
+            title={
+              modalType === "approve" ? "Approve Leave Request" : "Reject Leave Request"
+            }
+            confirmationMessage={
+              modalType === "approve"
+                ? "Are you sure you want to approve this leave request?"
+                : "Are you sure you want to reject this leave request?"
+            }
+            deleteMessage="This action will update the employee's leave status."
+            actionText={modalType === "approve" ? "Approve" : "Reject"}
+          />
+
+          {/* Leave Details Modal */}
+          <LeaveDetails
+            isOpen={isLeaveDetailsModalOpen}
+            onClose={() => setIsLeaveDetailsModalOpen(false)}
+            leaveId={selectedLeaveId}
+            isAdminView={true}
+          />
         </>
       ) : canView ? (
         <EmployeeDashboardContent />
