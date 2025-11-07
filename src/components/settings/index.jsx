@@ -115,19 +115,6 @@ const Settings = () => {
       ],
     },
     {
-      label: "Leave",
-      icon: <FiUsers className="text-sm" />,
-      items: [
-        {
-          id: "leave",
-          label: "Leave Policies",
-          description: "Configure leave rules and entitlements.",
-          icon: <FiUsers className="text-sm" />,
-          content: <LeavePolicies />,
-        },
-      ],
-    },
-    {
       label: "Policies",
       icon: <HiOutlineClipboardDocumentList className="text-sm" />,
       items: [
@@ -137,6 +124,13 @@ const Settings = () => {
           description: "Manage global company policies.",
           icon: <HiOutlineClipboardDocumentList className="text-sm" />,
           content: <div>Company policies content goes here</div>,
+        },
+        {
+          id: "leave",
+          label: "Leave Policies",
+          description: "Configure leave rules and entitlements.",
+          icon: <FiUsers className="text-sm" />,
+          content: <LeavePolicies />,
         },
         {
           id: "break_policies",

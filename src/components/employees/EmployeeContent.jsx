@@ -424,7 +424,6 @@ const EmployeeDashboardContent = () => {
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Action Buttons - Now at the top right */}
       <div className="flex justify-end items-center gap-3 h-12">
         {/* Clock In/Out Button */}
         {!clockIn ? (
@@ -486,7 +485,6 @@ const EmployeeDashboardContent = () => {
           </div>
         )}
         
-        {/* Permission-based Log Task Button */}
         {canCreateTask && (
           <div
             onClick={() => setIsLogTaskModalOpen(true)}
@@ -507,9 +505,8 @@ const EmployeeDashboardContent = () => {
         )}
       </div>
 
-      {/* Status Cards - Now 4 cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
-        {/* ID Card - Teal Version - FIRST */}
+        {/* ID Card - Teal Version */}
         <div className="relative flex flex-col justify-start items-start p-4 rounded-xl min-h-[120px] shadow-sm
          text-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-md overflow-hidden">
           {/* Teal Background */}
@@ -644,11 +641,10 @@ const EmployeeDashboardContent = () => {
           </div>
         </div>
 
-        {/* Today's Status with Sticker - FOURTH/LAST */}
+        {/* Today's Status */}
         <div className="relative flex items-center p-4
          rounded-xl min-h-[120px] shadow-sm text-white 
          transition-transform duration-200 hover:-translate-y-1 hover:shadow-md overflow-hidden">
-          {/* Sticker Image as Background */}
           <img
             src="/images/card1.png"
             alt="Sticker background"
@@ -723,7 +719,7 @@ const EmployeeDashboardContent = () => {
               bgColor="bg-yellow-500"
             />
 
-            {/* Task Cards - Limited to 2 latest */}
+            {/* Task Cards */}
             <div className="flex flex-col gap-4">
               {groupedTasks.inProgress.map((task) => (
                 <TaskCard key={task.id} task={task} onClick={handleCardClick} />
@@ -750,7 +746,7 @@ const EmployeeDashboardContent = () => {
               bgColor="bg-green-500"
             />
 
-            {/* Task Cards - Limited to 2 latest */}
+            {/* Task Cards */}
             <div className="flex flex-col gap-4">
               {groupedTasks.completed.map((task) => (
                 <TaskCard key={task.id} task={task} onClick={handleCardClick} />

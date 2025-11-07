@@ -1,30 +1,65 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import ReactApexChart from 'react-apexcharts';
 import { useGetTasksQuery } from '../../../store/services/tasks/tasksService';
 import { useGetDepartmentsQuery } from '../../../store/services/companies/departmentsService';
 import ContentSpinner from '../../common/spinners/dataLoadingSpinner';
+import { PAGE_SIZE } from '@constants/constants';
 
 const TaskCompletionChart = () => {
-  // Fetch all tasks
-  const { data: tasksData, isLoading: tasksLoading } = useGetTasksQuery({
-    page_size: 1000,
+  const [allTasks, setAllTasks] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoadingAll, setIsLoadingAll] = useState(true);
+
+  const { data: tasksData, isFetching } = useGetTasksQuery({
+    page: currentPage,
+    page_size: PAGE_SIZE,
   });
 
-  // Fetch departments
   const { data: departmentsData, isLoading: deptsLoading } = useGetDepartmentsQuery({});
 
-  const tasks = tasksData?.results || [];
   const departments = departmentsData || [];
 
-  // Calculate completion percentage per department
+  useEffect(() => {
+    if (tasksData?.results) {
+      if (currentPage === 1) {
+        setAllTasks(tasksData.results);
+      } else {
+        setAllTasks(prev => {
+          const newTasks = tasksData.results.filter(
+            newTask => !prev.some(existingTask => existingTask.id === newTask.id)
+          );
+          return [...prev, ...newTasks];
+        });
+      }
+      
+      setHasMore(tasksData.next !== null);
+      
+      if (tasksData.next === null) {
+        setIsLoadingAll(false);
+      }
+    }
+  }, [tasksData, currentPage]);
+
+  useEffect(() => {
+    if (hasMore && !isFetching && currentPage === 1) {
+      setIsLoadingAll(true);
+    }
+    
+    if (hasMore && !isFetching && allTasks.length > 0) {
+      setCurrentPage(prev => prev + 1);
+    }
+  }, [hasMore, isFetching, allTasks.length, currentPage]);
+
   const departmentStats = useMemo(() => {
-    if (!tasks.length || !departments.length) return [];
+    if (!allTasks.length || !departments.length) return [];
 
     return departments
       .map((dept) => {
-        const deptTasks = tasks.filter(
+        const deptTasks = allTasks.filter(
           (task) => task.department === dept.id || task.department_name === dept.name
         );
+
         const completedTasks = deptTasks.filter((task) => task.status === 'COMPLETED').length;
         const completionRate =
           deptTasks.length > 0 ? Math.round((completedTasks / deptTasks.length) * 100) : 0;
@@ -37,9 +72,8 @@ const TaskCompletionChart = () => {
         };
       })
       .filter((dept) => dept.totalTasks > 0);
-  }, [tasks, departments]);
+  }, [allTasks, departments]);
 
-  // ApexCharts configuration
   const chartOptions = {
     chart: {
       type: 'bar',
@@ -101,16 +135,19 @@ const TaskCompletionChart = () => {
     },
   ];
 
-  // Loading State
-  if (tasksLoading || deptsLoading) {
+  if (isLoadingAll || deptsLoading) {
     return (
       <div className="flex items-center justify-center min-h-[300px] h-full">
         <ContentSpinner />
+        {isFetching && allTasks.length > 0 && (
+          <div className="ml-3 text-sm text-gray-500">
+            Loading tasks... ({allTasks.length} loaded)
+          </div>
+        )}
       </div>
     );
   }
 
-  // No data
   if (departmentStats.length === 0) {
     return (
       <div className="flex items-center justify-center min-h-[300px] h-full">
@@ -124,7 +161,6 @@ const TaskCompletionChart = () => {
     );
   }
 
-  // Render chart
   return (
     <div className="w-full" style={{ height: '300px' }}>
       <ReactApexChart options={chartOptions} series={series} type="bar" height="100%" />
