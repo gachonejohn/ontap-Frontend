@@ -1,4 +1,3 @@
-// src/components/myprofile/ChangePasswordModal.jsx
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 import { useChangePasswordMutation } from "../../store/services/profile/profileService";
@@ -70,12 +69,10 @@ export default function ChangePasswordModal({ isOpen, onClose, onForgotPassword 
     }
 
     try {
-      // Backend will validate everything
       await changePassword(formData).unwrap();
       
       toast.success("Password changed successfully!");
       
-      // Reset form and close modal
       setFormData({
         old_password: "",
         new_password: "",
@@ -85,10 +82,8 @@ export default function ChangePasswordModal({ isOpen, onClose, onForgotPassword 
     } catch (error) {
       console.error("Failed to change password:", error);
       
-      // Handle backend validation errors
       if (error?.data) {
         if (typeof error.data === 'object') {
-          // Set field-specific errors from backend
           const backendErrors = {};
           Object.keys(error.data).forEach(key => {
             backendErrors[key] = Array.isArray(error.data[key]) 
@@ -97,7 +92,6 @@ export default function ChangePasswordModal({ isOpen, onClose, onForgotPassword 
           });
           setErrors(backendErrors);
           
-          // Show first error as toast
           const firstError = Object.values(backendErrors)[0];
           toast.error(firstError);
         } else {
@@ -127,7 +121,6 @@ export default function ChangePasswordModal({ isOpen, onClose, onForgotPassword 
   };
 
   const handleForgotPassword = () => {
-    // Call parent handler to manage modal transitions
     if (onForgotPassword) {
       onForgotPassword();
     }

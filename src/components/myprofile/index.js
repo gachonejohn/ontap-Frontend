@@ -1,4 +1,3 @@
-// src/components/myprofile/index.js
 import React from "react";
 import { useAppSelector } from "../../store/hooks";
 import MyProfileContent from "./MyProfileContent";
@@ -8,7 +7,6 @@ export default function ProfileContent() {
   
   console.log("Profile user", user);
 
-  // Get profile permission
   const profilePermissions = user?.role?.permissions?.find(
     (p) => p.feature_code === "my_profile"
   );
