@@ -64,6 +64,31 @@ export const attendanceApi = apiSlice.injectEndpoints({
         };
       },
     }),
+    getWeeklyAttendance: builder.query({
+      query: ({  period,   } = {}) => {
+        const queryParams = {};
+       
+        if (period) queryParams.period = period;
+     
+        return {
+          url: `attendance/weekly/`,
+          method: 'GET',
+          params: queryParams,
+        };
+      },
+      //  query: ({ period = 'current_week', month = '' }) => {
+      //   let params = new URLSearchParams();
+      //   if (period) params.append('period', period);
+      //   if (month) params.append('month', month);
+
+      //   return {
+      //     url: `/attendance/weekly-summary/?${params.toString()}`,
+      //     method: 'GET',
+      //   };
+      // },
+      
+    }),
+    
     getTodayClockIns: builder.query({
       query: ({ page, page_size, employee_no } = {}) => {
         const queryParams = {};
@@ -100,4 +125,5 @@ export const {
   useGetAttendaceQuery,
   useGetAttendanceTrendsQuery,
   useGetAttendanceConsistencyQuery,
+  useGetWeeklyAttendanceQuery,
 } = attendanceApi;
