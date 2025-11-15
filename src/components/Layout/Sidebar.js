@@ -28,6 +28,13 @@ const menuItems = [
     whiteIcon: "/images/whiteattendance.png",
   },
   {
+    code: "attendance_management",
+    id: "attendance_management",
+    label: "Attendance Management",
+    icon: "/images/attendance.png",
+    whiteIcon: "/images/whiteattendance.png",
+  },
+  {
     code: "task",
     id: "tasks",
     label: "Task Management",
