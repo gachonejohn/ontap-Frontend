@@ -33,6 +33,39 @@ export const attendanceApi = apiSlice.injectEndpoints({
         };
       },
     }),
+    
+    getGroupedAttendace: builder.query({
+      query: ({ page, page_size, department } = {}) => {
+        const queryParams = {};
+        if (page) queryParams.page = page;
+        if (page_size) queryParams.page_size = page_size;
+        
+        if (department) queryParams.department = department;
+        return {
+          url: `attendance/management/departments/attendance/`,
+          method: 'GET',
+          params: queryParams,
+        };
+      },
+    }),
+    getCompanyAttendaceList: builder.query({
+      query: ({ page, page_size, department, id, date, from_date, to_date, status, search } = {}) => {
+        const queryParams = {};
+        if (page) queryParams.page = page;
+        if (page_size) queryParams.page_size = page_size;
+        if (search) queryParams.search = search;
+        if (status) queryParams.status = status;
+        if (date) queryParams.date = date;
+        if (from_date) queryParams.from_date = from_date;
+        if (to_date) queryParams.to_date = to_date;
+        if (department) queryParams.department = department;
+        return {
+          url: `attendance/management/departments/${id}/employees/`,
+          method: 'GET',
+          params: queryParams,
+        };
+      },
+    }),
     getAttendanceTrends: builder.query({
       query: ({ page, page_size, search, department, date, from_date, to_date, status } = {}) => {
         const queryParams = {};
@@ -46,6 +79,23 @@ export const attendanceApi = apiSlice.injectEndpoints({
         if (department) queryParams.department = department;
         return {
           url: `attendance/trends/`,
+          method: 'GET',
+          params: queryParams,
+        };
+      },
+    }),
+    getCompanyAttendanceTrends: builder.query({
+      query: ({  search, year, department, date, from_date, to_date, status } = {}) => {
+        const queryParams = {};
+        if (year) queryParams.year = year;
+        if (search) queryParams.search = search;
+        if (date) queryParams.date = date;
+        if (from_date) queryParams.from_date = from_date;
+        if (to_date) queryParams.to_date = to_date;
+        if (status) queryParams.status = status;
+        if (department) queryParams.department = department;
+        return {
+          url: `attendance/management/dashboard/trend/`,
           method: 'GET',
           params: queryParams,
         };
@@ -76,17 +126,6 @@ export const attendanceApi = apiSlice.injectEndpoints({
           params: queryParams,
         };
       },
-      //  query: ({ period = 'current_week', month = '' }) => {
-      //   let params = new URLSearchParams();
-      //   if (period) params.append('period', period);
-      //   if (month) params.append('month', month);
-
-      //   return {
-      //     url: `/attendance/weekly-summary/?${params.toString()}`,
-      //     method: 'GET',
-      //   };
-      // },
-      
     }),
     
     getTodayClockIns: builder.query({
@@ -114,6 +153,85 @@ export const attendanceApi = apiSlice.injectEndpoints({
         method: 'PATCH',
       }),
     }),
+        getAttendanceMetrics: builder.query({
+      query: ({  period,   } = {}) => {
+        const queryParams = {};
+       
+        if (period) queryParams.period = period;
+     
+        return {
+          url: `attendance/management/dashboard/metrics/`,
+          method: 'GET',
+          params: queryParams,
+        };
+      },
+    }),
+     requestOvertime: builder.mutation({
+      query: (data) => ({
+        url: `attendance/overtime/requests/create/`,
+        method: 'POST',
+        body: data,
+      }),
+    }),
+   updateOvertimeRequest: builder.mutation({
+  query: ({ id, action }) => ({
+    url: `attendance/overtime/requests/${id}/approve/`,
+    method: 'PATCH',
+    body: { action },  
+  }),
+}),
+    offSiteRequest: builder.mutation({
+      query: (data) => ({
+        url: `attendance/offoffice/requests/create/`,
+        method: 'POST',
+        body: data,
+      }),
+    }),
+    updateOffSiteRequest: builder.mutation({
+      query: ({ id, action }) => ({
+    url: `attendance/offoffice/requests/${id}/approve/`,
+    method: 'PATCH',
+    body: { action },  
+  }),
+    }),
+    getOffsiteRequests: builder.query({
+      query: ({ page, page_size, search, department, date,time_range, from_date, to_date, status } = {}) => {
+        const queryParams = {};
+        if (page) queryParams.page = page;
+        if (page_size) queryParams.page_size = page_size;
+        if (search) queryParams.search = search;
+        if (date) queryParams.date = date;
+        if (from_date) queryParams.from_date = from_date;
+        if (to_date) queryParams.to_date = to_date;
+        if (status) queryParams.status = status;
+        if (department) queryParams.department = department;
+        if (time_range) queryParams.time_range = time_range;
+        return {
+          url: `attendance/offoffice/requests/`,
+          method: 'GET',
+          params: queryParams,
+        };
+      },
+    }),
+    getOvertimeRequests: builder.query({
+      query: ({ page, page_size, search, department,time_range, date, from_date, to_date, status } = {}) => {
+        const queryParams = {};
+        if (page) queryParams.page = page;
+        if (page_size) queryParams.page_size = page_size;
+        if (search) queryParams.search = search;
+        if (date) queryParams.date = date;
+        if (from_date) queryParams.from_date = from_date;
+        if (to_date) queryParams.to_date = to_date;
+        if (status) queryParams.status = status;
+        if (department) queryParams.department = department;
+        if (time_range) queryParams.time_range = time_range;
+        return {
+          url: `attendance/overtime/requests/`,
+          method: 'GET',
+          params: queryParams,
+        };
+      },
+    }),
   }),
 });
 
@@ -126,4 +244,14 @@ export const {
   useGetAttendanceTrendsQuery,
   useGetAttendanceConsistencyQuery,
   useGetWeeklyAttendanceQuery,
+  useGetAttendanceMetricsQuery,
+  useGetCompanyAttendanceTrendsQuery,
+  useGetGroupedAttendaceQuery,
+  useGetCompanyAttendaceListQuery,
+  useRequestOvertimeMutation,
+  useOffSiteRequestMutation,
+  useUpdateOvertimeRequestMutation,
+  useUpdateOffSiteRequestMutation,
+  useGetOvertimeRequestsQuery,
+  useGetOffsiteRequestsQuery,
 } = attendanceApi;

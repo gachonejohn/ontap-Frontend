@@ -101,7 +101,7 @@ export const CreateBreakRule = ({ data, refetchData }) => {
                 </div>
 
                 {/* Max Breaks per Day */}
-                {/* <div>
+                <div>
                   <label className="block text-sm font-medium mb-2">Max Breaks per Day</label>
                   <input
                     type="number"
@@ -112,7 +112,7 @@ export const CreateBreakRule = ({ data, refetchData }) => {
                   {errors.max_breaks_per_day && (
                     <p className="text-red-500 text-sm">{errors.max_breaks_per_day.message}</p>
                   )}
-                </div> */}
+                </div>
 
                 {/* Max Total Break Minutes */}
                 {/* <div>
@@ -149,7 +149,7 @@ export const CreateBreakRule = ({ data, refetchData }) => {
                 </div>
 
                 {/* Default Grace Period */}
-                {/* <div>
+                <div>
                   <label className="block text-sm font-medium mb-2">
                     Default Grace Period (Minutes)
                   </label>
@@ -166,7 +166,7 @@ export const CreateBreakRule = ({ data, refetchData }) => {
                       {errors.default_grace_period_minutes.message}
                     </p>
                   )}
-                </div> */}
+                </div>
 
                 {/* Enforce Strictly */}
                 {/* <div className="flex items-center space-x-2">

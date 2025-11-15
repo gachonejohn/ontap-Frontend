@@ -95,22 +95,16 @@ const BreakTypeRuleAssignments = () => {
     },
 
     {
-      header: 'Max Duration (Minutes)',
+      header: ' Duration (Minutes)',
       accessor: 'max_duration_minutes',
-      cell: (item) => <span className="text-xs font-medium">{item.max_duration_minutes}</span>,
+      cell: (item) => <span className="text-xs font-medium">{item.break_rule.default_max_duration_minutes}</span>,
     },
     {
       header: 'Grace Period (Minutes)',
       accessor: 'grace_period_minutes',
-      cell: (item) => <span className="text-xs font-medium">{item.grace_period_minutes}</span>,
+      cell: (item) => <span className="text-xs font-medium">{item.break_rule.default_grace_period_minutes}</span>,
     },
-    {
-      header: 'Mandatory',
-      accessor: 'required',
-      cell: (item) => (
-        <span className="text-xs font-medium">{item.required === true ? 'Yes' : 'No'}</span>
-      ),
-    },
+    
 
     {
       header: 'Actions',

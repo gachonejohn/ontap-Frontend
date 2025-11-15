@@ -17,6 +17,7 @@ import ButtonDropdown from '@components/common/ActionsPopover';
 import { LuArchiveX } from 'react-icons/lu';
 import { NewCategory } from './NewCategory';
 import { EditCategory } from './EditCategory';
+import { AssignBreakTypePolicy } from '../rulesAssignments/NewAssignment';
 const BreakCategories = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -87,6 +88,16 @@ const BreakCategories = () => {
       cell: (item) => <span>{item.name}</span>,
     },
     {
+      header: 'Duration',
+      accessor: 'default_max_duration_minutes',
+      cell: (item) => <span>{item.default_max_duration_minutes}</span>,
+    },
+    {
+      header: 'Grace Minutes',
+      accessor: 'default_grace_period_minutes',
+      cell: (item) => <span>{item.default_grace_period_minutes}</span>,
+    },
+    {
       header: 'Actions',
       accessor: 'id',
       cell: (item) => (
@@ -99,7 +110,7 @@ const BreakCategories = () => {
               <LuArchiveX className="text-lg text-red-500" />
               <span className="text-red-600">Delete</span>
             </button>
-
+            <AssignBreakTypePolicy refetchData={refetch} />
             <EditCategory data={item} refetchData={refetch} />
           </ButtonDropdown>
         </>

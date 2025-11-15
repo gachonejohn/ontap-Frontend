@@ -34,11 +34,11 @@ export default function WeeklyAttendanceChart({ data, isLoading }) {
     return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
   };
 
-  const getBarSegments = (day) => {
-    if (day.is_on_leave)
-      return [{ color: colorMap.leave, label: "Leave", height: "100%" }];
-    if (day.is_absent)
-      return [{ color: colorMap.absent, label: "Absent", height: "100%" }];
+const getBarSegments = (day) => {
+ 
+    const dayDate = new Date(day.date);
+    const dayOfWeek = dayDate.getDay();
+    const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
     if (day.is_present) {
       if (day.is_late) {
         return [
@@ -49,6 +49,17 @@ export default function WeeklyAttendanceChart({ data, isLoading }) {
         return [{ color: colorMap.present, label: "On Time", height: "100%" }];
       }
     }
+    
+
+    if (day.is_on_leave)
+      return [{ color: colorMap.leave, label: "Leave", height: "100%" }];
+    
+    if (isWeekend)
+      return [{ color: colorMap.upcoming, label: "Weekend", height: "100%" }];
+
+    if (day.is_absent)
+      return [{ color: colorMap.absent, label: "Absent", height: "100%" }];
+    
     return [{ color: colorMap.upcoming, label: "Upcoming", height: "20%" }];
   };
 
@@ -81,7 +92,13 @@ export default function WeeklyAttendanceChart({ data, isLoading }) {
       <div className="flex items-end justify-center flex-wrap gap-[2px] pb-8">
         {dailyData.map((day, idx) => {
           const segments = getBarSegments(day);
-          const isToday = new Date(day.date).toDateString() === new Date().toDateString();
+          const dayDate = new Date(day.date);
+          const today = new Date();
+          const isToday = dayDate.toDateString() === today.toDateString();
+          const isFuture = dayDate > today;
+
+          // Skip future days
+          if (isFuture) return null;
 
           return (
             <div key={idx} className="flex-1 flex flex-col items-center">

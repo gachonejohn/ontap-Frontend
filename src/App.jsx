@@ -25,6 +25,7 @@ import TemplateDetails from "@components/staffcycle/onboarding/templates/templat
 import Steps from "@components/staffcycle/onboarding/steps";
 
 import AttendacePage from "@components/attendance";
+import AttendanceManagement from "@components/attendance/management";
 
 import UnifiedCalendar from "./components/calendar/UnifiedCalendar";
 import RecordsPage from "./components/records/RecordsPage";
@@ -62,6 +63,7 @@ function App() {
             <Route path="calendar" element={<UnifiedCalendar />} />
             <Route path="records" element={<RecordsPage />} />
 
+            <Route path="attendance_management" element={<AttendanceManagement />} />
             <Route path="tasks" element={<TaskContent />} />
             <Route path="performance" element={<Performance />} />
             <Route path="payroll" element={<Payroll />} />

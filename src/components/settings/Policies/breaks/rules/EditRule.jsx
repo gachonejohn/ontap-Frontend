@@ -22,10 +22,10 @@ export const EditBreakRule = ({ data, refetchData }) => {
     resolver: zodResolver(CreateBreakRuleSchema),
     defaultValues: {
       name: data?.name ?? '',
-      // max_breaks_per_day: data?.max_breaks_per_day ?? 0,
+      max_breaks_per_day: data?.max_breaks_per_day ?? 0,
       // max_total_break_minutes: data?.max_total_break_minutes ?? 0,
       default_max_duration_minutes: data?.default_max_duration_minutes ?? 0,
-      // default_grace_period_minutes: data?.default_grace_period_minutes ?? 0,
+      default_grace_period_minutes: data?.default_grace_period_minutes ?? 0,
       // enforce_strictly: data?.enforce_strictly ?? false,
     },
   });
@@ -82,7 +82,7 @@ export const EditBreakRule = ({ data, refetchData }) => {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="sticky top-0 bg-white z-40 flex px-4 justify-between items-center py-4 border-b">
-                <p className="text-sm md:text-lg font-semibold">Add New Break Policy</p>
+                <p className="text-sm md:text-lg font-semibold">Edit Break Policy</p>
                 <IoCloseOutline size={20} className="cursor-pointer" onClick={handleCloseModal} />
               </div>
 
@@ -102,7 +102,7 @@ export const EditBreakRule = ({ data, refetchData }) => {
                 </div>
 
                 {/* Max Breaks per Day */}
-                {/* <div>
+                <div>
                   <label className="block text-sm font-medium mb-2">Max Breaks per Day</label>
                   <input
                     type="number"
@@ -113,7 +113,7 @@ export const EditBreakRule = ({ data, refetchData }) => {
                   {errors.max_breaks_per_day && (
                     <p className="text-red-500 text-sm">{errors.max_breaks_per_day.message}</p>
                   )}
-                </div> */}
+                </div>
 
                 {/* Max Total Break Minutes */}
                 {/* <div>
@@ -150,7 +150,7 @@ export const EditBreakRule = ({ data, refetchData }) => {
                 </div>
 
                 {/* Default Grace Period */}
-                {/* <div>
+                <div>
                   <label className="block text-sm font-medium mb-2">
                     Default Grace Period (Minutes)
                   </label>
@@ -167,7 +167,7 @@ export const EditBreakRule = ({ data, refetchData }) => {
                       {errors.default_grace_period_minutes.message}
                     </p>
                   )}
-                </div> */}
+                </div>
 
                 {/* Enforce Strictly */}
                 {/* <div className="flex items-center space-x-2">

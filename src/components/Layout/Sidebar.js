@@ -132,10 +132,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
   const [logoutUser] = useLogoutUserMutation();
   const navigate = useNavigate();
   const { user } = useAppSelector((state) => state.auth);
-  const permissions = React.useMemo(
-    () => user?.role?.permissions ?? [],
-    [user]
-  );
+  const permissions = React.useMemo(() => user?.role?.permissions ?? [], [user]);
   const allowedCodes = React.useMemo(
     () =>
       new Set(
@@ -153,39 +150,39 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
 
   const handleLogout = async () => {
     try {
-      const loadingToast = toast.loading("Logging out...");
+      const loadingToast = toast.loading('Logging out...');
       await logoutUser({}).unwrap();
       dispatch(userLoggedOut());
       toast.update(loadingToast, {
-        render: "Logged out successfully!",
-        type: "success",
+        render: 'Logged out successfully!',
+        type: 'success',
         isLoading: false,
         autoClose: 2000,
       });
-      navigate("/");
+      navigate('/');
     } catch (error) {
-      toast.error("Failed to logout. Please try again.");
-      console.error("Logout error:", error);
+      toast.error('Failed to logout. Please try again.');
+      console.error('Logout error:', error);
     }
   };
 
   const location = useLocation();
-  const pathParts = location.pathname.split("/").filter(Boolean);
-  const activePage = pathParts.length === 1 ? "dashboard" : pathParts.pop();
+  const pathParts = location.pathname.split('/').filter(Boolean);
+  const activePage = pathParts.length === 1 ? 'dashboard' : pathParts.pop();
 
   return (
     <>
       {/* Overlay on mobile when sidebar is open */}
       <div
         className={`fixed inset-0 bg-black/40 z-40 md:hidden transition-opacity ${
-          sidebarOpen ? "opacity-100 visible" : "opacity-0 invisible"
+          sidebarOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
         }`}
         onClick={() => setSidebarOpen(false)}
       ></div>
       <div
         className={`fixed top-0 left-0 h-full bg-white border-r border-slate-100 shrink-0 transition-all duration-300 z-50
-  ${sidebarOpen ? "w-[272px]" : "w-[64px]"}
-  ${sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
+  ${sidebarOpen ? 'w-[272px]' : 'w-[64px]'}
+  ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
   `}
       >
         {/* Logo */}
@@ -194,37 +191,29 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
             src="/images/logo.png"
             alt="Logo"
             className={`object-contain transition-all duration-300 ${
-              sidebarOpen ? "h-12 w-auto" : "h-14 w-14"
+              sidebarOpen ? 'h-12 w-auto' : 'h-14 w-14'
             }`}
           />
         </div>
 
         {/* Menu */}
         <div className="flex flex-col items-start gap-2 mt-2 h-[calc(100%-140px)] relative pl-2 pr-1 overflow-y-auto">
-          <div className={`${sidebarOpen ? "px-3" : "px-1"} py-1`}>
+          <div className={`${sidebarOpen ? 'px-3' : 'px-1'} py-1`}>
             {sidebarOpen && (
-              <div className="text-sm text-neutral-900/60 font-medium mb-2">
-                Main Menu
-              </div>
+              <div className="text-sm text-neutral-900/60 font-medium mb-2">Main Menu</div>
             )}
           </div>
           {filteredMenu.map((item) => (
             <div
               key={item.id}
               className={`flex items-center justify-start cursor-pointer gap-3 p-2 rounded-lg transition-all duration-200 w-full
-    ${
-      activePage === item.id
-        ? "bg-teal-500 text-white"
-        : "text-gray-600 hover:bg-gray-100"
-    }
+    ${activePage === item.id ? 'bg-teal-500 text-white' : 'text-gray-600 hover:bg-gray-100'}
     `}
               onClick={() => {
                 if (!sidebarOpen) {
                   setSidebarOpen(true);
                 } else {
-                  navigate(
-                    `/dashboard/${item.id === "dashboard" ? "" : item.id}`
-                  );
+                  navigate(`/dashboard/${item.id === 'dashboard' ? '' : item.id}`);
                 }
               }}
             >
@@ -234,9 +223,11 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
                 src={activePage === item.id ? item.whiteIcon : item.icon}
                 alt={item.label}
               />
-              {sidebarOpen && (
-                <span className="text-base font-normal">{item.label}</span>
-              )}
+              {/* {React.createElement(item.icon, {
+      size: 22,
+      className: activePage === item.id ? "text-white" : "text-gray-600",
+    })}*/}
+              {sidebarOpen && <span className="text-base font-normal">{item.label}</span>}
             </div>
           ))}
         </div>
@@ -246,15 +237,8 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
           className="mt-auto w-full border-t border-slate-200 p-3 flex items-center gap-3 cursor-pointer"
           onClick={handleLogout}
         >
-          <img
-            width="24px"
-            height="24px"
-            src="/images/logout.png"
-            alt="Logout"
-          />
-          {sidebarOpen && (
-            <span className="font-inter text-base text-teal-500">Logout</span>
-          )}
+          <img width="24px" height="24px" src="/images/logout.png" alt="Logout" />
+          {sidebarOpen && <span className="font-inter text-base text-teal-500">Logout</span>}
         </div>
       </div>
     </>
