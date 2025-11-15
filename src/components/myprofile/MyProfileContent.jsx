@@ -1,4 +1,3 @@
-// src/components/myprofile/MyProfileContent.jsx
 import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { 
@@ -14,14 +13,11 @@ export default function MyProfileContent({ canEdit, user }) {
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
   
-  // Fetch profile data from API
   const { data: apiProfileData } = useGetMyProfileQuery();
   const [updateProfile, { isLoading }] = useUpdateProfileMutation();
 
-  // Use API data if available, otherwise fallback to props
   const profileData = apiProfileData || user;
 
-  // Extract user data
   const userId = profileData?.id || profileData?.user?.id || profileData?.employee_profile?.user?.id;
   const userEmail = profileData?.email || profileData?.user?.email || profileData?.employee_profile?.user?.display_email;
   const userFirstName = profileData?.first_name || profileData?.user?.first_name || profileData?.employee_profile?.user?.first_name || "";
@@ -33,7 +29,6 @@ export default function MyProfileContent({ canEdit, user }) {
   const userGender = profileData?.employee_profile?.user?.gender;
   const employeeId = profileData?.employee_profile?.employee_no;
 
-  // State for editable data
   const [personalData, setPersonalData] = useState({
     fullName: `${userFirstName} ${userLastName}`.trim(),
     gender: userGender,
@@ -46,7 +41,6 @@ export default function MyProfileContent({ canEdit, user }) {
     startDate: "2023-08-13"
   });
 
-  // Update personalData when profile data changes
   useEffect(() => {
     if (profileData) {
       setPersonalData(prev => ({
@@ -109,13 +103,11 @@ export default function MyProfileContent({ canEdit, user }) {
     }));
   };
 
-  // Handler to open forgot password modal (closes change password modal first)
   const handleOpenForgotPassword = () => {
     setIsPasswordModalOpen(false);
     setIsForgotPasswordOpen(true);
   };
 
-  // Calculate time since last password change (using last_active as proxy since API doesn't have password_changed_at)
   const getPasswordChangeTime = () => {
     const lastActive = profileData?.last_active || profileData?.employee_profile?.user?.last_active;
     if (!lastActive) return "Not available";

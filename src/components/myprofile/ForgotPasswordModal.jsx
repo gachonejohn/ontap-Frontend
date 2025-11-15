@@ -1,4 +1,3 @@
-// src/components/myprofile/ForgotPasswordModal.jsx
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 import {
@@ -14,7 +13,7 @@ export default function ForgotPasswordModal({ isOpen, onClose }) {
   const [confirmPassword, { isLoading: isConfirming }] = useConfirmNewPasswordMutation();
   const [resendOTP, { isLoading: isResending }] = useResendOTPMutation();
 
-  const [step, setStep] = useState(1); // 1: Email, 2: OTP, 3: New Password
+  const [step, setStep] = useState(1); 
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [passwords, setPasswords] = useState({
@@ -27,7 +26,6 @@ export default function ForgotPasswordModal({ isOpen, onClose }) {
     confirm: false,
   });
 
-  // Step 1: Request OTP
   const handleRequestOTP = async (e) => {
     e.preventDefault();
     setErrors({});
@@ -49,7 +47,6 @@ export default function ForgotPasswordModal({ isOpen, onClose }) {
     }
   };
 
-  // Step 2: Verify OTP
   const handleVerifyOTP = async (e) => {
     e.preventDefault();
     setErrors({});
@@ -76,7 +73,6 @@ export default function ForgotPasswordModal({ isOpen, onClose }) {
     }
   };
 
-  // Step 3: Set New Password
   const handleSetNewPassword = async (e) => {
     e.preventDefault();
     setErrors({});
@@ -130,7 +126,6 @@ export default function ForgotPasswordModal({ isOpen, onClose }) {
     }
   };
 
-  // Resend OTP
   const handleResendOTP = async () => {
     try {
       await resendOTP({ email }).unwrap();

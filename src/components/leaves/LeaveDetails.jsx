@@ -99,23 +99,43 @@ const LeaveDetails = ({ isOpen, onClose, leaveId, isAdminView = false }) => {
     }
   };
 
+  const getProcessedByName = () => {
+    if (leaveRequest.status === 'PENDING') {
+      return "Not processed yet";
+    }
+    return leaveRequest.approved_by_name || "Unknown Approver";
+  };
+
+  const getProcessedDate = () => {
+    if (leaveRequest.status === 'PENDING') {
+      return "Not processed yet";
+    }
+    return leaveRequest.updated_at ? CustomDate(leaveRequest.updated_at) : CustomDate(leaveRequest.created_at);
+  };
+
+  const getManagerComments = () => {
+    if (leaveRequest.status === 'PENDING') {
+      return "Waiting for approval";
+    }
+    return `Leave request was ${leaveRequest.status.toLowerCase()} by ${leaveRequest.approved_by_name || 'manager'}`;
+  };
+
   const displayData = {
     employeeName: leaveRequest.employee_name || "Unknown Employee",
-    position: "Employee", 
+    position: leaveRequest.department || "Employee", 
     leaveType: leaveRequest.leave_type_name || "Leave",
     status: leaveRequest.status || "PENDING",
     leavePeriod: `${CustomDate(leaveRequest.start_date)} - ${CustomDate(leaveRequest.end_date)}`,
     duration: `${parseFloat(leaveRequest.days) || 0} days`,
     submittedOn: CustomDate(leaveRequest.created_at),
     reason: leaveRequest.reason || "No reason provided",
-    processedBy: leaveRequest.approved_by || "Not processed yet",
-    processedOn: leaveRequest.status !== 'PENDING' ? CustomDate(leaveRequest.updated_at) : "Not processed yet",
-    managerComments: leaveRequest.status !== 'PENDING' ? 
-      `Leave request was ${leaveRequest.status.toLowerCase()}` : 
-      "Waiting for approval",
+    processedBy: getProcessedByName(),
+    processedOn: getProcessedDate(),
+    managerComments: getManagerComments(),
     requestId: `LR-${String(leaveRequest.id).padStart(6, '0')}`,
     initials: getInitials(leaveRequest.employee_name),
-    document: leaveRequest.document 
+    document: leaveRequest.document,
+    department: leaveRequest.department 
   };
 
   return (
@@ -124,23 +144,10 @@ const LeaveDetails = ({ isOpen, onClose, leaveId, isAdminView = false }) => {
         {/* Fixed Header */}
         <div className="flex flex-row justify-between items-start p-6 w-full bg-white">
           <div className="flex flex-row justify-start items-center gap-1.5">
-            <div className="flex flex-row justify-center items-center rounded-full w-10 h-10 bg-blue-100 overflow-hidden">
-              <img
-                width="20px"
-                height="20px"
-                src="/images/viewleave.png"
-                alt="Leave Details Icon"
-              />
-            </div>
             <div className="flex flex-col justify-start items-start gap-1 h-6">
               <div className="font-inter text-lg whitespace-nowrap text-neutral-900 text-opacity-100 leading-tight font-semibold">
                 Leave Request Details
               </div>
-              {isAdminView && (
-                <div className="font-inter text-xs text-blue-600 font-medium">
-                  Admin View
-                </div>
-              )}
             </div>
           </div>
           <div className="flex flex-col justify-start items-end gap-2">
