@@ -28,6 +28,7 @@ import AttendacePage from "@components/attendance";
 import AttendanceRecords from "./components/records/AttendanceRecords";
 import LeavesRecords from "@components/records/LeavesRecords";
 import RecordsPage from "./components/records/RecordsPage";
+import UnifiedCalendar from "./components/calendar/UnifiedCalendar";
 
 function App() {
   return (
@@ -55,13 +56,13 @@ function App() {
             <Route path="leaves" element={<LeaveContent />} />
             <Route path="attendance" element={<AttendacePage />} />
             <Route path="tasks" element={<TaskContent />} />
+            <Route path="calendar" element={<UnifiedCalendar />} />
             <Route path="performance" element={<Performance />} />
             <Route path="payroll" element={<Payroll />} />
             <Route path="payslips" element={<Payslip />} />
             <Route path="trainings" element={<HRTrainings />} />
             <Route path="cards" element={<CardsContent />} />
             <Route path="announcements" element={<AnnouncementsHR />} />
-            {/* <Route path="records" element={<AttendanceRecords />} /> */}
             <Route path="records" element={<RecordsPage />} />
 
             {/* Settings */}

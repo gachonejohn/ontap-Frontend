@@ -35,6 +35,13 @@ const menuItems = [
     whiteIcon: "/images/whitetask.png",
   },
   {
+    code: "calendar",
+    id: "calendar",
+    label: "Unified Calendar",
+    icon: "/images/unified_calendar.png",
+    whiteIcon: "/images/unified_calendar.png",
+  },
+  {
     code: "records",
     id: "records",
     label: "Records",
