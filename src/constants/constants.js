@@ -118,3 +118,40 @@ export const leavesStatusOptions = [
   { value: 'REJECTED', label: 'REJECTED' },
   { value: 'CANCELLED', label: 'CANCELLED' },
 ];
+
+//Calendar Constants
+export const EVENT_TYPE_OPTIONS = [
+  { value: '', label: 'Select Event Type' },
+  { value: 'MEETING', label: 'Meeting' },
+  { value: 'LEAVE', label: 'Leave' },
+  { value: 'TRAINING', label: 'Training' },
+  { value: 'PERFORMANCE_REVIEW', label: 'Performance Review' },
+  { value: 'PAYROLL_DEADLINE', label: 'Payroll Deadline' },
+  { value: 'ONBOARDING', label: 'Onboarding' },
+  { value: 'HOLIDAY', label: 'Holiday' },
+  { value: 'PROJECT_MILESTONE', label: 'Project Milestone' },
+  { value: 'OTHER', label: 'Other' },
+];
+
+
+export const EVENT_TYPE_META = {
+  MEETING: { color: '#3B82F6', icon: '📹' },
+  LEAVE: { color: '#EC4899', icon: '🏖️' },
+  TRAINING: { color: '#10B981', icon: '📚' },
+  PERFORMANCE_REVIEW: { color: '#F59E0B', icon: '⭐' },
+  PAYROLL_DEADLINE: { color: '#8B5CF6', icon: '💰' },
+  ONBOARDING: { color: '#6366F1', icon: '👋' },
+  HOLIDAY: { color: '#EF4444', icon: '🎉' },
+  PROJECT_MILESTONE: { color: '#F97316', icon: '🎯' },
+  OTHER: { color: '#6B7280', icon: '📌' },
+};
+
+export const VIEW_TYPES = {
+  MONTH: 'month',
+  WEEK: 'week'
+};
+
+export const DAYS_OF_WEEK = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+export const HOURS = Array.from({ length: 24 }, (_, i) => i);
+
