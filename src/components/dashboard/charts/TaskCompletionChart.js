@@ -141,7 +141,7 @@ const TaskCompletionChart = () => {
         <ContentSpinner />
         {isFetching && allTasks.length > 0 && (
           <div className="ml-3 text-sm text-gray-500">
-            Loading tasks... ({allTasks.length} loaded)
+            Loading tasks... ({allTasks.length})
           </div>
         )}
       </div>
