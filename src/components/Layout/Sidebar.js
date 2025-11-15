@@ -86,7 +86,7 @@ const menuItems = [
   {
     code: "performance",
     id: "performance",
-    label: "Performance",
+    label: "Performance Modules",
     icon: "/images/performance.png",
     whiteIcon: "/images/performance.png",
   },

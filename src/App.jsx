@@ -5,12 +5,12 @@ import Staffcycle from "./dashboards/hr/components/Staffcycle";
 import Employees from "./components/employees";
 import EmployeeDetails from "./components/employees/EmployeeDetails";
 import LeaveContent from "./components/leaves";
-import Performance from "./dashboards/hr/components/Performance";
+import Performance from "./components/performance";
 import Payroll from "./dashboards/hr/components/Payroll";
 import Payslip from "./dashboards/employee/components/Payslip";
 import HRTrainings from "./dashboards/hr/components/Trainings";
-import CardsContent from "./components/cards"; // keep this one
-import AnnouncementsHR from "./dashboards/hr/components/Announcements";
+import CardsContent from "./components/cards"; 
+import Announcements from "./components/announcements";
 import Settings from "./components/settings";
 import ProfileContent from "./components/myprofile";
 import DashboardLayout from "./components/Layout/Layout";
@@ -57,7 +57,7 @@ function App() {
             <Route path="payslips" element={<Payslip />} />
             <Route path="trainings" element={<HRTrainings />} />
             <Route path="cards" element={<CardsContent />} />
-            <Route path="announcements" element={<AnnouncementsHR />} />
+            <Route path="announcements" element={<Announcements />} />
 
             {/* Settings */}
             <Route path="settings" element={<Settings />} />
