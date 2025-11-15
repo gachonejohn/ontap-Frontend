@@ -13,6 +13,7 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FiPlus } from 'react-icons/fi';
 import { IoCloseOutline } from 'react-icons/io5';
+import { MdOutlinePostAdd } from 'react-icons/md';
 import Select from 'react-select';
 import { toast } from 'react-toastify';
 export const AssignBreakTypePolicy = ({ refetchData }) => {
@@ -75,11 +76,10 @@ export const AssignBreakTypePolicy = ({ refetchData }) => {
       <CreateUpdateButton
         onClick={handleOpenModal}
         // title="Add New"
-        label="New Policy Assignment"
-        icon={<FiPlus className="w-4 h-4" />}
-        className="bg-primary text-white px-4 py-2
-        rounded-md  transition-all duration-200 shadow-sm hover:shadow-md 
-         hover:bg-primary-600 focus:ring-primary-500 focus:ring-offset-1"
+        label="Assign policy"
+        icon={<MdOutlinePostAdd className="w-4 h-4" />}
+        className="  hover:bg-slate-100 px-4 py-2
+        rounded-md  transition-all duration-200 "
       />
 
       {isOpen && (
@@ -184,46 +184,6 @@ export const AssignBreakTypePolicy = ({ refetchData }) => {
                   )}
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium mb-2">Max Duration (Minutes)</label>
-                  <input
-                    type="number"
-                    min="1"
-                    {...register('max_duration_minutes', {
-                      valueAsNumber: true,
-                    })}
-                    className="w-full py-2 px-4 rounded-md border border-gray-400 focus:outline-none focus:border-primary focus:bg-white placeholder:text-sm"
-                  />
-                  {errors.max_duration_minutes && (
-                    <p className="text-red-500 text-sm">{errors.max_duration_minutes.message}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-2">Grace Period (Minutes)</label>
-                  <input
-                    type="number"
-                    min="0"
-                    {...register('grace_period_minutes', {
-                      valueAsNumber: true,
-                    })}
-                    className="w-full py-2 px-4 rounded-md border border-gray-400 focus:outline-none focus:border-primary focus:bg-white placeholder:text-sm"
-                  />
-                  {errors.grace_period_minutes && (
-                    <p className="text-red-500 text-sm">{errors.grace_period_minutes.message}</p>
-                  )}
-                </div>
-                <div className="flex items-center space-x-2 mb-4">
-                  <input
-                    type="checkbox"
-                    id="required"
-                    className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                    {...register('required')}
-                  />
-                  <label htmlFor="required" className="ml-2 text-sm font-medium text-gray-700">
-                    Required
-                  </label>
-                </div>
                 {/* Buttons */}
                 <SubmitCancelButtons
                   onCancel={handleCloseModal}

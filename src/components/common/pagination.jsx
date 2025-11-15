@@ -21,11 +21,11 @@ const Pagination = ({ currentPage, totalItems, pageSize, onPageChange, className
     return [...new Set(range)].sort((a, b) => a - b);
   };
 
-  if (totalPages <= 1) return null;
+  // if (totalPages <= 1) return null;
 
   const handlePageChange = (page) => {
     onPageChange(page);
-    navigate(`?page=${page}`); // Navigate to the new page
+    navigate(`?page=${page}`); 
   };
 
   return (

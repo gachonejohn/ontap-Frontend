@@ -20,26 +20,23 @@ export const CreateBreak = ({ refetchData }) => {
     {},
     { refetchOnMountOrArgChange: true }
   );
-
+  console.log('categoriesData:', categoriesData);
   const {
-    register,
     handleSubmit,
     reset,
     setValue,
     formState: { isSubmitting, errors },
   } = useForm({
     resolver: zodResolver(CreateBreakSchema),
+    defaultValues: {
+      break_type: undefined,
+    },
   });
 
   const onSubmit = async (formData) => {
     try {
-      const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      const payload = {
-        ...formData,
-        timezone: userTimezone,
-      };
-
-      await createBreak(payload).unwrap();
+     
+     await createBreak(formData).unwrap();
       toast.success('Break started  successfully!');
       handleCloseModal();
       refetchData();
@@ -61,12 +58,14 @@ export const CreateBreak = ({ refetchData }) => {
     setIsOpen(false);
   };
 
-  const handleBreakTypeChange = (selected) => {
-    if (selected) {
-      const item_id = Number(selected.value);
-      setValue('break_type', item_id);
-    }
-  };
+const handleBreakTypeChange = (selected) => {
+  if (selected && selected.id !== undefined && selected.id !== null) {
+    setValue('break_type', Number(selected.id)); 
+  } else {
+    setValue('break_type', undefined);
+  }
+};
+
 
   return (
     <>
@@ -108,58 +107,58 @@ export const CreateBreak = ({ refetchData }) => {
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium mb-2">Break Type</label>
                   <Select
-                    options={categoriesData?.map((item) => ({
-                      value: item.id,
-                      label: `${item.name}`,
-                    }))}
+                    options={categoriesData || []}
+                     getOptionLabel={(option) => option.name}
+                    getOptionValue={(option) => option.id}
                     menuPortalTarget={document.body}
                     menuPlacement="auto"
                     styles={{
-                      menuPortal: (base) => ({
-                        ...base,
-                        zIndex: 9999,
-                      }),
+                      menuPortal: (base) => ({ ...base, zIndex: 9999 }),
                       control: (base) => ({
                         ...base,
                         minHeight: '40px',
                         borderColor: '#d1d5db',
                         boxShadow: 'none',
-                        '&:hover': {
-                          borderColor: '#9ca3af',
-                        },
-                        '&:focus-within': {
-                          borderColor: '#9ca3af',
-                          boxShadow: 'none',
-                        },
+                        '&:hover': { borderColor: '#9ca3af' },
+                        '&:focus-within': { borderColor: '#9ca3af', boxShadow: 'none' },
                         backgroundColor: '#F8FAFC',
                       }),
+                      option: (base, state) => ({
+                        ...base,
+                        backgroundColor: state.isSelected
+                          ? '#dbeafe' 
+                          : state.isFocused
+                            ? '#e2e8f0' 
+                            : 'white',
+                        color: state.isSelected ? '#1e40af' : 'black', 
+                        padding: '10px',
+                        borderBottom: '1px solid #e5e7eb',
+                        display: 'flex',
+                        flexDirection: 'column',
+                      }),
                     }}
+                    formatOptionLabel={(option) => (
+                      <div className="flex flex-col">
+                        <span className="font-medium text-gray-800">{option.name}</span>
+                        <div className="flex gap-2 text-xs text-gray-500 mt-1">
+                          {option.default_max_duration_minutes !== null && (
+                            <span className="bg-green-100 text-green-700 px-1 rounded">
+                              Duration: {option.default_max_duration_minutes} min
+                            </span>
+                          )}
+                          {option.default_grace_period_minutes !== null && (
+                            <span className="bg-blue-100 text-blue-700 px-1 rounded">
+                              Grace: {option.default_grace_period_minutes} min
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    )}
                     onChange={handleBreakTypeChange}
                   />
+
                   {errors.break_type && (
                     <p className="text-red-500 text-sm mt-1">{errors.break_type.message}</p>
-                  )}
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Break Start</label>
-                  <input
-                    type="time"
-                    {...register('break_start')}
-                    className="w-full py-2 px-4 rounded-md border border-gray-400 focus:outline-none focus:border-[#1E9FF2] focus:bg-white placeholder:text-sm cursor-text"
-                  />
-                  {errors.break_start && (
-                    <p className="text-red-500 text-sm">{errors.break_start.message}</p>
-                  )}
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Break End</label>
-                  <input
-                    type="time"
-                    {...register('break_end')}
-                    className="w-full py-2 px-4 rounded-md border border-gray-400 focus:outline-none focus:border-[#1E9FF2] focus:bg-white placeholder:text-sm cursor-text"
-                  />
-                  {errors.break_end && (
-                    <p className="text-red-500 text-sm">{errors.break_end.message}</p>
                   )}
                 </div>
 

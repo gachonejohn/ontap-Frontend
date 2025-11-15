@@ -92,13 +92,13 @@ const Settings = () => {
           content: <BreakCategories />,
         },
         
-        {
-          id: "break_limits",
-          label: "Break Types Policy Assignments",
-          description: "Set per-break duration limits.",
-          icon: <FiSliders className="text-sm" />,
-          content: <BreakTypeRuleAssignments />,
-        },
+        // {
+        //   id: "break_limits",
+        //   label: "Break Types Policy Assignments",
+        //   description: "Set per-break duration limits.",
+        //   icon: <FiSliders className="text-sm" />,
+        //   content: <BreakTypeRuleAssignments />,
+        // },
       ],
     },
     {

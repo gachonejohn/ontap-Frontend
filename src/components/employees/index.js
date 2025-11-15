@@ -17,8 +17,8 @@ import EmployeeLayoutWrapper from './EmployeeLayoutWrapper';
 import { CreateEmployee } from './NewEmployee';
 
 const Employees = () => {
-  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const currentPageParam = parseInt(searchParams.get('page') || '1', 10);
 
