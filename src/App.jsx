@@ -29,8 +29,7 @@ import AttendanceManagement from "@components/attendance/management";
 
 import UnifiedCalendar from "./components/calendar/UnifiedCalendar";
 import RecordsPage from "./components/records/RecordsPage";
-import AttendanceRecords from "./components/records/AttendanceRecords";
-import LeavesRecords from "@components/records/LeavesRecords";
+import ChatPage from "@components/chat/dashboard/ChatPage"
 
 function App() {
   return (
@@ -62,6 +61,7 @@ function App() {
 
             <Route path="calendar" element={<UnifiedCalendar />} />
             <Route path="records" element={<RecordsPage />} />
+            <Route path="chat" element={<ChatPage />} />
 
             <Route path="attendance_management" element={<AttendanceManagement />} />
             <Route path="tasks" element={<TaskContent />} />

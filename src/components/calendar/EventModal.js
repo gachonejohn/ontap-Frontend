@@ -20,7 +20,7 @@ const EventModal = () => {
 
     // Editing existing event
     // Check if current user is the organizer
-    const isOrganizer = selectedEvent.organizer?.user?.id === currentUserId || 
+    const isOrganizer = selectedEvent.organizer?.employee?.id === currentUserId || 
                         selectedEvent.organizer?.id === currentUserId;
     
     return isOrganizer ? 'creator' : 'participant';

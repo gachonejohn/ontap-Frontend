@@ -9,8 +9,8 @@ import CalendarPageHeader from './CalendarPageHeader';
 const UnifiedCalendar = () =>  {
   return (
     <CalendarProvider>
-      <CalendarPageHeader />
       <div className="h-full flex flex-col">
+      <CalendarPageHeader />
         <CalendarHeader />
         <div className="flex flex-1 min-h-0">
           <Sidebar />
