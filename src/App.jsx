@@ -23,7 +23,8 @@ import TemplateDetails from "@components/staffcycle/onboarding/templates/templat
 import Steps from "@components/staffcycle/onboarding/steps";
 import AttendacePage from "@components/attendance";
 import AttendanceManagement from "@components/attendance/management";
-import UnifiedCalendar from "./components/calendar/UnifiedCalendar";
+
+import UnifiedCalendar from "./components/calendar";
 import RecordsPage from "./components/records/RecordsPage";
 import ChatPage from "@components/chat/dashboard/ChatPage";
 import AttendanceRecords from "./components/records/AttendanceRecords";
