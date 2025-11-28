@@ -27,6 +27,8 @@ import BreakCategories from "./Policies/breaks/Categories";
 import BreakPolicies from "./Policies/breaks/rules";
 import LeavePolicies from "./Leave";
 import BreakTypeRuleAssignments from "./Policies/breaks/rulesAssignments";
+import Departments from "./departments";
+import Positions from "./positions";
 
 const Settings = () => {
   const { id } = useParams();
@@ -49,14 +51,14 @@ const Settings = () => {
           label: "Departments",
           description: "Manage company departments and reporting structure.",
           icon: <FiLayers className="text-sm" />,
-          content: <div>Departments content goes here</div>,
+          content: <Departments />,
         },
         {
           id: "positions",
           label: "Positions",
           description: "Define job titles, ranks, and structure.",
           icon: <FiBriefcase className="text-sm" />,
-          content: <div>Positions content goes here</div>,
+          content: <Positions />,
         },
       ],
     },

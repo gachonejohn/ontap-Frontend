@@ -1,63 +1,152 @@
 import Cookies from 'js-cookie';
-import { userLoading, userLoggedIn, userLoggedOut } from './authSlice';
+import { userLoading, userLoggedIn, userLoginFailed, userLoggedOut } from './authSlice';
 import { apiSlice } from '../../api/apiSlice';
 
 export const authApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
+    // login: builder.mutation({
+    //   query: ({ email, password }) => ({
+    //     url: `users/device-login/`,
+    //     method: 'POST',
+    //     body: { email, password },
+    //   }),
+    //   async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+    //     try {
+    //       dispatch(userLoading());
+    //       const result = await queryFulfilled;
+
+    //       Cookies.set('accessToken', result.data.access);
+    //       Cookies.set('refreshToken', result.data.refresh);
+
+    //       try {
+    //         const permissionsData = await dispatch(
+    //           authApi.endpoints.getPermissions.initiate()
+    //         ).unwrap();
+
+    //         // Get the active role from profile.roles or use the first role
+    //         const activeRole = permissionsData.profile?.roles?.[0];
+
+    //         dispatch(
+    //           userLoggedIn({
+    //             accessToken: result.data.access,
+    //             refreshToken: result.data.refresh,
+    //             user: {
+    //               ...result.data.user,
+    //               ...permissionsData.profile, // Merge profile data
+    //               role: {
+    //                 name: permissionsData.role,
+    //                 permissions: permissionsData.permissions || [],
+    //                 profile: permissionsData.profile, // Keep full profile for role switching
+    //                 ...activeRole, // Merge active role details
+    //               },
+    //             },
+    //           })
+    //         );
+    //       } catch (permissionError) {
+    //         console.error('Failed to fetch permissions:', permissionError);
+
+    //         dispatch(
+    //           userLoggedIn({
+    //             accessToken: result.data.access,
+    //             refreshToken: result.data.refresh,
+    //             user: result.data.user,
+    //           })
+    //         );
+    //       }
+    //     } catch (error) {
+    //       console.log(error);
+    //     }
+    //   },
+    // }),
     login: builder.mutation({
-      query: ({ email, password }) => ({
-        url: `users/login/`,
-        method: 'POST',
-        body: { email, password },
+      query: ({ email, password, device_identifier }) => ({
+        url: `users/device-login/`,
+        method: "POST",
+        body: { email, password, device_identifier }
       }),
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
         try {
           dispatch(userLoading());
           const result = await queryFulfilled;
 
-          Cookies.set('accessToken', result.data.access);
-          Cookies.set('refreshToken', result.data.refresh);
-
-          try {
-            const permissionsData = await dispatch(
-              authApi.endpoints.getPermissions.initiate()
-            ).unwrap();
-
-            // Get the active role from profile.roles or use the first role
-            const activeRole = permissionsData.profile?.roles?.[0];
-
-            dispatch(
-              userLoggedIn({
-                accessToken: result.data.access,
-                refreshToken: result.data.refresh,
-                user: {
-                  ...result.data.user,
-                  ...permissionsData.profile, // Merge profile data
-                  role: {
-                    name: permissionsData.role,
-                    permissions: permissionsData.permissions || [],
-                    profile: permissionsData.profile, // Keep full profile for role switching
-                    ...activeRole, // Merge active role details
-                  },
-                },
-              })
-            );
-          } catch (permissionError) {
-            console.error('Failed to fetch permissions:', permissionError);
-
-            dispatch(
-              userLoggedIn({
-                accessToken: result.data.access,
-                refreshToken: result.data.refresh,
-                user: result.data.user,
-              })
-            );
+          // if OTP is required, do not try to save tokens yet(not in response)
+          if (result.data.detail === "OTP_REQUIRED") {
+            return; 
           }
+          // save tokens normally for trusted devices
+          Cookies.set("accessToken", result.data.access);
+          Cookies.set("refreshToken", result.data.refresh);
+
+          const permissionsData = await dispatch(
+            authApi.endpoints.getPermissions.initiate()
+          ).unwrap();
+
+          const activeRole = permissionsData.profile?.roles?.[0];
+
+          dispatch(
+            userLoggedIn({
+              accessToken: result.data.access,
+              refreshToken: result.data.refresh,
+              user: {
+                ...result.data.user,
+                ...permissionsData.profile,
+                role: {
+                  name: permissionsData.role,
+                  permissions: permissionsData.permissions || [],
+                  profile: permissionsData.profile,
+                  ...activeRole
+                }
+              }
+            })
+          );
         } catch (error) {
-          console.log(error);
+          dispatch(userLoginFailed(error));
         }
-      },
+      }
     }),
+
+
+  verifyDeviceOtp: builder.mutation({
+    query: ({ email, code, device_identifier }) => ({
+      url: `users/verify-device-otp/`,
+      method: "POST",
+      body: { email, code, device_identifier }
+    }),
+    async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+      try {
+        dispatch(userLoading());
+        const result = await queryFulfilled;
+
+        Cookies.set("accessToken", result.data.access);
+        Cookies.set("refreshToken", result.data.refresh);
+        const permissionsData = await dispatch(
+          authApi.endpoints.getPermissions.initiate()
+        ).unwrap();
+
+        const activeRole = permissionsData.profile?.roles?.[0];
+
+        dispatch(
+          userLoggedIn({
+            accessToken: result.data.access,
+            refreshToken: result.data.refresh,
+            user: {
+              ...result.data.user,
+              ...permissionsData.profile,
+              role: {
+                name: permissionsData.role,
+                permissions: permissionsData.permissions || [],
+                profile: permissionsData.profile,
+                ...activeRole
+              }
+            }
+          })
+        );
+      } catch (error) {
+        dispatch(userLoginFailed(error));
+      }
+    }
+  }),
+
 
     logoutUser: builder.mutation({
       query: () => {
@@ -156,4 +245,5 @@ export const {
   useLogoutUserMutation,
   useGetPermissionsQuery,
   useSwitchRoleMutation,
+  useVerifyDeviceOtpMutation,
 } = authApi;

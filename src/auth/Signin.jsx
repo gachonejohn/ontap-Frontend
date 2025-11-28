@@ -6,11 +6,15 @@ import { toast } from "react-toastify";
 import { useLoginMutation } from "../store/services/auth/authService";
 import { loginSchema } from "../schemas/authSchema";
 import ForgotPasswordModal from "../components/myprofile/ForgotPasswordModal";
+import OtpModal from "./otpModal";
 
 const Signin = () => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isForgotPasswordModalOpen, setIsForgotPasswordModalOpen] = useState(false);
   const navigate = useNavigate();
+  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [otpData, setOtpData] = useState(null);
+
   
   const togglePasswordVisibility = () => {
     setIsPasswordVisible(!isPasswordVisible);
@@ -25,24 +29,65 @@ const Signin = () => {
     resolver: zodResolver(loginSchema),
   });
 
+  // const onSubmit = async (data) => {
+  //   console.log("data", data);
+  //   try {
+  //     const response = await login(data).unwrap();
+  //     console.log("response", response);
+  //     const successMessage = response?.message || "Login successful";
+  //     toast.success(successMessage);
+  //     navigate("/dashboard");
+  //   } catch (error) {
+  //     console.log("error", error);
+
+  //     if (error?.data?.detail) {
+  //       console.log("Error Message:", error.data.errror);
+  //       toast.error(error.data.detail);
+  //     } else {
+  //       toast.error("Failed to Login. Please try again.");
+  //     }
+  //   }
+  // };
+
+  function getDeviceIdentifier() {
+    let id = localStorage.getItem("device_id");
+    if (!id) {
+      id = "WEB-" + crypto.randomUUID();
+      localStorage.setItem("device_id", id);
+    }
+    return id;
+  }
+
+
   const onSubmit = async (data) => {
-    console.log("data", data);
     try {
-      const response = await login(data).unwrap();
-      console.log("response", response);
-      const successMessage = response?.message || "Login successful";
-      toast.success(successMessage);
+      const device_identifier = getDeviceIdentifier();
+
+      const response = await login({
+        ...data,
+        device_identifier
+      }).unwrap();
+
+      if (response.detail === "OTP_REQUIRED") {
+        setOtpData({
+          // otp_id: response.otp_id,
+          email: response.email,
+          device_identifier
+        });
+        setShowOtpModal(true);
+        return;
+      }
+
+      toast.success("Login successful");
       navigate("/dashboard");
     } catch (error) {
-      console.log("error", error);
-
+      // toast.error("Failed to login");
       if (error?.data?.detail) {
-        console.log("Error Message:", error.data.errror);
-        toast.error(error.data.detail);
-      } else {
-        toast.error("Failed to Login. Please try again.");
+          toast.error(error.data.detail);
+        } else {
+          toast.error("Failed to Login. Please try again.");
+        }
       }
-    }
   };
 
   const handleForgotPasswordClick = () => {
@@ -237,6 +282,12 @@ const Signin = () => {
         isOpen={isForgotPasswordModalOpen}
         onClose={handleCloseForgotPasswordModal}
       />
+      <OtpModal
+        isOpen={showOtpModal}
+        otpData={otpData}
+        onClose={() => setShowOtpModal(false)}
+      />
+
     </>
   );
 };
