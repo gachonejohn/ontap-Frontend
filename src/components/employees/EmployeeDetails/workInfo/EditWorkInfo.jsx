@@ -175,7 +175,7 @@ export const EditWorkInfo = ({ refetchData, data }) => {
                 <div>
                   <label className="block text-sm font-medium mb-2">Position</label>
                   <Select
-                    options={positionsData?.results?.map((item) => ({
+                    options={positionsData?.map((item) => ({
                       value: item.id,
                       label: `${item.title}`,
                     }))}
@@ -213,7 +213,7 @@ export const EditWorkInfo = ({ refetchData, data }) => {
                 </div>
 
                 {/* Role - spans full width */}
-                <div className="md:col-span-2">
+                {/* <div className="md:col-span-2">
                   <label className="block text-sm font-medium mb-2">Role</label>
                   <Select
                     options={rolesData?.results?.map((item) => ({
@@ -251,7 +251,7 @@ export const EditWorkInfo = ({ refetchData, data }) => {
                   {errors.role_id && (
                     <p className="text-red-500 text-sm mt-1">{errors.role_id.message}</p>
                   )}
-                </div>
+                </div> */}
                 <SubmitCancelButtons
                   onCancel={handleCloseModal}
                   isSubmitting={isSubmitting}
