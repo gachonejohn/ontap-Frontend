@@ -14,6 +14,13 @@ const menuItems = [
     whiteIcon: "/images/whitedashboard.png",
   },
   {
+    code: "chat",
+    id: "chat",
+    label: "My Chats",
+    icon: "/images/myprofile2.png",
+    whiteIcon: "/images/whiteprofile.png",
+  },
+  {
     code: "onboard",
     id: "onboarding",
     label: "Staff Onboarding",
