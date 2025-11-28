@@ -230,7 +230,14 @@ export const CreateEmployee = ({ refetchData }) => {
                       type="email"
                       placeholder="Enter email"
                       {...register('email')}
-                      className="w-full py-2 px-4 rounded-md border bg-slate-50 focus:outline-none focus:border-primary focus:bg-white placeholder:text-[12px]"
+                      className="
+                      w-full py-2 
+                      px-4 rounded-md
+                       border bg-slate-50
+                        focus:outline-none
+                         focus:border-primary
+                          focus:bg-white 
+                          placeholder:text-[12px]"
                     />
                     {errors.email && (
                       <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>

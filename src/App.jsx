@@ -30,6 +30,10 @@ import AttendanceManagement from "@components/attendance/management";
 import UnifiedCalendar from "./components/calendar/UnifiedCalendar";
 import RecordsPage from "./components/records/RecordsPage";
 import ChatPage from "@components/chat/dashboard/ChatPage"
+import AttendanceRecords from "./components/records/AttendanceRecords";
+import LeavesRecords from "@components/records/LeavesRecords";
+import CreateEmployeegWizard from "@components/employees/Onboarding";
+import { CreateNewEmployee } from "@components/employees/Onboarding/CreateEmployee";
 
 function App() {
   return (
@@ -54,6 +58,7 @@ function App() {
 
             <Route path="staffcycle" element={<Staffcycle />} />
             <Route path="employees" element={<Employees />} />
+            <Route path="employees/new" element={<CreateNewEmployee />} />
             <Route path="employees/:id" element={<EmployeeDetails />} />
 
             <Route path="leaves" element={<LeaveContent />} />
