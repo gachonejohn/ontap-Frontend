@@ -63,6 +63,13 @@ const menuItems = [
     whiteIcon: "/images/records.png",
   },
   {
+    code: "pay_roll",
+    id: "payroll-settings",
+    label: "Payroll Settings",
+    icon: "/images/payroll-settings.png",
+    whiteIcon: "/images/payroll-settings-white.png",
+  },
+  {
     code: "trainings",
     id: "trainings",
     label: "Trainings",
