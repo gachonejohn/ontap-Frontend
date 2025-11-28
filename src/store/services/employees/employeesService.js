@@ -17,6 +17,15 @@ export const employeesApi = apiSlice.injectEndpoints({
         };
       },
     }),
+    getEmployeesMetricis: builder.query({
+      query: () => {
+       
+        return {
+          url: `employees/metrics/`,
+          method: 'GET',
+        };
+      },
+    }),
 
      getRecentHires: builder.query({
       query: ({ page, page_size, search, status, department } = {}) => {
@@ -315,4 +324,5 @@ export const {
   useSetTimezoneMutation,
   useGetProfileInfoQuery,
   useGetRecentHiresQuery,
+  useGetEmployeesMetricisQuery
 } = employeesApi;
