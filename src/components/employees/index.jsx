@@ -1,8 +1,8 @@
 import ButtonDropdown from '@components/common/ActionsPopover';
 import NoDataFound from '@components/common/NoData';
 import { useGetDepartmentsQuery } from '@store/services/companies/companiesService';
-import { useMemo } from 'react';
-import { FiEdit, FiUserMinus } from 'react-icons/fi';
+import { useMemo, useState } from 'react';
+import { FiEdit, FiUserMinus, FiUserPlus } from 'react-icons/fi';
 import { GoSearch } from 'react-icons/go';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { employeeStatusOptions, PAGE_SIZE } from '../../constants/constants';
@@ -19,7 +19,7 @@ import { CreateEmployee } from './NewEmployee';
 const Employees = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-
+  const [showOnboardingModal, setShowOnboardingModal] = useState(false);
   const currentPageParam = parseInt(searchParams.get('page') || '1', 10);
 
   const { filters, currentPage, handleFilterChange, handlePageChange } = useFilters({
@@ -188,9 +188,20 @@ const Employees = () => {
   ];
 
   const customActions = (
-    <div>
-      <CreateEmployee refetchData={refetch} />
-    </div>
+    <>
+     {/* <div>
+       <CreateEmployee refetchData={refetch} />
+     </div> */}
+     <button
+          onClick={() => navigate('/dashboard/employees/new')}
+           className="bg-primary text-white px-4 py-2
+         hover:bg-primary-600 flex items-center gap-2 focus:ring-primary-500 rounded-md  transition-all duration-200 shadow-sm hover:shadow-md  focus:ring-offset-1"
+      >
+          <FiUserPlus size={20} />
+          <span>New Employee</span>
+        </button>
+    </>
+    
   );
 
   return (
