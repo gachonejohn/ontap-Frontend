@@ -22,10 +22,14 @@ import Templates from "@components/staffcycle/onboarding/templates/templateList"
 import TemplateDetails from "@components/staffcycle/onboarding/templates/templateDetails";
 import Steps from "@components/staffcycle/onboarding/steps";
 import AttendacePage from "@components/attendance";
+import AttendanceManagement from "@components/attendance/management";
 import UnifiedCalendar from "./components/calendar/UnifiedCalendar";
 import RecordsPage from "./components/records/RecordsPage";
+import ChatPage from "@components/chat/dashboard/ChatPage";
 import AttendanceRecords from "./components/records/AttendanceRecords";
 import LeavesRecords from "@components/records/LeavesRecords";
+import CreateEmployeegWizard from "@components/employees/Onboarding";
+import { CreateNewEmployee } from "@components/employees/Onboarding/CreateEmployee";
 
 function App() {
   return (
@@ -47,11 +51,14 @@ function App() {
             </Route>
             <Route path="staffcycle" element={<Staffcycle />} />
             <Route path="employees" element={<Employees />} />
+            <Route path="employees/new" element={<CreateNewEmployee />} />
             <Route path="employees/:id" element={<EmployeeDetails />} />
             <Route path="leaves" element={<LeaveContent />} />
             <Route path="attendance" element={<AttendacePage />} />
             <Route path="calendar" element={<UnifiedCalendar />} />
             <Route path="records" element={<RecordsPage />} />
+            <Route path="chat" element={<ChatPage />} />
+            <Route path="attendance_management" element={<AttendanceManagement />} />
             <Route path="tasks" element={<TaskContent />} />
             <Route path="performance" element={<Performance />} />
             <Route path="payroll" element={<PayrollContent />} />

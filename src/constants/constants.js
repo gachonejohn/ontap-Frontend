@@ -155,3 +155,10 @@ export const DAYS_OF_WEEK = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 export const HOURS = Array.from({ length: 24 }, (_, i) => i);
 
+
+export const offsiteRequestTypes = [
+    { label: 'Meeting', value: 'Meeting' },
+    { label: 'Field Visit', value: 'Field Visit' },
+    { label: 'External Meeting', value: 'External Meeting' },
+    { label: 'Other', value: 'Other' },
+];

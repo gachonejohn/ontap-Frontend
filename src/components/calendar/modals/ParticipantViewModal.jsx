@@ -165,7 +165,7 @@ const ParticipantViewModal = ({ isOpen, onClose, event, currentUserId }) => {
 
               <div className="space-y-2">
                 {localParticipants?.map(participant => {
-                  const isCurrentUser = participant.employee.user.id === currentUserId;
+                  const isCurrentUser = participant.employee.id === currentUserId;
                   return (
                     <div 
                       key={participant.id} 
@@ -215,7 +215,7 @@ const ParticipantViewModal = ({ isOpen, onClose, event, currentUserId }) => {
                     } disabled:opacity-50 disabled:cursor-not-allowed`}
                   >
                     {userStatus === 'CONFIRMED' && <Check className="inline mr-1" size={16} />}
-                    Confirmed
+                    Yes
                   </button>
                   <button
                     onClick={() => handleStatusUpdate('PENDING')}
@@ -227,7 +227,7 @@ const ParticipantViewModal = ({ isOpen, onClose, event, currentUserId }) => {
                     } disabled:opacity-50 disabled:cursor-not-allowed`}
                   >
                     {userStatus === 'PENDING' && <Clock className="inline mr-1" size={16} />}
-                    Pending
+                    No
                   </button>
                 </div>
               </div>

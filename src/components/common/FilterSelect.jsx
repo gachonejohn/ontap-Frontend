@@ -1,16 +1,18 @@
 import React from 'react';
+import { FiChevronDown } from 'react-icons/fi';
 import Select, { components } from 'react-select';
 
 // Custom dropdown indicator with your own icon
 const DropdownIndicator = (props) => (
   <components.DropdownIndicator {...props}>
-    <img
+    {/* <img
       src="/images/dropdown.png"
       alt="Dropdown"
       width="9.5"
       height="5.1"
       style={{ display: 'block' }}
-    />
+    /> */}
+    <FiChevronDown size={16} className="text-gray-500 "/> 
   </components.DropdownIndicator>
 );
 
