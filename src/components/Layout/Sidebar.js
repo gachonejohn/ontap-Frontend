@@ -107,7 +107,7 @@ const menuItems = [
   {
     code: "pay_roll",
     id: "payroll",
-    label: "Payroll",
+    label: "Payroll Settings",
     icon: "/images/payslips.png",
     whiteIcon: "/images/payslips.png",
   },
