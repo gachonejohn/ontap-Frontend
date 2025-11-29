@@ -3,13 +3,17 @@ import React from 'react';
 const StatCard = ({
   title,
   value,
-  diff,
+  diff, 
   subtext,
+  subtextColor, 
   icon: Icon,
   iconColor = 'text-gray-500',
   iconBgColor = 'bg-gray-100',
 }) => {
-  const hasSubtext = Boolean(subtext);
+  const displayText = subtext || (diff ? `${diff} vs last month` : null);
+  const hasSubtext = Boolean(displayText);
+  
+  const textColor = subtextColor || 'text-emerald-600';
 
   return (
     <div
@@ -27,8 +31,8 @@ const StatCard = ({
         </p>
 
         {hasSubtext && (
-          <p className="mt-1 text-xs font-normal text-emerald-600">
-            {subtext || `${diff} vs last month`}
+          <p className={`mt-1 text-xs font-normal ${textColor}`}>
+            {displayText}
           </p>
         )}
       </div>
