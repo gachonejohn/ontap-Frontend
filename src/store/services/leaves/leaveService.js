@@ -2,13 +2,7 @@ import { apiSlice } from "../../api/apiSlice";
 
 export const leavesApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    /**
-     * ========================
-     * LEAVES QUERIES (READ)
-     * ========================
-     */
 
-    // Get all leave policies (Admin only - for listings)
     getLeavePolicies: builder.query({
       query: ({ page, page_size } = {}) => {
         const params = new URLSearchParams();
@@ -23,7 +17,6 @@ export const leavesApi = apiSlice.injectEndpoints({
       providesTags: ["LeavePolicies"],
     }),
 
-    // Get single leave policy by ID (Works for both admin and employees)
     getLeavePolicyById: builder.query({
       query: (id) => ({
         url: `leaves/policies/${id}/`,
@@ -32,7 +25,6 @@ export const leavesApi = apiSlice.injectEndpoints({
       providesTags: (result, error, id) => [{ type: "LeavePolicies", id }],
     }),
 
-    // Get employee leave balances (Shows employee's entitlements)
     getEmployeeLeaveBalances: builder.query({
       query: () => ({
         url: `leaves/employee-leave-balances/`,
@@ -41,7 +33,6 @@ export const leavesApi = apiSlice.injectEndpoints({
       providesTags: ["LeaveBalances"],
     }),
 
-    // Get leave requests - WORKS FOR BOTH ADMIN AND EMPLOYEES
     getLeaveRequests: builder.query({
       query: ({ page, page_size, status, start_date, end_date, department, search } = {}) => {
         const params = new URLSearchParams();
@@ -61,7 +52,6 @@ export const leavesApi = apiSlice.injectEndpoints({
       providesTags: ["LeaveRequests"],
     }),
 
-    // Get approved leaves
     getApprovedLeaves: builder.query({
       query: ({ page, page_size } = {}) => {
         const params = new URLSearchParams();
@@ -76,7 +66,6 @@ export const leavesApi = apiSlice.injectEndpoints({
       providesTags: ["ApprovedLeaves"],
     }),
 
-    // Get single employee leave entitlements
     getSingleEmployeeLeaveEntitlements: builder.query({
       query: ({ employee_no, leave_type, year } = {}) => {
         const params = new URLSearchParams();
@@ -92,7 +81,6 @@ export const leavesApi = apiSlice.injectEndpoints({
       providesTags: ["EmployeeEntitlements"],
     }),
 
-    // Get all employee leave entitlements with filters
     getAllEmployeeLeaveEntitlements: builder.query({
       query: ({ page, page_size, leave_type, year } = {}) => {
         const params = new URLSearchParams();
@@ -109,7 +97,6 @@ export const leavesApi = apiSlice.injectEndpoints({
       providesTags: ["EmployeeEntitlements"],
     }),
 
-    // Get bulk employee leave entitlements
     getBulkEmployeeLeaveEntitlements: builder.query({
       query: ({ page, page_size } = {}) => {
         const params = new URLSearchParams();
@@ -124,13 +111,6 @@ export const leavesApi = apiSlice.injectEndpoints({
       providesTags: ["BulkEntitlements"],
     }),
 
-    /**
-     * ========================
-     * LEAVES MUTATIONS (WRITE)
-     * ========================
-     */
-
-    // Create a new leave policy
     createLeavePolicy: builder.mutation({
       query: (data) => ({
         url: `leaves/policies/create/`,
@@ -140,7 +120,6 @@ export const leavesApi = apiSlice.injectEndpoints({
       invalidatesTags: ["LeavePolicies"],
     }),
 
-    // Update a leave policy (PUT)
     updateLeavePolicy: builder.mutation({
       query: ({ id, ...data }) => ({
         url: `leaves/policies/${id}/`,
@@ -150,7 +129,6 @@ export const leavesApi = apiSlice.injectEndpoints({
       invalidatesTags: ["LeavePolicies"],
     }),
 
-    // Update a leave policy (PATCH)
     patchLeavePolicy: builder.mutation({
       query: ({ id, ...data }) => ({
         url: `leaves/policies/${id}/`,
@@ -160,7 +138,6 @@ export const leavesApi = apiSlice.injectEndpoints({
       invalidatesTags: ["LeavePolicies"],
     }),
 
-    // Delete a leave policy
     deleteLeavePolicy: builder.mutation({
       query: (id) => ({
         url: `leaves/policies/${id}/`,
@@ -169,17 +146,15 @@ export const leavesApi = apiSlice.injectEndpoints({
       invalidatesTags: ["LeavePolicies"],
     }),
 
-    // Create a leave request
     createLeaveRequest: builder.mutation({
       query: (data) => ({
         url: `leaves/requests/create/`,
         method: "POST",
         body: data,
       }),
-      invalidatesTags: ["LeaveRequests"],
+      invalidatesTags: ["LeaveRequests", "LeaveBalances"],
     }),
 
-    // Approve a leave request (PUT)
     approveLeaveRequest: builder.mutation({
       query: (id) => ({
         url: `leaves/requests/${id}/approve/`,
@@ -188,7 +163,6 @@ export const leavesApi = apiSlice.injectEndpoints({
       invalidatesTags: ["LeaveRequests", "ApprovedLeaves", "LeaveBalances"],
     }),
 
-    // Approve a leave request (PATCH)
     patchApproveLeaveRequest: builder.mutation({
       query: (id) => ({
         url: `leaves/requests/${id}/approve/`,
@@ -197,7 +171,6 @@ export const leavesApi = apiSlice.injectEndpoints({
       invalidatesTags: ["LeaveRequests", "ApprovedLeaves", "LeaveBalances"],
     }),
 
-    // Reject a leave request (PUT)
     rejectLeaveRequest: builder.mutation({
       query: (id) => ({
         url: `leaves/requests/${id}/reject/`,
@@ -206,7 +179,6 @@ export const leavesApi = apiSlice.injectEndpoints({
       invalidatesTags: ["LeaveRequests", "LeaveBalances"],
     }),
 
-    // Reject a leave request (PATCH)
     patchRejectLeaveRequest: builder.mutation({
       query: (id) => ({
         url: `leaves/requests/${id}/reject/`,
@@ -215,7 +187,6 @@ export const leavesApi = apiSlice.injectEndpoints({
       invalidatesTags: ["LeaveRequests", "LeaveBalances"],
     }),
 
-    // Report from leave (PUT)
     reportFromLeave: builder.mutation({
       query: (id) => ({
         url: `leaves/report-from-leave/${id}/`,
@@ -224,7 +195,6 @@ export const leavesApi = apiSlice.injectEndpoints({
       invalidatesTags: ["LeaveRequests", "ApprovedLeaves", "LeaveBalances"],
     }),
 
-    // Report from leave (PATCH)
     patchReportFromLeave: builder.mutation({
       query: (id) => ({
         url: `leaves/report-from-leave/${id}/`,
@@ -233,7 +203,6 @@ export const leavesApi = apiSlice.injectEndpoints({
       invalidatesTags: ["LeaveRequests", "ApprovedLeaves", "LeaveBalances"],
     }),
 
-    // Bulk employee leave entitlements - CREATE
     bulkEmployeeLeaveEntitlements: builder.mutation({
       query: (data) => ({
         url: `leaves/bulk-employee-leave-entitlements/`,
@@ -243,7 +212,6 @@ export const leavesApi = apiSlice.injectEndpoints({
       invalidatesTags: ["LeaveBalances", "EmployeeEntitlements", "BulkEntitlements"],
     }),
 
-    // Single employee leave entitlements - CREATE
     singleEmployeeLeaveEntitlements: builder.mutation({
       query: (data) => ({
         url: `leaves/single-employee-leave-entitlements/`,
@@ -253,7 +221,6 @@ export const leavesApi = apiSlice.injectEndpoints({
       invalidatesTags: ["LeaveBalances", "EmployeeEntitlements"],
     }),
 
-    // Update employee leave entitlements (PUT)
     updateEmployeeLeaveEntitlements: builder.mutation({
       query: ({ id, ...data }) => ({
         url: `leaves/employee-leave-entitlements/${id}/`,
@@ -263,7 +230,6 @@ export const leavesApi = apiSlice.injectEndpoints({
       invalidatesTags: ["LeaveBalances", "EmployeeEntitlements"],
     }),
 
-    // Update employee leave entitlements (PATCH)
     patchEmployeeLeaveEntitlements: builder.mutation({
       query: ({ id, ...data }) => ({
         url: `leaves/employee-leave-entitlements/${id}/`,
@@ -273,7 +239,6 @@ export const leavesApi = apiSlice.injectEndpoints({
       invalidatesTags: ["LeaveBalances", "EmployeeEntitlements"],
     }),
 
-    // Delete employee leave entitlements
     deleteEmployeeLeaveEntitlements: builder.mutation({
       query: (id) => ({
         url: `leaves/employee-leave-entitlements/${id}/`,

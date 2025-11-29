@@ -1,11 +1,10 @@
-// src/components/leaves/EmployeeLeavesDashboardContent.jsx
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { toast } from "react-toastify";
 import ApplyLeave from "./ApplyLeave";
 import ApplySpecialLeave from "./ApplySpecialLeave";
 import LeaveDetailsModal from "./LeaveDetails";
 import {
-  useGetLeavePoliciesQuery,
+  useGetEmployeeLeaveBalancesQuery,
   useGetLeaveRequestsQuery,
 } from "@store/services/leaves/leaveService";
 import { CustomDate } from "../../utils/dates";
@@ -25,41 +24,12 @@ const EmployeeLeavesDashboardContent = () => {
   const [hasMore, setHasMore] = useState(true);
   const observerTarget = useRef(null);
 
-  const [policiesPage, setPoliciesPage] = useState(1);
-  const [allPolicies, setAllPolicies] = useState([]);
-  const [hasMorePolicies, setHasMorePolicies] = useState(true);
-
-  const policiesQueryParams = useMemo(
-    () => ({
-      page: policiesPage,
-      page_size: PAGE_SIZE,
-    }),
-    [policiesPage]
-  );
-
   const {
-    data: policiesData,
-    isLoading: loadingPolicies,
-    isFetching: isFetchingPolicies,
-    error: policiesError,
-  } = useGetLeavePoliciesQuery(policiesQueryParams);
-
-  useEffect(() => {
-    if (policiesData?.results) {
-      if (policiesPage === 1) {
-        setAllPolicies(policiesData.results);
-      } else {
-        setAllPolicies(prev => {
-          const newPolicies = policiesData.results.filter(
-            newPolicy => !prev.some(existingPolicy => existingPolicy.id === newPolicy.id)
-          );
-          return [...prev, ...newPolicies];
-        });
-      }
-      
-      setHasMorePolicies(policiesData.next !== null);
-    }
-  }, [policiesData, policiesPage]);
+    data: leaveBalancesData,
+    isLoading: loadingBalances,
+    isFetching: isFetchingBalances,
+    error: balancesError,
+  } = useGetEmployeeLeaveBalancesQuery();
 
   const queryParams = useMemo(
     () => ({
@@ -150,34 +120,10 @@ const EmployeeLeavesDashboardContent = () => {
     }
   };
 
-  const calculateUsedDays = (policyId) => {
-    if (!allLeaveRequests) return 0;
+  const calculateProgressPercentage = (usedDays, allocatedDays) => {
+    if (allocatedDays === 0) return 0;
     
-    const usedDays = allLeaveRequests
-      .filter(request => 
-        request.leave_policy === policyId && 
-        request.status?.toUpperCase() === 'APPROVED'
-      )
-      .reduce((total, request) => {
-        return total + (parseFloat(request.days) || 0);
-      }, 0);
-    
-    return usedDays;
-  };
-
-  const calculateRemainingDays = (policy) => {
-    const defaultDays = parseFloat(policy.default_days) || 0;
-    const usedDays = calculateUsedDays(policy.id);
-    const remaining = defaultDays - usedDays;
-    return remaining > 0 ? remaining : 0;
-  };
-
-  const calculateProgressPercentage = (policy) => {
-    const defaultDays = parseFloat(policy.default_days) || 0;
-    if (defaultDays === 0) return 0;
-    
-    const usedDays = calculateUsedDays(policy.id);
-    const percentage = (usedDays / defaultDays) * 100;
+    const percentage = (parseFloat(usedDays) / parseFloat(allocatedDays)) * 100;
     return Math.min(percentage, 100); 
   };
 
@@ -240,32 +186,33 @@ const EmployeeLeavesDashboardContent = () => {
         </div>
       </div>
 
-      {/* Status Cards - Dynamic from Backend with Pagination */}
-      {loadingPolicies && policiesPage === 1 ? (
+      {/* Status Cards - Dynamic from Backend */}
+      {loadingBalances ? (
         <div className="flex justify-center items-center py-12">
           <ContentSpinner />
         </div>
-      ) : policiesError ? (
+      ) : balancesError ? (
         <div className="bg-red-50 p-4 rounded-md text-red-800 text-center">
-          Error loading leave policies
+          Error loading leave balances
         </div>
       ) : (
         <div className="grid grid-cols-4 gap-4 w-full items-center">
-          {allPolicies && allPolicies.map((policy) => {
-            const usedDays = calculateUsedDays(policy.id);
-            const remainingDays = calculateRemainingDays(policy);
-            const progressPercentage = calculateProgressPercentage(policy);
+          {leaveBalancesData?.results && leaveBalancesData.results.map((balance) => {
+            const usedDays = parseFloat(balance.used_days) || 0;
+            const remainingDays = parseFloat(balance.remaining_days) || 0;
+            const allocatedDays = parseFloat(balance.allocated_days) || 0;
+            const progressPercentage = calculateProgressPercentage(usedDays, allocatedDays);
             
             return (
-              <div key={policy.id} className="flex flex-col justify-start items-start gap-4 p-4 rounded-xl min-h-[121px] shadow-sm bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
+              <div key={balance.id} className="flex flex-col justify-start items-start gap-4 p-4 rounded-xl min-h-[121px] shadow-sm bg-white transition-transform duration-200 hover:-translate-y-1 hover:shadow-md">
                 <div className="flex flex-row justify-between items-start w-full h-5">
                   <div className="font-inter text-sm whitespace-nowrap text-neutral-900 text-opacity-100 leading-snug tracking-normal font-medium">
-                    {policy.name}
+                    {balance.leave_type_name}
                   </div>
                   <div className="flex flex-col justify-start items-start gap-2.5 p-1 rounded border border-neutral-200 h-5 overflow-hidden">
                     <div className="flex flex-row justify-center items-center gap-1 h-4">
                       <div className="font-inter text-xs whitespace-nowrap text-neutral-900 text-opacity-100 leading-snug tracking-normal font-semibold">
-                        {policy.default_days}
+                        {allocatedDays}
                       </div>
                     </div>
                   </div>
@@ -477,17 +424,17 @@ const EmployeeLeavesDashboardContent = () => {
             </div>
           </div>
 
-          {loadingPolicies && policiesPage === 1 ? (
+          {loadingBalances ? (
             <div className="flex justify-center items-center py-12 w-full">
               <ContentSpinner />
             </div>
-          ) : policiesError ? (
+          ) : balancesError ? (
             <div className="bg-red-50 p-4 rounded-md text-red-800 text-center w-full">
               Error loading leave policies
             </div>
           ) : (
             <div className="flex flex-col justify-start items-start gap-4 p-4 w-full">
-              {allPolicies && allPolicies.map((policy, index) => {
+              {leaveBalancesData?.results && leaveBalancesData.results.map((balance, index) => {
                 const bgColors = [
                   'bg-blue-50',
                   'bg-orange-50',
@@ -517,27 +464,20 @@ const EmployeeLeavesDashboardContent = () => {
 
                 return (
                   <div 
-                    key={policy.id}
+                    key={balance.id}
                     className={`flex justify-start items-center p-3 rounded-lg w-full ${bgColors[colorIndex]} border ${borderColors[colorIndex]}`}
                   >
                     <div className="flex flex-col justify-start items-start gap-2 w-full">
                       <div className={`font-inter text-base whitespace-nowrap ${textColors[colorIndex]} text-opacity-100 leading-tight font-medium`}>
-                        {policy.name}
+                        {balance.leave_type_name}
                       </div>
                       <div className={`font-inter text-xs whitespace-nowrap ${labelColors[colorIndex]} text-opacity-100 leading-snug tracking-normal font-medium`}>
-                        {policy.description}
+                        Allocated: {balance.allocated_days} days | Used: {parseFloat(balance.used_days)} days | Remaining: {parseFloat(balance.remaining_days)} days
                       </div>
                     </div>
                   </div>
                 );
               })}
-              
-              {/* Show loading indicator when fetching more policies */}
-              {isFetchingPolicies && hasMorePolicies && (
-                <div className="flex justify-center items-center py-4 w-full">
-                  <div className="text-sm text-gray-500">Loading more policies...</div>
-                </div>
-              )}
             </div>
           )}
         </div>
