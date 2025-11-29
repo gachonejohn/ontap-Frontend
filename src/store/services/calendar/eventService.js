@@ -49,11 +49,39 @@ export const eventApi = apiSlice.injectEndpoints({
         method: 'PATCH',
         body: { status },
       }),
-      // invalidatesTags: (result, error, { eventId }) => [
-      //   { type: 'Events', id: eventId },
-      //   { type: 'Events', id: 'LIST' },
-      //   'Participants',
-      // ],
+      invalidatesTags: ['Events'],
+    }),
+
+    addParticipants: builder.mutation({
+      query: ({ eventId, internal_participants, external_participants }) => ({
+        url: `/calendar/events/${eventId}/participants/add/`,
+        method: 'POST',
+        body: { 
+          internal_participants, 
+          external_participants 
+        },
+      }),
+      invalidatesTags: ['Events'],
+    }),
+
+    removeParticipant: builder.mutation({
+      query: ({ eventId, participantId, participantIds }) => {
+        const body = {};
+        
+        if (participantId !== undefined) {
+          body.participant_id = participantId;
+        }
+        
+        if (participantIds !== undefined && Array.isArray(participantIds)) {
+          body.participant_ids = participantIds;
+        }
+        
+        return {
+          url: `/calendar/events/${eventId}/participants/remove/`,
+          method: 'DELETE',
+          body,
+        };
+      },
       invalidatesTags: ['Events'],
     }),
   }),
@@ -65,4 +93,6 @@ export const {
   useUpdateEventMutation,
   useDeleteEventMutation,
   useUpdateParticipantStatusMutation,
+  useAddParticipantsMutation,
+  useRemoveParticipantMutation
 } = eventApi;

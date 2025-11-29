@@ -11,10 +11,14 @@ import {
   useApproveLeaveRequestMutation, 
   useRejectLeaveRequestMutation 
 } from '@store/services/leaves/leaveService';
+import { useGetDashboardMetricsQuery } from '@store/services/employees/employeesService';
 import RecentEmployees from './RecentEmployees';
 import { CustomDate } from '../../utils/dates';
 import LeaveDetails from '../leaves/LeaveDetails';
 import ActionModal from '../common/Modals/ActionModal';
+import StatCard from '@components/common/statsCard';
+import ContentSpinner from '@components/common/spinners/dataLoadingSpinner';
+import { FiUsers, FiUserPlus, FiDollarSign, FiFileText } from 'react-icons/fi';
 
 export default function Dashboard() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -93,30 +97,30 @@ export default function Dashboard() {
   const processedLeaveRequests = processLeaveRequests(latestLeaveRequests);
 
   // --- Hire calculations ---
-  const getNewHiresThisMonth = () => {
-    const now = new Date();
-    return employees.filter((emp) => {
-      const createdDate = new Date(emp.created_at);
-      return (
-        createdDate.getMonth() === now.getMonth() && createdDate.getFullYear() === now.getFullYear()
-      );
-    }).length;
-  };
+  // const getNewHiresThisMonth = () => {
+  //   const now = new Date();
+  //   return employees.filter((emp) => {
+  //     const createdDate = new Date(emp.created_at);
+  //     return (
+  //       createdDate.getMonth() === now.getMonth() && createdDate.getFullYear() === now.getFullYear()
+  //     );
+  //   }).length;
+  // };
 
-  const getNewHiresLastMonth = () => {
-    const now = new Date();
-    const lastMonth = now.getMonth() === 0 ? 11 : now.getMonth() - 1;
-    const year = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
+  // const getNewHiresLastMonth = () => {
+  //   const now = new Date();
+  //   const lastMonth = now.getMonth() === 0 ? 11 : now.getMonth() - 1;
+  //   const year = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
 
-    return employees.filter((emp) => {
-      const createdDate = new Date(emp.created_at);
-      return createdDate.getMonth() === lastMonth && createdDate.getFullYear() === year;
-    }).length;
-  };
+  //   return employees.filter((emp) => {
+  //     const createdDate = new Date(emp.created_at);
+  //     return createdDate.getMonth() === lastMonth && createdDate.getFullYear() === year;
+  //   }).length;
+  // };
 
-  const hiresThisMonth = getNewHiresThisMonth();
-  const hiresLastMonth = getNewHiresLastMonth();
-  const hiresDiff = hiresThisMonth - hiresLastMonth;
+  // const hiresThisMonth = getNewHiresThisMonth();
+  // const hiresLastMonth = getNewHiresLastMonth();
+  // const hiresDiff = hiresThisMonth - hiresLastMonth;
 
   // Dropdown logic
   const handleToggleDropdown = () => {
@@ -233,6 +237,15 @@ export default function Dashboard() {
     }
   };
 
+  const { 
+    data: metrics, 
+    isLoading: metricsLoading, 
+    error: metricsError 
+  } = useGetDashboardMetricsQuery(
+    {}, 
+    { refetchOnMountOrArgChange: true }
+  );
+
   return (
     <div className="flex flex-col gap-6">
       {canViewAll ? (
@@ -246,102 +259,55 @@ export default function Dashboard() {
           </div>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
-            {/* Card 1 - Total Employees */}
-            <div
-              className="flex flex-col justify-between p-4 rounded-xl h-[120px] 
-             bg-white transition-transform duration-200 hover:-translate-y-1 shadow-sm border hover:shadow-md"
-            >
-              <div className="flex justify-between items-center">
-                <div className="flex flex-col">
-                  <div className="text-sm text-gray-600 font-medium">Total Employees</div>
-                  <div className="mt-2 text-lg text-neutral-900 font-semibold">
-                    {employeesData?.count ?? 0}
-                  </div>
-                  <div className="mt-1 text-xs text-gray-600 font-normal">
-                    {hiresDiff >= 0 ? `+${hiresDiff}` : hiresDiff} vs last month
-                  </div>
-                </div>
-                <div className="flex items-center justify-center p-1 rounded-2xl h-8 w-8 bg-blue-600 shadow-sm">
-                  <img
-                    className="h-5 w-5 object-contain"
-                    src="/images/total_employees.png"
-                    alt="Total Employees icon"
-                  />
-                </div>
+         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+            {metricsLoading ? (
+              <div className="col-span-4 text-center text-gray-500 py-6">
+                <ContentSpinner />
               </div>
-            </div>
-
-            {/* Card 2 - New Hires This Month */}
-            <div
-              className="flex flex-col justify-between p-4 rounded-xl h-[120px] 
-             bg-white transition-transform duration-200 hover:-translate-y-1 shadow-sm border hover:shadow-md"
-            >
-              <div className="flex justify-between items-center">
-                <div className="flex flex-col">
-                  <div className="text-sm text-gray-600 font-medium">New Hires This Month</div>
-                  <div className="mt-2 text-lg text-neutral-900 font-semibold">
-                    {hiresThisMonth}
-                  </div>
-                  <div className="mt-1 text-xs text-gray-600 font-normal">
-                    {hiresDiff >= 0 ? `+${hiresDiff}` : hiresDiff} vs last month
-                  </div>
-                </div>
-                <div className="flex items-center justify-center p-1 rounded-2xl h-8 w-8 bg-green-500 shadow-sm">
-                  <img
-                    className="h-5 w-5 object-contain"
-                    src="/images/total_employees.png"
-                    alt="New Hires icon"
-                  />
-                </div>
+            ) : metricsError ? (
+              <div className="col-span-4 text-center text-red-500 py-6">
+                Error loading dashboard metrics.
               </div>
-            </div>
-
-            {/* Card 3 - Pending Leave Requests (now dynamic) */}
-            <div
-              className="flex flex-col justify-between p-4 rounded-xl h-[120px] 
-             bg-white transition-transform duration-200 hover:-translate-y-1 shadow-sm border hover:shadow-md"
-            >
-              <div className="flex justify-between items-center">
-                <div className="flex flex-col">
-                  <div className="text-sm text-gray-600 font-medium">Pending Leave Requests</div>
-                  <div className="mt-2 text-lg text-neutral-900 font-semibold">
-                    {pendingLeaveRequestsCount}
-                  </div>
-                  <div className="mt-1 text-xs text-gray-600 font-normal">
-                    {leaveRequestsLoading ? 'Loading...' : '+0 vs last month'}
-                  </div>
-                </div>
-                <div className="flex items-center justify-center p-1 rounded-2xl h-8 w-8 bg-orange-500 shadow-sm">
-                  <img
-                    className="h-5 w-5 object-contain"
-                    src="/images/pending_leave.png"
-                    alt="Pending Leave icon"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Card 4 - Payroll Summary (static for now) */}
-            <div
-              className="flex flex-col justify-between p-4 rounded-xl h-[120px] 
-             bg-white transition-transform duration-200 hover:-translate-y-1 shadow-sm border hover:shadow-md"
-            >
-              <div className="flex justify-between items-center">
-                <div className="flex flex-col">
-                  <div className="text-sm text-gray-600 font-medium">Payroll Summary</div>
-                  <div className="mt-2 text-lg text-neutral-900 font-semibold">$485k</div>
-                  <div className="mt-1 text-xs text-gray-600 font-normal">+2.5% vs last month</div>
-                </div>
-                <div className="flex items-center justify-center p-1 rounded-2xl h-8 w-8 bg-blue-500 shadow-sm">
-                  <img
-                    className="h-5 w-5 object-contain"
-                    src="/images/payroll_summary.png"
-                    alt="Payroll Summary icon"
-                  />
-                </div>
-              </div>
-            </div>
+            ) : (
+              [
+                {
+                  title: 'Total Employees',
+                  value: metrics?.total_employees ?? 0,
+                  subtext: `${metrics?.hires_difference >= 0 ? '+' : ''}${metrics?.hires_difference ?? 0} vs last month`,
+                  subtextColor: metrics?.hires_difference >= 0 ? 'text-emerald-600' : 'text-red-600',
+                  icon: FiUsers,
+                  iconColor: 'text-white',
+                  iconBgColor: 'bg-blue-600',
+                },
+                {
+                  title: 'New Hires This Month',
+                  value: metrics?.new_hires_this_month ?? 0,
+                  subtext: `${metrics?.hires_difference >= 0 ? '+' : ''}${metrics?.hires_difference ?? 0} vs last month`,
+                  subtextColor: metrics?.hires_difference >= 0 ? 'text-emerald-600' : 'text-red-600',
+                  icon: FiUserPlus,
+                  iconColor: 'text-white',
+                  iconBgColor: 'bg-green-500',
+                },
+                {
+                  title: 'Monthly Payroll',
+                  value: metrics?.monthly_payroll_display ?? '$0',
+                  subtext: metrics?.monthly_payroll > 0 ? '+2.5% vs last month' : 'No data yet',
+                  subtextColor: 'text-gray-600',
+                  icon: FiDollarSign,
+                  iconColor: 'text-white',
+                  iconBgColor: 'bg-blue-500',
+                },
+                {
+                  title: 'Pending Leave Requests',
+                  value: metrics?.pending_leave_requests ?? 0,
+                  subtext: 'Awaiting approval',
+                  subtextColor: 'text-gray-600',
+                  icon: FiFileText,
+                  iconColor: 'text-white',
+                  iconBgColor: 'bg-orange-500',
+                },
+              ].map((card, i) => <StatCard key={i} {...card} />)
+            )}
           </div>
 
           {/* Table + Leave Requests */}
