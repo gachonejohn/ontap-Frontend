@@ -25,6 +25,7 @@ import EditProfilePicture from './personalInfo/UpdateProfilePic';
 import { StatutoryInfo } from './statutoryInfo';
 import { WorkDetails } from './workInfo/WorkDetails';
 import { SystemAccess } from './accessRights';
+import { EmployeeAllowance } from './allowances';
 
 const EmployeeDetails = () => {
   const { id } = useParams();
@@ -93,6 +94,7 @@ const EmployeeDetails = () => {
     <div className="space-y-6">
       <WorkDetails data={employeeData} refetch={refetch} />
       <ContractsDetails data={employeeData} refetch={refetch} />
+      <EmployeeAllowance data={employeeData} refetch={refetch} />
       <PaymentMethodDetails data={employeeData} refetch={refetch} />
     </div>
   );

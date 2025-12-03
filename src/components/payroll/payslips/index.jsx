@@ -3,7 +3,7 @@ import FilterSelect from '@components/common/FilterSelect';
 import NoDataFound from '@components/common/NoData';
 import Pagination from '@components/common/pagination';
 import ContentSpinner from '@components/common/spinners/dataLoadingSpinner';
-import { attendanceStatusOptions, PAGE_SIZE, payrollStatusOptions } from '@constants/constants';
+import { PAGE_SIZE, payrollStatusOptions } from '@constants/constants';
 import { useFilters } from '@hooks/useFIlters';
 import { useGetDepartmentsQuery } from '@store/services/companies/companiesService';
 import {
@@ -13,10 +13,12 @@ import {
 } from '@store/services/payroll/Payroll.Service';
 import { formatCurrencyWithSymbol } from '@utils/formatCurrency';
 import { useEffect, useMemo, useState } from 'react';
-import { FiChevronDown, FiChevronUp, FiEye } from 'react-icons/fi';
+import { FiChevronDown, FiChevronUp } from 'react-icons/fi';
 import { GoSearch } from 'react-icons/go';
 import { PiBuildingApartment } from 'react-icons/pi';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import CSVExportPayslips from './CSVExportPayslips';
+import PayslipDetails from './PayslipDetails';
 
 const GroupedPayslips = () => {
   const [searchParams] = useSearchParams();
@@ -32,7 +34,6 @@ const GroupedPayslips = () => {
       from_date: searchParams.get('from_date') || '',
       to_date: searchParams.get('to_date') || '',
       status: searchParams.get('status') || '',
-
     },
     initialPage: currentPageParam,
     navigate,
@@ -192,9 +193,9 @@ const GroupedPayslips = () => {
         </span>
       ),
     },
-   {
-      header: "Status",
-      accessor: "status",
+    {
+      header: 'Status',
+      accessor: 'status',
       cell: (item) => {
         const getStatusStyles = (status) => {
           const styles = {
@@ -209,7 +210,9 @@ const GroupedPayslips = () => {
         };
 
         return (
-          <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusStyles(item.status)}`}>
+          <span
+            className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusStyles(item.status)}`}
+          >
             {item.status}
           </span>
         );
@@ -219,12 +222,9 @@ const GroupedPayslips = () => {
       header: 'Actions',
       accessor: 'actions',
       cell: (item) => (
-        <button
-          onClick={() => navigate(`/payroll/${item.id}`)}
-          className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-        >
-          <FiEye className="w-4 h-4" />
-        </button>
+        <>
+          <PayslipDetails payslip={item} />
+        </>
       ),
     },
   ];
@@ -254,7 +254,6 @@ const GroupedPayslips = () => {
         </div>
 
         <div className="flex gap-2">
-          
           <FilterSelect
             options={departmentsOptions}
             value={
@@ -267,7 +266,6 @@ const GroupedPayslips = () => {
             placeholder="All Departments"
             defaultLabel="All Departments"
           />
-          
         </div>
       </div>
 
@@ -324,9 +322,9 @@ const GroupedPayslips = () => {
                 {/* Expanded Attendance Table */}
                 {expandedDept === dept.id && (
                   <div className="bg-gray-50 p-4">
-                    <div className="flex flex-col gap-4 mt-4 lg:gap-0 md:gap-0 lg:flex-row md:flex-row md:items-center p-2 md:justify-end lg:items-center lg:justify-end">
-                      <div className="flex flex-col gap-3 lg:p-0 lg:flex-row md:flex-row md:items-center md:space-x-2 lg:items-center lg:space-x-5">
-                        <div className="relative w-full md:w-auto md:min-w-[35%] border bg-white border-gray-300 flex items-center gap-2 text-gray-500 px-2 rounded-lg shadow-sm">
+                    <div className="w-full flex justify-end">
+                      <div className="flex items-center gap-3">
+                        <div className="relative w-full md:w-auto md:min-w-[25%] border bg-white border-gray-300 flex items-center gap-2 text-gray-500 px-2 rounded-lg shadow-sm">
                           <GoSearch size={20} className="" />
                           <input
                             type="text"
@@ -334,7 +332,7 @@ const GroupedPayslips = () => {
                             value={filters.search}
                             onChange={handleFilterChange}
                             placeholder="Search..."
-                            className="w-full md:w-auto md:min-w-[35%] bg-white text-gray-900 text-sm px-2 py-2 bg-transparent outline-none"
+                            className="w-full md:w-auto md:min-w-[25%] bg-white text-gray-900 text-sm px-2 py-2 bg-transparent outline-none"
                           />
                         </div>
                         <FilterSelect
@@ -352,18 +350,24 @@ const GroupedPayslips = () => {
                           defaultLabel="All Status"
                         />
                         <FilterSelect
-            options={payrollPeriodOptions}
-            value={
-              payrollPeriodOptions.find((option) => option.value === filters.period) || {
-                value: '',
-                label: 'Select Period',
-              }
-            }
-            onChange={handlePayrollPeriodChange}
-            placeholder="Select Period"
-            defaultLabel="Select Period"
-          />
-                       
+                          options={payrollPeriodOptions}
+                          value={
+                            payrollPeriodOptions.find(
+                              (option) => option.value === filters.period
+                            ) || {
+                              value: '',
+                              label: 'Select Period',
+                            }
+                          }
+                          onChange={handlePayrollPeriodChange}
+                          placeholder="Select Period"
+                          defaultLabel="Select Period"
+                        />
+                        <CSVExportPayslips
+                          departmentId={expandedDept}
+                          filters={filters}
+                          filename={`${dept.department_name}-payslips.csv`}
+                        />
                       </div>
                     </div>
 

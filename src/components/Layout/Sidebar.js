@@ -129,7 +129,7 @@ const menuItems = [
   },
   {
     code: "payroll_settings",
-    id: "payroll_settings",
+    id: "payroll-settings",
     label: "Payroll Settings",
     icon: "/images/payslips.png",
     whiteIcon: "/images/payslips.png",
@@ -158,7 +158,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
 
    // Fetch unread message count
   const { data: unreadData } = useGetUnreadCountQuery(undefined, {
-    pollingInterval: 60000, // Poll every 1 minute
+    // pollingInterval: 60000, // Poll every 1 minute
     refetchOnMountOrArgChange: true,
   });
 

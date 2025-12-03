@@ -6,9 +6,10 @@
   "dependencies": {
     "@floating-ui/react-dom": "^2.1.6",
     "@hookform/resolvers": "^5.2.2",
+    "@json2csv/plainjs": "^7.0.6",
     "@react-pdf-viewer/core": "^3.12.0",
     "@react-pdf-viewer/default-layout": "^3.12.0",
-    "@react-pdf/renderer": "^4.3.0",
+    "@react-pdf/renderer": "^4.3.1",
     "@reduxjs/toolkit": "^2.9.0",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.8.0",

@@ -66,3 +66,11 @@ export const EmployeeEmergencyContactSchema = z.object({
 
   address: z.string().nullable().optional(),
 });
+
+export const EmployeeAllowanceSchema = z.object({
+  allowance: z.number().positive('Allowance type is required'),
+  // employee: z.number().positive('Select an employee'),
+  amount: z
+    .string()
+    .regex(/^\d+(\.\d+)?$/, 'Amount must be a valid decimal number'),
+});
