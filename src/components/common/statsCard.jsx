@@ -12,6 +12,8 @@ const StatCard = ({
 }) => {
   const displayText = subtext || (diff ? `${diff} vs last month` : null);
   const hasSubtext = Boolean(displayText);
+  
+  // const textColor = subtextColor || 'text-emerald-600';
 
   return (
     <div
