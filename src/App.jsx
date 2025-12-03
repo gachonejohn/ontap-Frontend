@@ -26,7 +26,7 @@ import AttendanceManagement from "@components/attendance/management";
 
 import UnifiedCalendar from "./components/calendar";
 import RecordsPage from "./components/records/RecordsPage";
-import ChatPage from "@components/chat/dashboard/ChatPage";
+import ChatPage from "@components/chat/dashboard";
 import AttendanceRecords from "./components/records/AttendanceRecords";
 import LeavesRecords from "@components/records/LeavesRecords";
 import CreateEmployeegWizard from "@components/employees/Onboarding";

@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { useLogoutUserMutation } from "../../store/services/auth/authService";
 import { userLoggedOut } from "../../store/services/auth/authSlice";
+import { useGetUnreadCountQuery } from "../../store/services/chat/chatService";
 import { toast } from "react-toastify";
 
 const menuItems = [
@@ -19,6 +20,7 @@ const menuItems = [
     label: "My Chats",
     icon: "/images/myprofile2.png",
     whiteIcon: "/images/whiteprofile.png",
+    showBadge: true,
   },
   {
     code: "onboard",
@@ -146,6 +148,15 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
   const [logoutUser] = useLogoutUserMutation();
   const navigate = useNavigate();
   const { user } = useAppSelector((state) => state.auth);
+
+   // Fetch unread message count
+  const { data: unreadData } = useGetUnreadCountQuery(undefined, {
+    pollingInterval: 60000, // Poll every 1 minute
+    refetchOnMountOrArgChange: true,
+  });
+
+  const unreadCount = unreadData?.total_unread_count || 0;
+
   const permissions = React.useMemo(() => user?.role?.permissions ?? [], [user]);
   const allowedCodes = React.useMemo(
     () =>
@@ -237,11 +248,25 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
                 src={activePage === item.id ? item.whiteIcon : item.icon}
                 alt={item.label}
               />
+              {/* Unread badge for chat - shown when sidebar is closed */}
+                {item.showBadge && unreadCount > 0 && !sidebarOpen && (
+                  <span className="absolute -top-1 -right-1 flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-semibold text-white bg-red-500 rounded-full">
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </span>
+                )}
               {/* {React.createElement(item.icon, {
       size: 22,
       className: activePage === item.id ? "text-white" : "text-gray-600",
     })}*/}
               {sidebarOpen && <span className="text-base font-normal">{item.label}</span>}
+              {/* Unread badge for chat - shown when sidebar is open */}
+                  {item.showBadge && unreadCount > 0 && (
+                    <span className={`flex items-center justify-center min-w-[22px] h-[22px] px-2 text-xs font-semibold rounded-full ${
+                      activePage === item.id ? 'bg-white text-teal-500' : 'bg-red-500 text-white'
+                    }`}>
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </span>
+                  )}
             </div>
           ))}
         </div>
