@@ -677,21 +677,21 @@ export const payrollApi = apiSlice.injectEndpoints({
       invalidatesTags: ["Payroll", "PayrollSummary"],
     }),
 
-    approvePayroll: builder.mutation({
-      query: (id) => ({
-        url: `payroll/payroll/${id}/approve/`,
-        method: "PATCH",
-      }),
-      invalidatesTags: ["Payroll", "PayrollSummary", "Payslips"],
-    }),
+    // approvePayroll: builder.mutation({
+    //   query: (id) => ({
+    //     url: `payroll/payroll/${id}/approve/`,
+    //     method: "PATCH",
+    //   }),
+    //   invalidatesTags: ["Payroll", "PayrollSummary", "Payslips"],
+    // }),
 
-    processPayroll: builder.mutation({
-      query: (id) => ({
-        url: `payroll/payroll/${id}/process/`,
-        method: "PATCH",
-      }),
-      invalidatesTags: ["Payroll", "PayrollSummary", "Payslips"],
-    }),
+    // processPayroll: builder.mutation({
+    //   query: (id) => ({
+    //     url: `payroll/payroll/${id}/process/`,
+    //     method: "PATCH",
+    //   }),
+    //   invalidatesTags: ["Payroll", "PayrollSummary", "Payslips"],
+    // }),
 
     rejectPayroll: builder.mutation({
       query: (id) => ({
@@ -865,9 +865,9 @@ export const {
   useCreatePayrollMutation,
   useUpdatePayrollMutation,
   usePatchPayrollMutation,
-  useApprovePayrollMutation,
-  useProcessPayrollMutation,
-  useRejectPayrollMutation,
+  // useApprovePayrollMutation,
+  // useProcessPayrollMutation,
+  // useRejectPayrollMutation,
   useDeletePayrollMutation,
 
   // Payslip Mutations
