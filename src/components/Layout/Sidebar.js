@@ -114,7 +114,7 @@ const menuItems = [
     whiteIcon: "/images/performance.png",
   },
   {
-    code: "pay_roll",
+    code: "payroll",
     id: "payroll",
     label: "Payroll",
     icon: "/images/payslips.png",
