@@ -7,12 +7,12 @@ export default function EmployeeCardContent() {
   const [activeCardTab, setActiveCardTab] = useState('idCards');
   
   // Mock data - using user info where available
-  const userFirstName = user?.user?.first_name || user?.first_name || "Victor";
-  const userLastName = user?.user?.last_name || user?.last_name || "Smith";
+  const userFirstName = user?.user?.first_name || user?.first_name;
+  const userLastName = user?.user?.last_name || user?.last_name;
   const userName = `${userFirstName} ${userLastName}`;
-  const userEmail = user?.user?.email || user?.email || "victor.smith@company.com";
-  const userPhone = user?.user?.phone_number || user?.phone_number || "+234 7099767789";
-  const userPosition = user?.user?.position || user?.position || "Product Designer";
+  const userEmail = user?.user?.email || user?.email;
+  const userPhone = user?.user?.phone_number || user?.phone_number;
+  const userPosition = user?.user?.position?.title || user?.position?.title;
   const userDepartment = user?.department?.name || "Design & UX";
   const userProfilePicture = user?.user?.profile_picture || user?.profile_picture;
 
