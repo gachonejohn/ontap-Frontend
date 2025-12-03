@@ -26,10 +26,16 @@ export const leavesApi = apiSlice.injectEndpoints({
     }),
 
     getEmployeeLeaveBalances: builder.query({
-      query: () => ({
-        url: `leaves/employee-leave-balances/`,
-        method: "GET",
-      }),
+      query: ({ page, page_size } = {}) => {
+        const params = new URLSearchParams();
+        if (page) params.append("page", page);
+        if (page_size) params.append("page_size", page_size);
+
+        return {
+          url: `leaves/employee-leave-balances/?${params.toString()}`,
+          method: "GET",
+        };
+      },
       providesTags: ["LeaveBalances"],
     }),
 

@@ -13,6 +13,16 @@ import ButtonDropdown from "@components/common/ActionsPopover";
 import Pagination from "@components/common/pagination";
 import { PAGE_SIZE } from "@constants/constants";
 
+const TIER_TYPES = {
+  TIER_1: "TIER_1",
+  TIER_2: "TIER_2",
+};
+
+const TIER_TYPE_DISPLAY = {
+  [TIER_TYPES.TIER_1]: "Tier I",
+  [TIER_TYPES.TIER_2]: "Tier II",
+};
+
 export default function NSSF({ currentPage, onPageChange }) {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
@@ -21,14 +31,12 @@ export default function NSSF({ currentPage, onPageChange }) {
   const [selectedItem, setSelectedItem] = useState(null);
   const [selectedNssfTierId, setSelectedNssfTierId] = useState(null);
   const [formData, setFormData] = useState({
-    tier_type: "TIER_1",
+    tier_type: TIER_TYPES.TIER_1,
     lower_limit: "",
     upper_limit: "",
     employee_rate_percentage: "",
     employer_rate_percentage: "",
     is_active: true,
-    organization: 2,
-    created_by: 2,
   });
 
   const queryParams = useMemo(
@@ -50,7 +58,6 @@ export default function NSSF({ currentPage, onPageChange }) {
   const [updateNssfTier] = useUpdateNssfTierMutation();
   const [deleteNssfTier] = useDeleteNssfTierMutation();
 
-  // Set default selected NSSF tier when data loads
   useEffect(() => {
     if (nssfTiersData?.results && nssfTiersData.results.length > 0 && !selectedNssfTierId) {
       setSelectedNssfTierId(nssfTiersData.results[0].id);
@@ -60,14 +67,12 @@ export default function NSSF({ currentPage, onPageChange }) {
   const handleCreateClick = () => {
     setEditingId(null);
     setFormData({
-      tier_type: "TIER_1",
+      tier_type: TIER_TYPES.TIER_1,
       lower_limit: "",
       upper_limit: "",
       employee_rate_percentage: "",
       employer_rate_percentage: "",
       is_active: true,
-      organization: 2,
-      created_by: 2,
     });
     setIsFormOpen(true);
   };
@@ -79,14 +84,12 @@ export default function NSSF({ currentPage, onPageChange }) {
 
     setEditingId(item.id);
     setFormData({
-      tier_type: item.tier_type || "TIER_1",
+      tier_type: item.tier_type || TIER_TYPES.TIER_1,
       lower_limit: item.lower_limit || "",
       upper_limit: item.upper_limit || "",
       employee_rate_percentage: item.employee_rate_percentage || "",
       employer_rate_percentage: item.employer_rate_percentage || "",
       is_active: item.is_active ?? true,
-      organization: 2,
-      created_by: 2,
     });
     setIsFormOpen(true);
   };
@@ -125,14 +128,12 @@ export default function NSSF({ currentPage, onPageChange }) {
 
       setIsFormOpen(false);
       setFormData({
-        tier_type: "TIER_1",
+        tier_type: TIER_TYPES.TIER_1,
         lower_limit: "",
         upper_limit: "",
         employee_rate_percentage: "",
         employer_rate_percentage: "",
         is_active: true,
-        organization: 2,
-        created_by: 2,
       });
       setEditingId(null);
     } catch (error) {
@@ -177,6 +178,25 @@ export default function NSSF({ currentPage, onPageChange }) {
     }
   };
 
+  const getAvailableTierTypes = () => {
+    if (nssfTiersData?.results && nssfTiersData.results.length > 0) {
+      const existingTiers = {};
+      nssfTiersData.results.forEach(tier => {
+        existingTiers[tier.tier_type] = tier.tier_type_display || TIER_TYPE_DISPLAY[tier.tier_type];
+      });
+      
+      return Object.entries(existingTiers).map(([value, display]) => ({
+        value,
+        display
+      }));
+    } else {
+      return [
+        { value: TIER_TYPES.TIER_1, display: TIER_TYPE_DISPLAY[TIER_TYPES.TIER_1] },
+        { value: TIER_TYPES.TIER_2, display: TIER_TYPE_DISPLAY[TIER_TYPES.TIER_2] }
+      ];
+    }
+  };
+
   return (
     <>
       {/* Content Card with Shadow */}
@@ -218,7 +238,7 @@ export default function NSSF({ currentPage, onPageChange }) {
                     >
                       {nssfTiersData.results.map((tier) => (
                         <option key={tier.id} value={tier.id}>
-                          {tier.tier_type_display || tier.tier_type}
+                          {tier.tier_type_display || TIER_TYPE_DISPLAY[tier.tier_type]}
                         </option>
                       ))}
                     </select>
@@ -326,13 +346,13 @@ export default function NSSF({ currentPage, onPageChange }) {
                     <div className="flex justify-center items-center rounded-lg border border-neutral-200 w-full h-11 bg-gray-100">
                       <div className="flex flex-row justify-between items-center px-6 w-full">
                         <div className="font-inter text-xs text-neutral-900 leading-snug tracking-normal font-medium">
-                          {nssfTiersData?.results?.find(tier => tier.tier_type === 'TIER_1')?.upper_limit ? parseFloat(nssfTiersData.results.find(tier => tier.tier_type === 'TIER_1').upper_limit).toLocaleString() : '7,000'}
+                          {nssfTiersData?.results?.find(tier => tier.tier_type === TIER_TYPES.TIER_1)?.upper_limit ? parseFloat(nssfTiersData.results.find(tier => tier.tier_type === TIER_TYPES.TIER_1).upper_limit).toLocaleString() : '7,000'}
                         </div>
                       </div>
                     </div>
                   </div>
                   <div className="font-inter text-sm text-gray-600 leading-snug tracking-normal font-normal">
-                    Current: KSh {nssfTiersData?.results?.find(tier => tier.tier_type === 'TIER_1')?.upper_limit ? parseFloat(nssfTiersData.results.find(tier => tier.tier_type === 'TIER_1').upper_limit).toLocaleString() : '7,000'} (Lower earnings)
+                    Current: KSh {nssfTiersData?.results?.find(tier => tier.tier_type === TIER_TYPES.TIER_1)?.upper_limit ? parseFloat(nssfTiersData.results.find(tier => tier.tier_type === TIER_TYPES.TIER_1).upper_limit).toLocaleString() : '7,000'} (Lower earnings)
                   </div>
                 </div>
                 <div className="flex flex-col justify-start items-start gap-2 flex-1">
@@ -343,13 +363,13 @@ export default function NSSF({ currentPage, onPageChange }) {
                     <div className="flex justify-center items-center rounded-lg border border-neutral-200 w-full h-11 bg-gray-100">
                       <div className="flex flex-row justify-between items-center px-6 w-full">
                         <div className="font-inter text-xs text-neutral-900 leading-snug tracking-normal font-medium">
-                          {nssfTiersData?.results?.find(tier => tier.tier_type === 'TIER_2')?.upper_limit ? parseFloat(nssfTiersData.results.find(tier => tier.tier_type === 'TIER_2').upper_limit).toLocaleString() : '36,000'}
+                          {nssfTiersData?.results?.find(tier => tier.tier_type === TIER_TYPES.TIER_2)?.upper_limit ? parseFloat(nssfTiersData.results.find(tier => tier.tier_type === TIER_TYPES.TIER_2).upper_limit).toLocaleString() : '36,000'}
                         </div>
                       </div>
                     </div>
                   </div>
                   <div className="font-inter text-sm text-gray-600 leading-snug tracking-normal font-normal">
-                    Current: KSh {nssfTiersData?.results?.find(tier => tier.tier_type === 'TIER_2')?.upper_limit ? parseFloat(nssfTiersData.results.find(tier => tier.tier_type === 'TIER_2').upper_limit).toLocaleString() : '36,000'} (Pensionable earnings)
+                    Current: KSh {nssfTiersData?.results?.find(tier => tier.tier_type === TIER_TYPES.TIER_2)?.upper_limit ? parseFloat(nssfTiersData.results.find(tier => tier.tier_type === TIER_TYPES.TIER_2).upper_limit).toLocaleString() : '36,000'} (Pensionable earnings)
                   </div>
                 </div>
               </div>
@@ -431,24 +451,11 @@ export default function NSSF({ currentPage, onPageChange }) {
                   required
                   className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
                 >
-                  {nssfTiersData && nssfTiersData.results && nssfTiersData.results.length > 0 ? (
-                    // Extract unique tier types from the list
-                    (() => {
-                      const uniqueTiers = {};
-                      nssfTiersData.results.forEach(tier => {
-                        if (!uniqueTiers[tier.tier_type]) {
-                          uniqueTiers[tier.tier_type] = tier.tier_type_display;
-                        }
-                      });
-                      return Object.entries(uniqueTiers).map(([value, display]) => (
-                        <option key={value} value={value}>
-                          {display}
-                        </option>
-                      ));
-                    })()
-                  ) : (
-                    <option value="">Loading tier types...</option>
-                  )}
+                  {getAvailableTierTypes().map((tier) => (
+                    <option key={tier.value} value={tier.value}>
+                      {tier.display}
+                    </option>
+                  ))}
                 </select>
                 <span className="text-xs text-gray-500">
                   Select the NSSF tier classification
@@ -549,14 +556,12 @@ export default function NSSF({ currentPage, onPageChange }) {
                     setIsFormOpen(false);
                     setEditingId(null);
                     setFormData({
-                      tier_type: "TIER_1",
+                      tier_type: TIER_TYPES.TIER_1,
                       lower_limit: "",
                       upper_limit: "",
                       employee_rate_percentage: "",
                       employer_rate_percentage: "",
                       is_active: true,
-                      organization: 2,
-                      created_by: 2,
                     });
                   }}
                   disabled={actionLoading}
@@ -599,7 +604,7 @@ export default function NSSF({ currentPage, onPageChange }) {
         onClose={closeDeleteModal}
         onDelete={handleConfirmDelete}
         isDeleting={actionLoading}
-        confirmationMessage={`Are you sure you want to delete ${selectedItem?.tier_type_display || selectedItem?.tier_type}?`}
+        confirmationMessage={`Are you sure you want to delete ${selectedItem?.tier_type_display || TIER_TYPE_DISPLAY[selectedItem?.tier_type]}?`}
         deleteMessage="Deleting this NSSF Tier cannot be undone."
         title="Delete NSSF Tier"
         actionText="Delete"

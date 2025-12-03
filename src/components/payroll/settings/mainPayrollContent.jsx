@@ -1,12 +1,14 @@
 import React, { useState } from "react";
-
 import PAYETax from "./PAYE Tax";
 import NSSF from "./NSSF";
 import SHIF from "./SHIF";
 import AHL from "./AHL";
+import OvertimePayroll from "./Overtime Payroll";
+import PayrollRules from "./Payroll Rules";
 import Allowances from "./Allowances";
 import Deductions from "./Deductions";
 import StatutoryDeductions from "./Statutory Deductions";
+import AdjustmentRates from "./Adjustment Rates";
 
 export default function MainPayrollContent() {
   const [activeTab, setActiveTab] = useState("paye");
@@ -78,6 +80,20 @@ export default function MainPayrollContent() {
             </div>
           </button>
 
+          {/* Overtime Payroll Tab */}
+          <button
+            onClick={() => handleTabChange("overtime")}
+            className={`flex flex-row justify-center items-center gap-2 pt-2 pr-4 pb-2 pl-4 w-44 h-10 ${
+              activeTab === "overtime" ? "bg-white rounded-lg" : ""
+            }`}
+          >
+            <div className="flex flex-row justify-center items-center gap-1 h-4">
+              <div className="font-inter text-xs whitespace-nowrap text-neutral-900 text-opacity-100 leading-normal tracking-wide font-semibold">
+                Overtime Payroll
+              </div>
+            </div>
+          </button>
+
           {/* NSSF Tab */}
           <button
             onClick={() => handleTabChange("nssf")}
@@ -120,8 +136,22 @@ export default function MainPayrollContent() {
             </div>
           </button>
 
+          {/* Payroll Rules Tab */}
+          <button
+            onClick={() => handleTabChange("payrollRules")}
+            className={`flex flex-row justify-center items-center gap-2 pt-2 pr-4 pb-2 pl-4 w-44 h-10 ${
+              activeTab === "payrollRules" ? "bg-white rounded-lg" : ""
+            }`}
+          >
+            <div className="flex flex-row justify-center items-center gap-1 h-4">
+              <div className="font-inter text-xs whitespace-nowrap text-neutral-900 text-opacity-100 leading-normal tracking-wide font-semibold">
+                Payroll Rules
+              </div>
+            </div>
+          </button>
+
           {/* Allowances Tab */}
-          {/* <button
+          <button
             onClick={() => handleTabChange("allowances")}
             className={`flex flex-row justify-center items-center gap-2 pt-2 pr-4 pb-2 pl-4 w-44 h-10 ${
               activeTab === "allowances" ? "bg-white rounded-lg" : ""
@@ -132,7 +162,7 @@ export default function MainPayrollContent() {
                 Allowances
               </div>
             </div>
-          </button> */}
+          </button>
 
           {/* Deductions Tab */}
           {/* <button
@@ -161,11 +191,28 @@ export default function MainPayrollContent() {
               </div>
             </div>
           </button> */}
+
+          {/* Adjustment Rates Tab */}
+          <button
+            onClick={() => handleTabChange("adjustmentRates")}
+            className={`flex flex-row justify-center items-center gap-2 pt-2 pr-4 pb-2 pl-4 w-44 h-10 ${
+              activeTab === "adjustmentRates" ? "bg-white rounded-lg" : ""
+            }`}
+          >
+            <div className="flex flex-row justify-center items-center gap-1 h-4">
+              <div className="font-inter text-xs whitespace-nowrap text-neutral-900 text-opacity-100 leading-normal tracking-wide font-semibold">
+                Adjustment Rates
+              </div>
+            </div>
+          </button>
         </div>
 
         {/* Tab Content */}
         {activeTab === "paye" && (
           <PAYETax currentPage={currentPage} onPageChange={handlePageChange} />
+        )}
+        {activeTab === "overtime" && (
+          <OvertimePayroll currentPage={currentPage} onPageChange={handlePageChange} />
         )}
         {activeTab === "nssf" && (
           <NSSF currentPage={currentPage} onPageChange={handlePageChange} />
@@ -176,14 +223,20 @@ export default function MainPayrollContent() {
         {activeTab === "ahl" && (
           <AHL currentPage={currentPage} onPageChange={handlePageChange} />
         )}
+        {activeTab === "payrollRules" && (
+          <PayrollRules currentPage={currentPage} onPageChange={handlePageChange} />
+        )}
         {activeTab === "allowances" && (
           <Allowances currentPage={currentPage} onPageChange={handlePageChange} />
         )}
-        {activeTab === "deductions" && (
+        {/* {activeTab === "deductions" && (
           <Deductions currentPage={currentPage} onPageChange={handlePageChange} />
         )}
         {activeTab === "statutory" && (
           <StatutoryDeductions currentPage={currentPage} onPageChange={handlePageChange} />
+        )} */}
+        {activeTab === "adjustmentRates" && (
+          <AdjustmentRates currentPage={currentPage} onPageChange={handlePageChange} />
         )}
       </div>
     </div>
