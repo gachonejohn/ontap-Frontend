@@ -37,7 +37,6 @@ export default function Dashboard() {
     error: employeesError,
   } = useGetEmployeesQuery({}, { refetchOnMountOrArgChange: true });
 
-  // Fetch leave requests - get first page and take only 2 latest records
   const {
     data: leaveRequestsData,
     isLoading: leaveRequestsLoading,
@@ -45,35 +44,29 @@ export default function Dashboard() {
     refetch: refetchLeaveRequests
   } = useGetLeaveRequestsQuery({
     page: 1,
-    ordering: '-created_at' // Order by most recent first
+    ordering: '-created_at' 
   });
 
-  // Leave mutations
   const [approveLeaveRequest] = useApproveLeaveRequestMutation();
   const [rejectLeaveRequest] = useRejectLeaveRequestMutation();
 
-  // Get dashboard permission
   const dashboardPermission = user?.role?.permissions?.find((p) => p.feature_code === 'dashboard');
   const canViewAll = dashboardPermission?.can_view_all;
   const canView = dashboardPermission?.can_view;
 
   const itemsPerPage = 4;
 
-  // Employees data
   const employees = employeesData?.results || [];
   const totalCount = employeesData?.count || 0;
 
-  // Leave requests data - take only first 2 records from the response
   const allLeaveRequests = leaveRequestsData?.results || [];
-  const latestLeaveRequests = allLeaveRequests.slice(0, 2); // Take only first 2 records
+  const latestLeaveRequests = allLeaveRequests.slice(0, 2); 
   const totalLeaveRequestsCount = leaveRequestsData?.count || 0;
 
-  // Count pending leave requests for the stats card (from all requests, not just the 2 displayed)
   const pendingLeaveRequestsCount = allLeaveRequests.filter(
     request => request.status === 'PENDING'
   ).length;
 
-  // Process leave requests for display
   const processLeaveRequests = (data) => {
     if (!data || data.length === 0) return [];
     
@@ -133,7 +126,6 @@ export default function Dashboard() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Handle leave request status change
   const handleStatusChange = async (id, newStatus) => {
     setActionLoading(true);
     try {
@@ -145,7 +137,6 @@ export default function Dashboard() {
         toast.success("Leave request rejected successfully!");
       }
       
-      // Refetch leave requests to update the UI
       await refetchLeaveRequests();
     } catch (error) {
       console.error("Error updating leave request:", error);
@@ -155,26 +146,22 @@ export default function Dashboard() {
     }
   };
 
-  // Handle view details
   const handleViewDetails = (leaveId) => {
     setSelectedLeaveId(leaveId);
     setIsLeaveDetailsModalOpen(true);
   };
 
-  // Open action modal
   const openActionModal = (type, id) => {
     setSelectedItem(id);
     setModalType(type);
     setIsModalOpen(true);
   };
 
-  // Close modal
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedItem(null);
   };
 
-  // Handle confirm action from modal
   const handleConfirmAction = async () => {
     if (modalType === "approve" && selectedItem) {
       await handleStatusChange(selectedItem, "APPROVED");
@@ -203,7 +190,6 @@ export default function Dashboard() {
     alert(`Clicked: ${segment.label} - ${segment.value}%`);
   };
 
-  // Get status badge styles
   const getStatusStyles = (status) => {
     switch (status) {
       case 'PENDING':
@@ -218,7 +204,6 @@ export default function Dashboard() {
     }
   };
 
-  // Format status for display
   const formatStatus = (status) => {
     switch (status) {
       case 'PENDING':
@@ -297,7 +282,7 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Card 3 - Pending Leave Requests (now dynamic) */}
+            {/* Card 3 - Pending Leave Requests */}
             <div
               className="flex flex-col justify-between p-4 rounded-xl h-[120px] 
              bg-white transition-transform duration-200 hover:-translate-y-1 shadow-sm border hover:shadow-md"
@@ -322,7 +307,7 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Card 4 - Payroll Summary (static for now) */}
+            {/* Card 4 - Payroll Summary */}
             <div
               className="flex flex-col justify-between p-4 rounded-xl h-[120px] 
              bg-white transition-transform duration-200 hover:-translate-y-1 shadow-sm border hover:shadow-md"

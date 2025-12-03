@@ -5,6 +5,7 @@ import ApplySpecialLeave from "./ApplySpecialLeave";
 import LeaveDetailsModal from "./LeaveDetails";
 import {
   useGetEmployeeLeaveBalancesQuery,
+  useGetLeavePoliciesQuery,
   useGetLeaveRequestsQuery,
 } from "@store/services/leaves/leaveService";
 import { CustomDate } from "../../utils/dates";
@@ -24,12 +25,77 @@ const EmployeeLeavesDashboardContent = () => {
   const [hasMore, setHasMore] = useState(true);
   const observerTarget = useRef(null);
 
+  const [policiesPage, setPoliciesPage] = useState(1);
+  const [allPolicies, setAllPolicies] = useState([]);
+  const [hasMorePolicies, setHasMorePolicies] = useState(true);
+
+  const [balancesPage, setBalancesPage] = useState(1);
+  const [allBalances, setAllBalances] = useState([]);
+  const [hasMoreBalances, setHasMoreBalances] = useState(true);
+
+  const balancesQueryParams = useMemo(
+    () => ({
+      page: balancesPage,
+      page_size: PAGE_SIZE,
+    }),
+    [balancesPage]
+  );
+
   const {
     data: leaveBalancesData,
     isLoading: loadingBalances,
     isFetching: isFetchingBalances,
     error: balancesError,
-  } = useGetEmployeeLeaveBalancesQuery();
+  } = useGetEmployeeLeaveBalancesQuery(balancesQueryParams);
+
+  useEffect(() => {
+    if (leaveBalancesData?.results) {
+      if (balancesPage === 1) {
+        setAllBalances(leaveBalancesData.results);
+      } else {
+        setAllBalances(prev => {
+          const newBalances = leaveBalancesData.results.filter(
+            newBalance => !prev.some(existingBalance => existingBalance.id === newBalance.id)
+          );
+          return [...prev, ...newBalances];
+        });
+      }
+      
+      setHasMoreBalances(leaveBalancesData.next !== null);
+    }
+  }, [leaveBalancesData, balancesPage]);
+
+  const policiesQueryParams = useMemo(
+    () => ({
+      page: policiesPage,
+      page_size: PAGE_SIZE,
+    }),
+    [policiesPage]
+  );
+
+  const {
+    data: policiesData,
+    isLoading: loadingPolicies,
+    isFetching: isFetchingPolicies,
+    error: policiesError,
+  } = useGetLeavePoliciesQuery(policiesQueryParams);
+
+  useEffect(() => {
+    if (policiesData?.results) {
+      if (policiesPage === 1) {
+        setAllPolicies(policiesData.results);
+      } else {
+        setAllPolicies(prev => {
+          const newPolicies = policiesData.results.filter(
+            newPolicy => !prev.some(existingPolicy => existingPolicy.id === newPolicy.id)
+          );
+          return [...prev, ...newPolicies];
+        });
+      }
+      
+      setHasMorePolicies(policiesData.next !== null);
+    }
+  }, [policiesData, policiesPage]);
 
   const queryParams = useMemo(
     () => ({
@@ -186,8 +252,8 @@ const EmployeeLeavesDashboardContent = () => {
         </div>
       </div>
 
-      {/* Status Cards - Dynamic from Backend */}
-      {loadingBalances ? (
+      {/* Status Cards */}
+      {loadingBalances && balancesPage === 1 ? (
         <div className="flex justify-center items-center py-12">
           <ContentSpinner />
         </div>
@@ -197,7 +263,7 @@ const EmployeeLeavesDashboardContent = () => {
         </div>
       ) : (
         <div className="grid grid-cols-4 gap-4 w-full items-center">
-          {leaveBalancesData?.results && leaveBalancesData.results.map((balance) => {
+          {allBalances && allBalances.map((balance) => {
             const usedDays = parseFloat(balance.used_days) || 0;
             const remainingDays = parseFloat(balance.remaining_days) || 0;
             const allocatedDays = parseFloat(balance.allocated_days) || 0;
@@ -424,17 +490,17 @@ const EmployeeLeavesDashboardContent = () => {
             </div>
           </div>
 
-          {loadingBalances ? (
+          {loadingPolicies && policiesPage === 1 ? (
             <div className="flex justify-center items-center py-12 w-full">
               <ContentSpinner />
             </div>
-          ) : balancesError ? (
+          ) : policiesError ? (
             <div className="bg-red-50 p-4 rounded-md text-red-800 text-center w-full">
               Error loading leave policies
             </div>
           ) : (
             <div className="flex flex-col justify-start items-start gap-4 p-4 w-full">
-              {leaveBalancesData?.results && leaveBalancesData.results.map((balance, index) => {
+              {allPolicies && allPolicies.map((policy, index) => {
                 const bgColors = [
                   'bg-blue-50',
                   'bg-orange-50',
@@ -464,20 +530,27 @@ const EmployeeLeavesDashboardContent = () => {
 
                 return (
                   <div 
-                    key={balance.id}
+                    key={policy.id}
                     className={`flex justify-start items-center p-3 rounded-lg w-full ${bgColors[colorIndex]} border ${borderColors[colorIndex]}`}
                   >
                     <div className="flex flex-col justify-start items-start gap-2 w-full">
                       <div className={`font-inter text-base whitespace-nowrap ${textColors[colorIndex]} text-opacity-100 leading-tight font-medium`}>
-                        {balance.leave_type_name}
+                        {policy.name}
                       </div>
                       <div className={`font-inter text-xs whitespace-nowrap ${labelColors[colorIndex]} text-opacity-100 leading-snug tracking-normal font-medium`}>
-                        Allocated: {balance.allocated_days} days | Used: {parseFloat(balance.used_days)} days | Remaining: {parseFloat(balance.remaining_days)} days
+                        {policy.description}
                       </div>
                     </div>
                   </div>
                 );
               })}
+              
+              {/* Loading indicator */}
+              {isFetchingPolicies && hasMorePolicies && (
+                <div className="flex justify-center items-center py-4 w-full">
+                  <div className="text-sm text-gray-500">Loading more policies...</div>
+                </div>
+              )}
             </div>
           )}
         </div>

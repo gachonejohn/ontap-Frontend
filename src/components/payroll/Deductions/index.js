@@ -25,8 +25,6 @@ export default function Deductions({ currentPage, onPageChange }) {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    organization: 2,
-    created_by: 2,
   });
 
   const queryParams = useMemo(
@@ -63,8 +61,6 @@ export default function Deductions({ currentPage, onPageChange }) {
     setFormData({
       name: "",
       description: "",
-      organization: 2,
-      created_by: 2,
     });
     setIsFormOpen(true);
   };
@@ -74,20 +70,10 @@ export default function Deductions({ currentPage, onPageChange }) {
     console.log("Full item:", item);
     console.log("Item ID:", item.id);
 
-    const organizationId = typeof item.organization === 'object' 
-      ? item.organization?.id 
-      : item.organization;
-    
-    const createdById = typeof item.created_by === 'object'
-      ? item.created_by?.id
-      : item.created_by;
-
     setEditingId(item.id);
     setFormData({
       name: item.name,
       description: item.description || "",
-      organization: organizationId,
-      created_by: createdById,
     });
     setIsFormOpen(true);
   };
@@ -102,8 +88,6 @@ export default function Deductions({ currentPage, onPageChange }) {
           id: editingId,
           name: formData.name,
           description: formData.description,
-          organization: formData.organization,
-          created_by: formData.created_by,
         };
         await updateDeduction(updateData).unwrap();
         toast.success("Deduction updated successfully!");
@@ -112,8 +96,6 @@ export default function Deductions({ currentPage, onPageChange }) {
         const createData = {
           name: formData.name,
           description: formData.description,
-          organization: formData.organization,
-          created_by: formData.created_by,
         };
         await createDeduction(createData).unwrap();
         toast.success("Deduction created successfully!");
@@ -124,8 +106,6 @@ export default function Deductions({ currentPage, onPageChange }) {
       setFormData({
         name: "",
         description: "",
-        organization: 2,
-        created_by: 2,
       });
       setEditingId(null);
     } catch (error) {
@@ -316,8 +296,6 @@ export default function Deductions({ currentPage, onPageChange }) {
                     setFormData({
                       name: "",
                       description: "",
-                      organization: 2,
-                      created_by: 2,
                     });
                   }}
                   disabled={actionLoading}

@@ -2,7 +2,171 @@ import { apiSlice } from "../../api/apiSlice";
 
 export const payrollApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
- 
+    // Overtime Settings Queries
+    getOvertimeSettings: builder.query({
+      query: () => ({
+        url: `payroll/settings/overtime-settings/`,
+        method: "GET",
+      }),
+      providesTags: ["OvertimeSettings"],
+    }),
+
+    getOvertimeSettingById: builder.query({
+      query: (id) => ({
+        url: `payroll/settings/overtime-settings/${id}/`,
+        method: "GET",
+      }),
+      providesTags: (result, error, id) => [{ type: "OvertimeSettings", id }],
+    }),
+
+    // Overtime Settings Mutations
+    createOvertimeSetting: builder.mutation({
+      query: (data) => ({
+        url: `payroll/settings/overtime-settings/create/`,
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["OvertimeSettings"],
+    }),
+
+    updateOvertimeSetting: builder.mutation({
+      query: ({ id, ...data }) => ({
+        url: `payroll/settings/overtime-settings/${id}/`,
+        method: "PUT",
+        body: data,
+      }),
+      invalidatesTags: ["OvertimeSettings"],
+    }),
+
+    patchOvertimeSetting: builder.mutation({
+      query: ({ id, ...data }) => ({
+        url: `payroll/settings/overtime-settings/${id}/`,
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: ["OvertimeSettings"],
+    }),
+
+    deleteOvertimeSetting: builder.mutation({
+      query: (id) => ({
+        url: `payroll/settings/overtime-settings/${id}/`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["OvertimeSettings"],
+    }),
+
+    // Payroll Period Settings Queries
+    getPayrollPeriodSettings: builder.query({
+      query: () => ({
+        url: `payroll/settings/payroll-period-settings/`,
+        method: "GET",
+      }),
+      providesTags: ["PayrollPeriodSettings"],
+    }),
+
+    getPayrollPeriodSettingById: builder.query({
+      query: (id) => ({
+        url: `payroll/settings/payroll-period-settings/${id}/`,
+        method: "GET",
+      }),
+      providesTags: (result, error, id) => [{ type: "PayrollPeriodSettings", id }],
+    }),
+
+    // Payroll Period Settings Mutations
+    createPayrollPeriodSetting: builder.mutation({
+      query: (data) => ({
+        url: `payroll/settings/payroll-period-settings/create/`,
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["PayrollPeriodSettings"],
+    }),
+
+    updatePayrollPeriodSetting: builder.mutation({
+      query: ({ id, ...data }) => ({
+        url: `payroll/settings/payroll-period-settings/${id}/`,
+        method: "PUT",
+        body: data,
+      }),
+      invalidatesTags: ["PayrollPeriodSettings"],
+    }),
+
+    patchPayrollPeriodSetting: builder.mutation({
+      query: ({ id, ...data }) => ({
+        url: `payroll/settings/payroll-period-settings/${id}/`,
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: ["PayrollPeriodSettings"],
+    }),
+
+    deletePayrollPeriodSetting: builder.mutation({
+      query: (id) => ({
+        url: `payroll/settings/payroll-period-settings/${id}/`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["PayrollPeriodSettings"],
+    }),
+
+    // Payroll Adjustment Rates Queries
+    getPayrollAdjustmentRates: builder.query({
+      query: ({ page, page_size } = {}) => {
+        const params = new URLSearchParams();
+        if (page) params.append("page", page);
+        if (page_size) params.append("page_size", page_size);
+
+        return {
+          url: `payroll/adjustments/rates/?${params.toString()}`,
+          method: "GET",
+        };
+      },
+      providesTags: ["PayrollAdjustmentRates"],
+    }),
+
+    getPayrollAdjustmentRateById: builder.query({
+      query: (id) => ({
+        url: `payroll/adjustments/rates/${id}/`,
+        method: "GET",
+      }),
+      providesTags: (result, error, id) => [{ type: "PayrollAdjustmentRates", id }],
+    }),
+
+    // Payroll Adjustment Rates Mutations
+    createPayrollAdjustmentRate: builder.mutation({
+      query: (data) => ({
+        url: `payroll/adjustments/rates/`,
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["PayrollAdjustmentRates"],
+    }),
+
+    updatePayrollAdjustmentRate: builder.mutation({
+      query: ({ id, ...data }) => ({
+        url: `payroll/adjustments/rates/${id}/`,
+        method: "PUT",
+        body: data,
+      }),
+      invalidatesTags: ["PayrollAdjustmentRates"],
+    }),
+
+    patchPayrollAdjustmentRate: builder.mutation({
+      query: ({ id, ...data }) => ({
+        url: `payroll/adjustments/rates/${id}/`,
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: ["PayrollAdjustmentRates"],
+    }),
+
+    deletePayrollAdjustmentRate: builder.mutation({
+      query: (id) => ({
+        url: `payroll/adjustments/rates/${id}/`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["PayrollAdjustmentRates"],
+    }),
+
     getAllowances: builder.query({
       queryFn: async (args, api, extraOptions, baseQuery) => {
         try {
@@ -209,7 +373,6 @@ export const payrollApi = apiSlice.injectEndpoints({
       providesTags: (result, error, id) => [{ type: "HousingLevyRates", id }],
     }),
 
-
     getNssfTiers: builder.query({
       query: ({ page, page_size } = {}) => {
         const params = new URLSearchParams();
@@ -398,7 +561,6 @@ export const payrollApi = apiSlice.injectEndpoints({
       invalidatesTags: ["Allowances"],
     }),
 
-
     createDeduction: builder.mutation({
       query: (data) => ({
         url: `payroll/deductions/create/`,
@@ -434,7 +596,6 @@ export const payrollApi = apiSlice.injectEndpoints({
       invalidatesTags: ["Deductions"],
     }),
 
- 
     createStatutoryDeduction: builder.mutation({
       query: (data) => ({
         url: `payroll/statutory-deductions/create/`,
@@ -469,7 +630,6 @@ export const payrollApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["StatutoryDeductions"],
     }),
-
 
     createHousingLevyRate: builder.mutation({
       query: (data) => ({
@@ -506,7 +666,6 @@ export const payrollApi = apiSlice.injectEndpoints({
       invalidatesTags: ["HousingLevyRates"],
     }),
 
-  
     createNssfTier: builder.mutation({
       query: (data) => ({
         url: `paye/nssf-tier/create/`,
@@ -541,7 +700,6 @@ export const payrollApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["NssfTiers"],
     }),
-
 
     createTaxBand: builder.mutation({
       query: (data) => ({
@@ -578,7 +736,6 @@ export const payrollApi = apiSlice.injectEndpoints({
       invalidatesTags: ["TaxBands"],
     }),
 
-   
     createShifRate: builder.mutation({
       query: (data) => ({
         url: `paye/shif-rate/create/`,
@@ -649,7 +806,6 @@ export const payrollApi = apiSlice.injectEndpoints({
       invalidatesTags: ["PersonalReliefs"],
     }),
 
-
     createPayroll: builder.mutation({
       query: (data) => ({
         url: `payroll/payroll/create/`,
@@ -709,7 +865,6 @@ export const payrollApi = apiSlice.injectEndpoints({
       invalidatesTags: ["Payroll", "PayrollSummary", "Payslips"],
     }),
 
- 
     generatePayslips: builder.mutation({
       query: (payrollId) => ({
         url: `payroll/payslip/generate/`,
@@ -771,6 +926,36 @@ export const payrollApi = apiSlice.injectEndpoints({
 });
 
 export const {
+  // Overtime Settings Queries
+  useGetOvertimeSettingsQuery,
+  useGetOvertimeSettingByIdQuery,
+
+  // Overtime Settings Mutations
+  useCreateOvertimeSettingMutation,
+  useUpdateOvertimeSettingMutation,
+  usePatchOvertimeSettingMutation,
+  useDeleteOvertimeSettingMutation,
+
+  // Payroll Period Settings Queries
+  useGetPayrollPeriodSettingsQuery,
+  useGetPayrollPeriodSettingByIdQuery,
+
+  // Payroll Period Settings Mutations
+  useCreatePayrollPeriodSettingMutation,
+  useUpdatePayrollPeriodSettingMutation,
+  usePatchPayrollPeriodSettingMutation,
+  useDeletePayrollPeriodSettingMutation,
+
+  // Payroll Adjustment Rates Queries
+  useGetPayrollAdjustmentRatesQuery,
+  useGetPayrollAdjustmentRateByIdQuery,
+
+  // Payroll Adjustment Rates Mutations
+  useCreatePayrollAdjustmentRateMutation,
+  useUpdatePayrollAdjustmentRateMutation,
+  usePatchPayrollAdjustmentRateMutation,
+  useDeletePayrollAdjustmentRateMutation,
+
   // Allowance Queries
   useGetAllowancesQuery,
   useGetAllowanceByIdQuery,

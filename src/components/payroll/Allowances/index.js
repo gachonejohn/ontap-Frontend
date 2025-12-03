@@ -25,8 +25,6 @@ export default function Allowances({ currentPage, onPageChange }) {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    organization: 2,
-    created_by: 2,
   });
 
   const queryParams = useMemo(
@@ -59,8 +57,6 @@ export default function Allowances({ currentPage, onPageChange }) {
     setFormData({
       name: "",
       description: "",
-      organization: 2,
-      created_by: 2,
     });
     setIsFormOpen(true);
   };
@@ -70,20 +66,10 @@ export default function Allowances({ currentPage, onPageChange }) {
     console.log("Full item:", item);
     console.log("Item ID:", item.id);
 
-    const organizationId = typeof item.organization === 'object' 
-      ? item.organization?.id 
-      : item.organization;
-    
-    const createdById = typeof item.created_by === 'object'
-      ? item.created_by?.id
-      : item.created_by;
-
     setEditingId(item.id);
     setFormData({
       name: item.name,
       description: item.description || "",
-      organization: organizationId,
-      created_by: createdById,
     });
     setIsFormOpen(true);
   };
@@ -98,8 +84,6 @@ export default function Allowances({ currentPage, onPageChange }) {
           id: editingId,
           name: formData.name,
           description: formData.description,
-          organization: formData.organization,
-          created_by: formData.created_by,
         };
         await updateAllowance(updateData).unwrap();
         toast.success("Allowance updated successfully!");
@@ -108,8 +92,6 @@ export default function Allowances({ currentPage, onPageChange }) {
         const createData = {
           name: formData.name,
           description: formData.description,
-          organization: formData.organization,
-          created_by: formData.created_by,
         };
         await createAllowance(createData).unwrap();
         toast.success("Allowance created successfully!");
@@ -120,8 +102,6 @@ export default function Allowances({ currentPage, onPageChange }) {
       setFormData({
         name: "",
         description: "",
-        organization: 2,
-        created_by: 2,
       });
       setEditingId(null);
     } catch (error) {
@@ -175,17 +155,6 @@ export default function Allowances({ currentPage, onPageChange }) {
       accessor: "description",
       cell: (item) => (
         <span className="text-xs font-medium">{item.description || "N/A"}</span>
-      ),
-    },
-    {
-      header: "Created By",
-      accessor: "created_by",
-      cell: (item) => (
-        <span className="text-xs font-medium">
-          {typeof item.created_by === 'object'
-            ? `${item.created_by?.first_name || ''} ${item.created_by?.last_name || ''}`.trim() || item.created_by?.email || "N/A"
-            : `ID: ${item.created_by}` || "N/A"}
-        </span>
       ),
     },
     {
@@ -312,8 +281,6 @@ export default function Allowances({ currentPage, onPageChange }) {
                     setFormData({
                       name: "",
                       description: "",
-                      organization: 2,
-                      created_by: 2,
                     });
                   }}
                   disabled={actionLoading}
