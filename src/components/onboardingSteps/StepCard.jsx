@@ -64,7 +64,7 @@ const StepCard = ({ step, onClick }) => {
 
       <div className="mt-3 space-y-1">
         <div className="text-xs text-gray-500">
-          <span className="font-medium">Assigned to:</span> {step.assignee.full_name}
+          <span className="font-medium">Assigned to:</span> {step?.assignee?.full_name}
         </div>
         <div className="text-xs text-gray-500">
           <span className="font-medium">Coordinator:</span> {step.coordinator_name}
