@@ -33,8 +33,6 @@ export default function PAYETax({ currentPage, onPageChange }) {
     order: "",
     amount: "",
     is_active: true,
-    organization: 2,
-    created_by: 2,
     _editingPersonalRelief: false,
   });
 
@@ -77,8 +75,6 @@ export default function PAYETax({ currentPage, onPageChange }) {
       rate_percentage: "",
       order: "",
       is_active: true,
-      organization: 2,
-      created_by: 2,
       _editingPersonalRelief: false,
     });
     setIsFormOpen(true);
@@ -97,8 +93,6 @@ export default function PAYETax({ currentPage, onPageChange }) {
       rate_percentage: item.rate_percentage || "",
       order: item.order || "",
       is_active: item.is_active ?? true,
-      organization: typeof item.organization === 'object' ? item.organization?.id : item.organization,
-      created_by: 2,
       _editingPersonalRelief: false,
     });
     setIsFormOpen(true);
@@ -122,7 +116,6 @@ export default function PAYETax({ currentPage, onPageChange }) {
           await refetchPersonalReliefs();
         } else {
           const createData = {
-            organization: formData.organization,
             amount: formData.amount,
             is_active: formData.is_active,
           };
@@ -147,7 +140,6 @@ export default function PAYETax({ currentPage, onPageChange }) {
           await refetchTaxBands();
         } else {
           const createData = {
-            organization: formData.organization,
             name: formData.name,
             lower_limit: formData.lower_limit,
             upper_limit: formData.upper_limit,
@@ -170,8 +162,6 @@ export default function PAYETax({ currentPage, onPageChange }) {
         order: "",
         amount: "",
         is_active: true,
-        organization: 2,
-        created_by: 2,
         _editingPersonalRelief: false,
       });
       setEditingId(null);
@@ -366,7 +356,6 @@ export default function PAYETax({ currentPage, onPageChange }) {
                           setFormData({
                             amount: "",
                             is_active: true,
-                            organization: 2,
                             _editingPersonalRelief: true,
                           });
                           setEditingId(null);
@@ -387,7 +376,6 @@ export default function PAYETax({ currentPage, onPageChange }) {
                               setFormData({
                                 amount: item.amount || "",
                                 is_active: item.is_active ?? true,
-                                organization: 2,
                                 _editingPersonalRelief: true,
                               });
                               setIsFormOpen(true);
@@ -646,8 +634,6 @@ export default function PAYETax({ currentPage, onPageChange }) {
                       order: "",
                       amount: "",
                       is_active: true,
-                      organization: 2,
-                      created_by: 2,
                       _editingPersonalRelief: false,
                     });
                   }}

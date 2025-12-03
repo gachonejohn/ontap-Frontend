@@ -41,7 +41,6 @@ export default function Dashboard() {
     error: employeesError,
   } = useGetEmployeesQuery({}, { refetchOnMountOrArgChange: true });
 
-  // Fetch leave requests - get first page and take only 2 latest records
   const {
     data: leaveRequestsData,
     isLoading: leaveRequestsLoading,
@@ -49,35 +48,29 @@ export default function Dashboard() {
     refetch: refetchLeaveRequests
   } = useGetLeaveRequestsQuery({
     page: 1,
-    ordering: '-created_at' // Order by most recent first
+    ordering: '-created_at' 
   });
 
-  // Leave mutations
   const [approveLeaveRequest] = useApproveLeaveRequestMutation();
   const [rejectLeaveRequest] = useRejectLeaveRequestMutation();
 
-  // Get dashboard permission
   const dashboardPermission = user?.role?.permissions?.find((p) => p.feature_code === 'dashboard');
   const canViewAll = dashboardPermission?.can_view_all;
   const canView = dashboardPermission?.can_view;
 
   const itemsPerPage = 4;
 
-  // Employees data
   const employees = employeesData?.results || [];
   const totalCount = employeesData?.count || 0;
 
-  // Leave requests data - take only first 2 records from the response
   const allLeaveRequests = leaveRequestsData?.results || [];
-  const latestLeaveRequests = allLeaveRequests.slice(0, 2); // Take only first 2 records
+  const latestLeaveRequests = allLeaveRequests.slice(0, 2); 
   const totalLeaveRequestsCount = leaveRequestsData?.count || 0;
 
-  // Count pending leave requests for the stats card (from all requests, not just the 2 displayed)
   const pendingLeaveRequestsCount = allLeaveRequests.filter(
     request => request.status === 'PENDING'
   ).length;
 
-  // Process leave requests for display
   const processLeaveRequests = (data) => {
     if (!data || data.length === 0) return [];
     
@@ -96,32 +89,6 @@ export default function Dashboard() {
 
   const processedLeaveRequests = processLeaveRequests(latestLeaveRequests);
 
-  // --- Hire calculations ---
-  // const getNewHiresThisMonth = () => {
-  //   const now = new Date();
-  //   return employees.filter((emp) => {
-  //     const createdDate = new Date(emp.created_at);
-  //     return (
-  //       createdDate.getMonth() === now.getMonth() && createdDate.getFullYear() === now.getFullYear()
-  //     );
-  //   }).length;
-  // };
-
-  // const getNewHiresLastMonth = () => {
-  //   const now = new Date();
-  //   const lastMonth = now.getMonth() === 0 ? 11 : now.getMonth() - 1;
-  //   const year = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
-
-  //   return employees.filter((emp) => {
-  //     const createdDate = new Date(emp.created_at);
-  //     return createdDate.getMonth() === lastMonth && createdDate.getFullYear() === year;
-  //   }).length;
-  // };
-
-  // const hiresThisMonth = getNewHiresThisMonth();
-  // const hiresLastMonth = getNewHiresLastMonth();
-  // const hiresDiff = hiresThisMonth - hiresLastMonth;
-
   // Dropdown logic
   const handleToggleDropdown = () => {
     setIsDropdownOpen((prev) => !prev);
@@ -137,7 +104,6 @@ export default function Dashboard() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Handle leave request status change
   const handleStatusChange = async (id, newStatus) => {
     setActionLoading(true);
     try {
@@ -149,7 +115,6 @@ export default function Dashboard() {
         toast.success("Leave request rejected successfully!");
       }
       
-      // Refetch leave requests to update the UI
       await refetchLeaveRequests();
     } catch (error) {
       console.error("Error updating leave request:", error);
@@ -159,26 +124,22 @@ export default function Dashboard() {
     }
   };
 
-  // Handle view details
   const handleViewDetails = (leaveId) => {
     setSelectedLeaveId(leaveId);
     setIsLeaveDetailsModalOpen(true);
   };
 
-  // Open action modal
   const openActionModal = (type, id) => {
     setSelectedItem(id);
     setModalType(type);
     setIsModalOpen(true);
   };
 
-  // Close modal
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedItem(null);
   };
 
-  // Handle confirm action from modal
   const handleConfirmAction = async () => {
     if (modalType === "approve" && selectedItem) {
       await handleStatusChange(selectedItem, "APPROVED");
@@ -207,7 +168,6 @@ export default function Dashboard() {
     alert(`Clicked: ${segment.label} - ${segment.value}%`);
   };
 
-  // Get status badge styles
   const getStatusStyles = (status) => {
     switch (status) {
       case 'PENDING':
@@ -222,7 +182,6 @@ export default function Dashboard() {
     }
   };
 
-  // Format status for display
   const formatStatus = (status) => {
     switch (status) {
       case 'PENDING':
@@ -259,7 +218,7 @@ export default function Dashboard() {
           </div>
 
           {/* Stats Cards */}
-         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
             {metricsLoading ? (
               <div className="col-span-4 text-center text-gray-500 py-6">
                 <ContentSpinner />

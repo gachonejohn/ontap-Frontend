@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 import DropdownAuthenticationModal from "../../dashboards/employee/components/DropdownAuthenticationModal";
 import LeaveModal from "../../dashboards/employee/components/LeaveModal.js";
 import LogTaskModal from "../tasks/LogTaskModal";
@@ -75,8 +76,8 @@ const TaskCard = ({ task, onClick }) => {
             </span>
           )}
           {/* Priority Flag */}
-          <img 
-            src={priorityFlags[priority] || priorityFlags.MEDIUM} 
+          <img
+            src={priorityFlags[priority] || priorityFlags.MEDIUM}
             alt={`${priorityMap[priority] || priority} priority`}
             width="20"
             height="20"
@@ -95,30 +96,27 @@ const TaskCard = ({ task, onClick }) => {
       <div className="flex justify-between items-center pt-2">
         <div className="flex items-center gap-1">
           <img width="12.2" height="12.2" src="/images/calendar1.png" alt="Calendar" />
-          <div className={`text-[10px] font-medium ${
-            showOverdueBadge ? "text-red-600" : "text-gray-600"
-          }`}>
+          <div className={`text-[10px] font-medium ${showOverdueBadge ? "text-red-600" : "text-gray-600"
+            }`}>
             {dueDate ? new Date(dueDate).toLocaleDateString() : "No due date"}
             {showOverdueBadge && " • Overdue"}
           </div>
         </div>
         <div
-          className={`flex items-center justify-center py-0.5 px-2 rounded-md ${
-            priority === "HIGH" || priority === "URGENT"
+          className={`flex items-center justify-center py-0.5 px-2 rounded-md ${priority === "HIGH" || priority === "URGENT"
               ? "bg-red-100"
               : priority === "MEDIUM"
-              ? "bg-yellow-100"
-              : "bg-green-100"
-          }`}
+                ? "bg-yellow-100"
+                : "bg-green-100"
+            }`}
         >
           <div
-            className={`text-[10.5px] font-semibold ${
-              priority === "HIGH" || priority === "URGENT"
+            className={`text-[10.5px] font-semibold ${priority === "HIGH" || priority === "URGENT"
                 ? "text-pink-800"
                 : priority === "MEDIUM"
-                ? "text-yellow-800"
-                : "text-green-800"
-            }`}
+                  ? "text-yellow-800"
+                  : "text-green-800"
+              }`}
           >
             {priorityMap[priority] || priority}
           </div>
@@ -194,6 +192,7 @@ const EmployeeDashboardContent = () => {
   const [modalType, setModalType] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
+  const navigate = useNavigate();
 
   const currentUser = useSelector((state) => state.auth.user);
 
@@ -208,15 +207,15 @@ const EmployeeDashboardContent = () => {
 
   const canCreateTask = taskPermissions?.can_create;
 
-  const { 
-    data: tasksData, 
-    isLoading: tasksLoading, 
-    error: tasksError, 
-    refetch: refetchTasks 
+  const {
+    data: tasksData,
+    isLoading: tasksLoading,
+    error: tasksError,
+    refetch: refetchTasks
   } = useGetMyTasksQuery({
-    page_size: 100, 
+    page_size: 100,
   });
-  
+
   const {
     data: attendanceData,
     isLoading: attendanceLoading,
@@ -246,12 +245,12 @@ const EmployeeDashboardContent = () => {
 
   const organizationName = profileData?.organization?.name || "OnTap Technologies";
   const employeeStatus = profileData?.employee_profile?.status || "ACTIVE";
-  const employeeRole = profileData?.employee_profile?.user?.role?.name || 
-                      profileData?.roles?.[0]?.name || 
-                      (currentUser?.role ? 
-                        (typeof currentUser.role === 'string' ? currentUser.role : 
-                        currentUser.role.name || currentUser.role.title) 
-                        : "Employee");
+  const employeeRole = profileData?.employee_profile?.user?.role?.name ||
+    profileData?.roles?.[0]?.name ||
+    (currentUser?.role ?
+      (typeof currentUser.role === 'string' ? currentUser.role :
+        currentUser.role.name || currentUser.role.title)
+      : "Employee");
 
   const toggleAmountVisibility = () => {
     setIsAmountVisible((prev) => !prev);
@@ -280,6 +279,10 @@ const EmployeeDashboardContent = () => {
     }
   };
 
+  const handleViewMoreTasks = () => {
+    navigate('/dashboard/tasks');
+  };
+
   const handleLeaveSubmit = (formData) => {
     console.log("Leave application submitted:", formData);
   };
@@ -290,7 +293,7 @@ const EmployeeDashboardContent = () => {
         date ? new Date(date).toISOString().split("T")[0] : null;
 
       const userId = currentUser?.user?.id || currentUser?.id;
-      
+
       if (!userId) {
         console.error("Cannot determine user ID from currentUser:", currentUser);
         toast.error("Failed to create task: User ID not found");
@@ -298,32 +301,32 @@ const EmployeeDashboardContent = () => {
       }
 
       const formDataObj = new FormData();
-      
+
       formDataObj.append("title", formData.title || "");
       formDataObj.append("description", formData.description || "");
       formDataObj.append("status", formData.status || "TO_DO");
       formDataObj.append("priority", formData.priority || "MEDIUM");
-      
+
       formDataObj.append("assignee", userId);
-      
+
       if (formData.department) {
         formDataObj.append("department", formData.department);
       }
-      
+
       const startDate = formatDate(formData.start_date || formData.startDate);
       const dueDate = formatDate(formData.due_date || formData.dueDate);
-      
+
       if (startDate) formDataObj.append("start_date", startDate);
       if (dueDate) formDataObj.append("due_date", dueDate);
-      
+
       formDataObj.append("progress_percentage", formData.progress_percentage || formData.progressPercentage || 0);
-      
+
       if (formData.estimated_hours || formData.estimatedHours) {
-        formDataObj.append("estimated_hours", 
+        formDataObj.append("estimated_hours",
           parseFloat(formData.estimated_hours || formData.estimatedHours)
         );
       }
-      
+
       formDataObj.append("is_urgent", Boolean(formData.is_urgent || formData.isUrgent));
       formDataObj.append("requires_approval", Boolean(
         formData.requires_approval || formData.requiresApproval
@@ -346,7 +349,7 @@ const EmployeeDashboardContent = () => {
     } catch (err) {
       console.error("Task creation failed:", err);
       console.error("Error details:", err?.data);
-      
+
       if (err?.data?.assignee) {
         toast.error(`Assignee error: ${err.data.assignee[0]}`);
       } else if (err?.data?.detail) {
@@ -418,7 +421,7 @@ const EmployeeDashboardContent = () => {
 
   if (tasksLoading || attendanceLoading || profileLoading) {
     return (
-     <ContentSpinner />
+      <ContentSpinner />
     );
   }
 
@@ -484,7 +487,7 @@ const EmployeeDashboardContent = () => {
             </div>
           </div>
         )}
-        
+
         {canCreateTask && (
           <div
             onClick={() => setIsLogTaskModalOpen(true)}
@@ -531,41 +534,40 @@ const EmployeeDashboardContent = () => {
             </div>
 
             {/* Profile Section */}
-<div className="flex flex-row justify-start items-center gap-2 mt-2">
-  <img
-    className="rounded-full border-2 border-emerald-300 overflow-hidden"
-    src={
-      profileData?.employee_profile?.user?.profile_picture 
-        ? `${process.env.REACT_APP_SERVER_URI}${profileData.employee_profile.user.profile_picture}`
-        : "/images/avatar.png"
-    }
-    alt="Profile"
-    width="35px"
-    height="35px"
-    onError={(e) => {
-      e.target.src = "/images/avatar.png";
-    }}
-  />
-  <div className="flex flex-col justify-start items-start gap-0.5">
-    <div className="text-xs font-bold">
-      {currentUser?.first_name} {currentUser?.last_name}
-    </div>
-    <div className="text-[10px] text-teal-100 font-medium">
-      {employeeRole}
-    </div>
-    <div className="text-[10px] text-teal-100 font-medium">
-      ID: {currentUser?.employee_no || "N/A"}
-    </div>
-  </div>
-</div>
+            <div className="flex flex-row justify-start items-center gap-2 mt-2">
+              <img
+                className="rounded-full border-2 border-emerald-300 overflow-hidden"
+                src={
+                  profileData?.employee_profile?.user?.profile_picture
+                    ? `${process.env.REACT_APP_SERVER_URI}${profileData.employee_profile.user.profile_picture}`
+                    : "/images/avatar.png"
+                }
+                alt="Profile"
+                width="35px"
+                height="35px"
+                onError={(e) => {
+                  e.target.src = "/images/avatar.png";
+                }}
+              />
+              <div className="flex flex-col justify-start items-start gap-0.5">
+                <div className="text-xs font-bold">
+                  {currentUser?.first_name} {currentUser?.last_name}
+                </div>
+                <div className="text-[10px] text-teal-100 font-medium">
+                  {employeeRole}
+                </div>
+                <div className="text-[10px] text-teal-100 font-medium">
+                  ID: {currentUser?.employee_no || "N/A"}
+                </div>
+              </div>
+            </div>
 
             {/* Status Badge */}
             <div className="absolute bottom-3 right-3 flex justify-center items-center rounded-lg px-2 h-5 bg-white">
-              <div className={`text-[10px] font-medium ${
-                employeeStatus === "ACTIVE" ? "text-teal-500" : 
-                employeeStatus === "INACTIVE" ? "text-red-500" : 
-                "text-gray-500"
-              }`}>
+              <div className={`text-[10px] font-medium ${employeeStatus === "ACTIVE" ? "text-teal-500" :
+                  employeeStatus === "INACTIVE" ? "text-red-500" :
+                    "text-gray-500"
+                }`}>
                 {employeeStatus}
               </div>
             </div>
@@ -703,7 +705,10 @@ const EmployeeDashboardContent = () => {
                 </div>
               )}
               {totalCounts.todo > 2 && (
-                <div className="text-center text-teal-600 text-sm py-2 font-medium">
+                <div
+                  className="text-center text-teal-600 text-sm py-2 font-medium cursor-pointer hover:text-teal-800 hover:underline transition-colors"
+                  onClick={handleViewMoreTasks}
+                >
                   +{totalCounts.todo - 2} more tasks in Task Management
                 </div>
               )}
@@ -730,7 +735,10 @@ const EmployeeDashboardContent = () => {
                 </div>
               )}
               {totalCounts.inProgress > 2 && (
-                <div className="text-center text-teal-600 text-sm py-2 font-medium">
+                <div
+                  className="text-center text-teal-600 text-sm py-2 font-medium cursor-pointer hover:text-teal-800 hover:underline transition-colors"
+                  onClick={handleViewMoreTasks}
+                >
                   +{totalCounts.inProgress - 2} more tasks in Task Management
                 </div>
               )}
@@ -757,7 +765,10 @@ const EmployeeDashboardContent = () => {
                 </div>
               )}
               {totalCounts.completed > 2 && (
-                <div className="text-center text-teal-600 text-sm py-2 font-medium">
+                <div
+                  className="text-center text-teal-600 text-sm py-2 font-medium cursor-pointer hover:text-teal-800 hover:underline transition-colors"
+                  onClick={handleViewMoreTasks}
+                >
                   +{totalCounts.completed - 2} more tasks in Task Management
                 </div>
               )}
@@ -894,5 +905,5 @@ const EmployeeDashboardContent = () => {
     </div>
   );
 };
-  
+
 export default EmployeeDashboardContent;
