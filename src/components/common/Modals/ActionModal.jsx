@@ -2,6 +2,7 @@ import { IoCheckmarkCircleOutline, IoCloseOutline } from 'react-icons/io5';
 import { PiSpinnerGap } from 'react-icons/pi';
 import { FaExclamation } from 'react-icons/fa6';
 import { useNavigate } from 'react-router-dom';
+
 const ActionModal = ({
   isOpen,
   onClose,
@@ -15,7 +16,53 @@ const ActionModal = ({
   extraInfo,
 }) => {
   const navigate = useNavigate();
+
   if (!isOpen) return null;
+
+  // Color schemes based on actionType
+  const getColorScheme = () => {
+    switch (actionType) {
+      case 'delete':
+      case 'cancel':
+        return {
+          iconBg: 'bg-red-100',
+          iconColor: 'text-red-600',
+          buttonBg: 'bg-red-600 hover:bg-red-700',
+        };
+      case 'update':
+        return {
+          iconBg: 'bg-yellow-100',
+          iconColor: 'text-yellow-600',
+          buttonBg: 'bg-yellow-600 hover:bg-yellow-700',
+        };
+      case 'process':
+        return {
+          iconBg: 'bg-purple-100',
+          iconColor: 'text-purple-600',
+          buttonBg: 'bg-purple-600 hover:bg-purple-700',
+        };
+      case 'approve':
+        return {
+          iconBg: 'bg-blue-100',
+          iconColor: 'text-blue-600',
+          buttonBg: 'bg-blue-600 hover:bg-blue-700',
+        };
+      case 'pay':
+        return {
+          iconBg: 'bg-green-100',
+          iconColor: 'text-green-600',
+          buttonBg: 'bg-green-600 hover:bg-green-700',
+        };
+      default:
+        return {
+          iconBg: 'bg-green-100',
+          iconColor: 'text-green-600',
+          buttonBg: 'bg-green-600 hover:bg-green-700',
+        };
+    }
+  };
+
+  const colors = getColorScheme();
 
   return (
     <>
@@ -28,29 +75,18 @@ const ActionModal = ({
         <div
           className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity animate-fadeIn"
           aria-hidden="true"
+          onClick={onClose}
         ></div>
 
         <div className="fixed inset-0 z-9999 w-screen overflow-y-auto font-nunito">
           <div className="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
             <div className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all w-full max-w-lg p-6">
               <div className="flex items-center mb-4">
-                <div
-                  className={`flex-shrink-0 rounded-full p-2 mr-3 ${
-                    actionType === 'delete'
-                      ? 'bg-red-100'
-                      : actionType === 'cancel'
-                        ? 'bg-red-100'
-                        : actionType === 'update'
-                          ? 'bg-yellow-100'
-                          : 'bg-green-100'
-                  }`}
-                >
+                <div className={`flex-shrink-0 rounded-full p-2 mr-3 ${colors.iconBg}`}>
                   {actionType === 'delete' || actionType === 'cancel' ? (
-                    <FaExclamation className="h-6 w-6 text-red-600" />
-                  ) : actionType === 'update' ? (
-                    <IoCheckmarkCircleOutline className="h-6 w-6 text-yellow-600" />
+                    <FaExclamation className={`h-6 w-6 ${colors.iconColor}`} />
                   ) : (
-                    <IoCheckmarkCircleOutline className="h-6 w-6 text-green-600" />
+                    <IoCheckmarkCircleOutline className={`h-6 w-6 ${colors.iconColor}`} />
                   )}
                 </div>
                 <h3 className="text-lg font-medium text-gray-900">
@@ -60,17 +96,20 @@ const ActionModal = ({
                 <div className="absolute top-4 right-4 cursor-pointer" onClick={onClose}>
                   <IoCloseOutline
                     size={20}
-                    className="text-gray-500 hover:text-gray-500 transition-colors"
+                    className="text-gray-500 hover:text-gray-700 transition-colors"
                   />
                 </div>
               </div>
 
-              <div className="px-6 py-4 mb-5 text-sm md:text-lg font-light font-inter">
-                <p className=" ">
+              <div className="px-6 py-4 mb-5 text-sm md:text-base font-light font-inter">
+                <p className="text-gray-700">
                   {confirmationMessage}
-                  <span className="">{deleteMessage}</span>
+                  {deleteMessage && (
+                    <span className="block mt-2 text-gray-600">{deleteMessage}</span>
+                  )}
                 </p>
               </div>
+
               {extraInfo && (
                 <div className="mx-6 mb-4 p-4 bg-primary-50 border border-primary-100 rounded-lg">
                   <div className="flex items-start mb-3">
@@ -121,7 +160,8 @@ const ActionModal = ({
                 <button
                   type="button"
                   onClick={onClose}
-                  className="px-4 py-3 bg-white border border-gray-300 min-w-[170px] rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
+                  disabled={isDeleting}
+                  className="px-4 py-3 bg-white border border-gray-300 min-w-[170px] rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Cancel
                 </button>
@@ -129,16 +169,10 @@ const ActionModal = ({
                   onClick={onDelete}
                   disabled={isDeleting}
                   type="button"
-                  className={`px-4 py-3 border border-transparent min-w-[170px] rounded-md text-sm font-medium text-white transition-colors disabled:opacity-75 ${
-                    actionType === 'delete' || actionType === 'cancel'
-                      ? 'bg-red-600 hover:bg-red-700'
-                      : actionType === 'update'
-                        ? 'bg-yellow-600 hover:bg-yellow-700'
-                        : 'bg-green-600 hover:bg-green-700'
-                  }`}
+                  className={`px-4 py-3 border border-transparent min-w-[170px] rounded-md text-sm font-medium text-white transition-colors disabled:opacity-75 ${colors.buttonBg}`}
                 >
                   {isDeleting ? (
-                    <span className="flex items-center">
+                    <span className="flex items-center justify-center">
                       <PiSpinnerGap className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" />
                       {actionText
                         ? `${actionText}ing...`
@@ -150,7 +184,13 @@ const ActionModal = ({
                               ? 'Submitting...'
                               : actionType === 'create'
                                 ? 'Creating...'
-                                : 'Updating...'}
+                                : actionType === 'process'
+                                  ? 'Processing...'
+                                  : actionType === 'approve'
+                                    ? 'Approving...'
+                                    : actionType === 'pay'
+                                      ? 'Paying...'
+                                      : 'Updating...'}
                     </span>
                   ) : (
                     actionText ||
@@ -164,7 +204,13 @@ const ActionModal = ({
                             ? 'Update'
                             : actionType === 'delete'
                               ? 'Delete'
-                              : 'Save')
+                              : actionType === 'process'
+                                ? 'Process'
+                                : actionType === 'approve'
+                                  ? 'Approve'
+                                  : actionType === 'pay'
+                                    ? 'Pay'
+                                    : 'Save')
                   )}
                 </button>
               </div>

@@ -5,7 +5,7 @@ import Employees from "./components/employees";
 import EmployeeDetails from "./components/employees/EmployeeDetails";
 import LeaveContent from "./components/leaves";
 import Performance from "./components/performance";
-import PayrollContent from "./components/payroll";
+import PayrollContent from "./components/payroll/settings";
 import PayslipContent from "./components/payslips";
 import HRTrainings from "./dashboards/hr/components/Trainings";
 import CardsContent from "./components/cards";
@@ -31,6 +31,7 @@ import AttendanceRecords from "./components/records/AttendanceRecords";
 import LeavesRecords from "@components/records/LeavesRecords";
 import CreateEmployeegWizard from "@components/employees/Onboarding";
 import { CreateNewEmployee } from "@components/employees/Onboarding/CreateEmployee";
+import Payroll from "@components/payroll";
 
 function App() {
   return (
@@ -62,7 +63,8 @@ function App() {
             <Route path="attendance_management" element={<AttendanceManagement />} />
             <Route path="tasks" element={<TaskContent />} />
             <Route path="performance" element={<Performance />} />
-            <Route path="payroll" element={<PayrollContent />} />
+            <Route path="payroll_settings" element={<PayrollContent />} />
+            <Route path="payroll" element={<Payroll />} />
             <Route path="payslips" element={<PayslipContent />} />
             <Route path="trainings" element={<HRTrainings />} />
             <Route path="cards" element={<CardsContent />} />

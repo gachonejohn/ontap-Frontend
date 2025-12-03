@@ -79,13 +79,6 @@ const menuItems = [
     whiteIcon: "/images/whiteleave.png",
   },
   {
-    code: "pay_slips",
-    id: "payslips",
-    label: "Pay Slips",
-    icon: "/images/payslip.png",
-    whiteIcon: "/images/whitepayslip.png",
-  },
-  {
     code: "digital_cards",
     id: "cards",
     label: "My Cards",
@@ -123,6 +116,20 @@ const menuItems = [
   {
     code: "pay_roll",
     id: "payroll",
+    label: "Payroll",
+    icon: "/images/payslips.png",
+    whiteIcon: "/images/payslips.png",
+  },
+  {
+    code: "pay_slips",
+    id: "payslips",
+    label: "Payslips",
+    icon: "/images/payslips.png",
+    whiteIcon: "/images/payslips.png",
+  },
+  {
+    code: "payroll_settings",
+    id: "payroll_settings",
     label: "Payroll Settings",
     icon: "/images/payslips.png",
     whiteIcon: "/images/payslips.png",
