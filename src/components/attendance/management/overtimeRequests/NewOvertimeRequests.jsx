@@ -11,6 +11,8 @@ import { useForm } from 'react-hook-form';
 import { FiClock } from 'react-icons/fi';
 import { IoCloseOutline } from 'react-icons/io5';
 import { toast } from 'react-toastify';
+import Select from 'react-select';
+import { overtimeCategoryOptions } from '@constants/constants';
 
 export const RequestOvertime = ({ refetchData }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -29,9 +31,7 @@ export const RequestOvertime = ({ refetchData }) => {
     formState: { isSubmitting, errors },
   } = useForm({
     resolver: zodResolver(overtimeRequestSchema),
-    defaultValues: {
-      break_type: undefined,
-    },
+    
   });
 
   const onSubmit = async (formData) => {
@@ -52,6 +52,13 @@ export const RequestOvertime = ({ refetchData }) => {
     }
   };
 
+  const handleCategoryChange = (selected) => {
+  if (selected ) {
+    setValue('category', selected.value); 
+  } else {
+    setValue('category', "");
+  }
+};
   const handleOpenModal = () => setIsOpen(true);
   const handleCloseModal = () => {
     reset();
@@ -102,6 +109,32 @@ export const RequestOvertime = ({ refetchData }) => {
               </div>
 
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 p-4">
+                <div>
+                                    <label className="block text-sm font-medium mb-2">
+                                      Overtime Category <span className="text-red-500">*</span>
+                                    </label>
+                                    <Select
+                                      options={overtimeCategoryOptions}
+                                      onChange={handleCategoryChange}
+                                      placeholder="Select Gender"
+                                      menuPortalTarget={document.body}
+                                      menuPlacement="auto"
+                                      styles={{
+                                        menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                                        control: (base) => ({
+                                          ...base,
+                                          minHeight: '36px',
+                                          borderColor: '#d1d5db',
+                                          boxShadow: 'none',
+                                          '&:hover': { borderColor: '#9ca3af' },
+                                          backgroundColor: '#F3F4F6',
+                                        }),
+                                      }}
+                                    />
+                                    {errors.category && (
+                                      <p className="text-red-500 text-[12px] mt-1">{errors.category.message}</p>
+                                    )}
+                                  </div>
                 <div>
                   <label className="block text-sm font-medium mb-2">
                     Date<span className="text-red-500">*</span>

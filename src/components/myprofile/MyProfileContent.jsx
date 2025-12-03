@@ -23,7 +23,7 @@ export default function MyProfileContent({ canEdit, user }) {
   const userFirstName = profileData?.first_name || profileData?.user?.first_name || profileData?.employee_profile?.user?.first_name || "";
   const userLastName = profileData?.last_name || profileData?.user?.last_name || profileData?.employee_profile?.user?.last_name || "";
   const userPhone = profileData?.employee_profile?.user?.display_phone || profileData?.user?.phone_number || profileData?.phone_number || "";
-  const userPosition = profileData?.employee_profile?.position || profileData?.user?.position || profileData?.position || "";
+  const userPosition = profileData?.employee_profile?.position?.title || profileData?.user?.position?.title || profileData?.position?.title || "No position";
   const userProfilePicture = profileData?.employee_profile?.user?.profile_picture || profileData?.user?.profile_picture || profileData?.profile_picture;
   const userDepartment = profileData?.employee_profile?.department_name || profileData?.department?.name || "No department";
   const userGender = profileData?.employee_profile?.user?.gender;
@@ -34,11 +34,11 @@ export default function MyProfileContent({ canEdit, user }) {
     gender: userGender,
     email: userEmail,
     phone: userPhone,
-    address: "123 Main St",
+    address: profileData?.employee_profile?.address || "N/A",
     department: userDepartment,
     position: userPosition,
     employeeId: employeeId,
-    startDate: "2023-08-13"
+    startDate: profileData?.employee_profile?.start_date || "N/A",
   });
 
   useEffect(() => {
@@ -85,7 +85,7 @@ export default function MyProfileContent({ canEdit, user }) {
         first_name: personalData.fullName.split(' ')[0],
         last_name: personalData.fullName.split(' ').slice(1).join(' '),
         phone_number: personalData.phone,
-        position: personalData.position,
+        position: personalData?.position,
       }).unwrap();
 
       toast.success("Profile updated successfully!");
@@ -196,7 +196,7 @@ export default function MyProfileContent({ canEdit, user }) {
                   {personalData.fullName}
                 </div>
                 <div className="text-sm text-gray-600 font-normal">
-                  {personalData.position}
+                  {personalData?.position || "No position"}
                 </div>
               </div>
             </div>

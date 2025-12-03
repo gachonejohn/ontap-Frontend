@@ -20,6 +20,15 @@ export const attendanceStatusOptions = [
   { value: 'ABSENT', label: 'ABSENT' },
   { value: 'ON LEAVE', label: 'On Leave' },
 ];
+export const payrollStatusOptions = [
+  { value: 'PROCESSED', label: 'Processed' },
+  { value: 'PENDING', label: 'Pending' },
+  { value: 'PAID', label: 'Paid' },
+  { value: 'PROCESSING', label: 'Processing' },
+  { value: 'APPROVED', label: 'Approved' },
+  { value: 'CANCELLED', label: 'Cancelled' },
+
+];
 
 export const docOptions = [
   { value: 'National Id', label: 'National Id' },
@@ -161,4 +170,29 @@ export const offsiteRequestTypes = [
     { label: 'Field Visit', value: 'Field Visit' },
     { label: 'External Meeting', value: 'External Meeting' },
     { label: 'Other', value: 'Other' },
+];
+
+export const overtimeCategoryOptions = [
+  { value: 'weekend', label: 'Weekend' },
+  { value: 'weekday', label: 'Weekday' },
+  { value: 'holiday', label: 'Holiday' },
+];
+
+
+
+export const adjustmentTypesOptions = [
+  { value: 'OVERPAYMENT', label: 'OverPayment' },
+  { value: 'UNDERPAYMENT', label: 'UnderPayment' }
+];
+
+export const adjustmentApprovalStatusOptions = [
+  { value: 'PENDING_APPROVAL', label: 'Pending Approval' },
+  { value: 'APPROVED', label: 'Approved' },
+  { value: 'REJECTED', label: 'Rejected' },
+];
+
+export const adjustmentStatusOptions = [
+  { value: 'PENDING', label: 'Pending' },
+  { value: 'PARTIALLY_APPLIED', label: 'Partially Applied' },
+  { value: 'FULLY_APPLIED', label: 'Fully Applied' },
 ];

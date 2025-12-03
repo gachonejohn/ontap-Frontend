@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import ContentSpinner from "@components/common/spinners/dataLoadingSpinner";
 import NoDataFound from "@components/common/NoData";
-import { CustomDate } from "../../utils/dates";
+import { CustomDate } from "../../../utils/dates";
 import { PAGE_SIZE } from "@constants/constants";
 
 const EmployeePayrollContent = () => {

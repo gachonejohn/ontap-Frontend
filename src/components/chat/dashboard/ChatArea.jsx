@@ -1,8 +1,22 @@
 import { useEffect, useRef, useState } from 'react';
+import { toast } from 'react-toastify';
 import Img1 from '../assets/img6.jpg';
 import IMG2 from '../assets/img6.jpg';
 import Input from '../input';
-import { useGetMessagesQuery, useSendMessageMutation } from '../../../store/services/chat/chatService';
+import { 
+  useGetMessagesQuery, 
+  useSendMessageMutation, 
+  useReactToMessageMutation, 
+  useEditMessageMutation  } from '../../../store/services/chat/chatService';
+import AttachmentModal from '../modals/AttachmentModal';
+import AttachmentPreview from '../modals/AttachementPreview';
+import MessageAttachment from '../messages/MessageAttachment';
+import MessageActions from '../messages/MessageActions';
+import ReactionPicker from '../messages/ReactionPicker';
+import MessageReactions from '../messages/MessageReactions';
+import ReplyPreview from '../messages/ReplyPreview';
+import RepliedMessageDisplay from '../messages/RepliedMessageDisplay';
+
 
 const ChatArea = ({ selectedConversation, currentUser, currentUserId }) => {
   const [message, setMessage] = useState('');
@@ -13,6 +27,21 @@ const ChatArea = ({ selectedConversation, currentUser, currentUserId }) => {
   const prevScrollHeight = useRef(0);
   const isInitialLoad = useRef(true);
   const prevMessagesLength = useRef(0);
+
+  const [isAttachmentModalOpen, setIsAttachmentModalOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [fileCaption, setFileCaption] = useState('');
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const fileInputRef = useRef(null);
+
+  const [replyTo, setReplyTo] = useState(null);
+  const [editingMessage, setEditingMessage] = useState(null);
+  const [editText, setEditText] = useState('');
+  const [activeMessageMenu, setActiveMessageMenu] = useState(null);
+  const [activeReactionPicker, setActiveReactionPicker] = useState(null);
+
+  const [reactToMessage] = useReactToMessageMutation();
+  const [editMessage] = useEditMessageMutation();
 
   const { data, isLoading, isFetching } = useGetMessagesQuery(
     { conversationId: selectedConversation?.conversationId, page },
@@ -85,23 +114,120 @@ const ChatArea = ({ selectedConversation, currentUser, currentUserId }) => {
     };
   }, [hasMoreOlder, isFetching, isLoading, messages.length]);
 
-  const handleSendMessage = async () => {
-    if (!message.trim() || !selectedConversation?.conversationId || isSending) return;
+ 
+
+const handleReply = (msg) => {
+  setReplyTo(msg);
+  setActiveMessageMenu(null);
+};
+
+const handleEdit = (msg) => {
+  setEditingMessage(msg);
+  setEditText(msg.message);
+  setMessage(msg.message);
+  setActiveMessageMenu(null);
+};
+
+const handleReact = (messageId) => {
+  setActiveReactionPicker(messageId);
+  setActiveMessageMenu(null);
+};
+
+const handleSelectReaction = async (messageId, reaction) => {
+  try {
+    await reactToMessage({
+      conversationId: selectedConversation.conversationId,
+      messageId,
+      reaction,
+    }).unwrap();
+  } catch (error) {
+    console.error('Failed to add reaction:', error);
+  }
+};
+
+const handleSaveEdit = async () => {
+  if (!editText.trim() || !editingMessage) return;
+
+  try {
+    await editMessage({
+      conversationId: selectedConversation.conversationId,
+      messageId: editingMessage.id,
+      message_content: editText.trim(),
+    }).unwrap();
+
+    setEditingMessage(null);
+    setEditText('');
+    setMessage('');
+  } catch (error) {
+    console.error('Failed to edit message:', error);
+  }
+};
+
+const handleCancelEdit = () => {
+  setEditingMessage(null);
+  setEditText('');
+  setMessage('');
+};  
+
+const handleSendMessage = async () => {
+  // Handle file upload
+  if (selectedFile) {
+    if (!selectedConversation?.conversationId || isSending) return;
 
     try {
+      setUploadProgress(10);
+      
+      // Map attachment type to message_type for backend
+      const messageTypeMap = {
+        photo: 'image',
+        video: 'video',
+        audio: 'audio',
+        document: 'file',
+      };
+
       await sendMessageMutation({
         conversationId: selectedConversation.conversationId,
-        message_content: message,
+        message_content: fileCaption.trim() || undefined,
+        message_type: messageTypeMap[selectedFile.type], // This sends: 'image', 'video', 'audio', or 'document'
+        file: selectedFile.file,
       }).unwrap();
       
-      setMessage('');
+      setUploadProgress(100);
+      setSelectedFile(null);
+      setFileCaption('');
+      
       setTimeout(() => {
+        setUploadProgress(0);
         messagesEndRef?.current?.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
+      }, 500);
     } catch (error) {
-      console.error('Failed to send message:', error);
+      console.error('Failed to send attachment:', error);
+      setUploadProgress(0);
+      toast.error('Failed to send attachment, try again')
     }
-  };
+    return;
+  }
+
+  // Handle text message
+  if (!message.trim() || !selectedConversation?.conversationId || isSending) return;
+
+  try {
+    await sendMessageMutation({
+      conversationId: selectedConversation.conversationId,
+      message_content: message,
+      message_type: 'text', 
+      reply_to: replyTo?.id || null,
+    }).unwrap();
+
+    setMessage('');
+    setReplyTo(null);
+    setTimeout(() => {
+      messagesEndRef?.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+  } catch (error) {
+    console.error('Failed to send message:', error);
+  }
+};
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -109,6 +235,43 @@ const ChatArea = ({ selectedConversation, currentUser, currentUserId }) => {
       handleSendMessage();
     }
   };
+
+  const handleAttachmentTypeSelect = (type) => {
+  // Create a hidden file input
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = type.accept;
+  
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file size (e.g., max 50MB)
+      const maxSize = 50 * 1024 * 1024; // 50MB
+      if (file.size > maxSize) {
+        toast.error('File size exceeds the 50MB limit.');
+        return;
+      }
+      
+      setSelectedFile({
+        file,
+        type: type.id
+      });
+      setFileCaption('');
+    }
+  };
+  
+  input.click();
+};
+
+const handleRemoveFile = () => {
+  setSelectedFile(null);
+  setFileCaption('');
+  setUploadProgress(0);
+};
+
+const handleCaptionChange = (caption) => {
+  setFileCaption(caption);
+};
 
   const formatTime = (timestamp) => {
     const date = new Date(timestamp);
@@ -365,7 +528,7 @@ const ChatArea = ({ selectedConversation, currentUser, currentUserId }) => {
                     
                     return (
                       <div key={msg.id} className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'}`}>
-                        <div className="flex items-end max-w-[65%] group">
+                        <div className="flex items-end max-w-[65%] group relative">
                           {!isOwnMessage && (
                             <div className="relative flex-shrink-0 mr-2">
                               <img
@@ -376,7 +539,7 @@ const ChatArea = ({ selectedConversation, currentUser, currentUserId }) => {
                             </div>
                           )}
                           
-                          <div className="flex flex-col">
+                          <div className="flex flex-col flex-1">
                             <div
                               className={`rounded-2xl px-4 py-2.5 ${
                                 isOwnMessage
@@ -389,7 +552,22 @@ const ChatArea = ({ selectedConversation, currentUser, currentUserId }) => {
                                   {msg.user?.first_name} {msg.user?.last_name}
                                 </p>
                               )}
-                              <p className="break-words text-sm leading-relaxed">{msg.message}</p>
+                              
+                              {/* Replied Message Display */}
+                              {msg.replied_to && (
+                                <RepliedMessageDisplay
+                                  repliedTo={msg.replied_to}
+                                  isOwnMessage={isOwnMessage}
+                                />
+                              )}
+                              
+                              {/* Message Content */}
+                              {msg.message_type === 'text' ? (
+                                <p className="break-words text-sm leading-relaxed">{msg.message}</p>
+                              ) : (
+                                <MessageAttachment message={msg} isOwnMessage={isOwnMessage} />
+                              )}
+                              
                               <div className={`flex items-center mt-1 space-x-1 ${isOwnMessage ? 'justify-end' : 'justify-start'}`}>
                                 <span className={`text-xs ${isOwnMessage ? 'text-gray-200' : 'text-gray-500'}`}>
                                   {formatTime(msg.timestamp)}
@@ -399,6 +577,13 @@ const ChatArea = ({ selectedConversation, currentUser, currentUserId }) => {
                                 )}
                               </div>
                             </div>
+                            
+                            {/* Reactions Display */}
+                            <MessageReactions
+                              reactions={msg.reactions}
+                              onReactionClick={(type) => handleSelectReaction(msg.id, type)}
+                              currentUserId={currentUserId}
+                            />
                           </div>
 
                           {isOwnMessage && (
@@ -410,6 +595,37 @@ const ChatArea = ({ selectedConversation, currentUser, currentUserId }) => {
                               />
                             </div>
                           )}
+                          
+                          {/* Message Actions Button */}
+                          <button
+                            onClick={() => setActiveMessageMenu(activeMessageMenu === msg.id ? null : msg.id)}
+                            className="absolute -top-3 right-0 p-1.5 bg-white border border-gray-200 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-opacity hover:bg-gray-50"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            </svg>
+                          </button>
+                          
+                          {/* Message Actions Menu */}
+                          <MessageActions
+                            isOpen={activeMessageMenu === msg.id}
+                            onClose={() => setActiveMessageMenu(null)}
+                            onReply={() => handleReply(msg)}
+                            onEdit={() => handleEdit(msg)}
+                            onReact={() => handleReact(msg.id)}
+                            isOwnMessage={isOwnMessage}
+                            position={isOwnMessage ? 'left' : 'right'}
+                          />
+                          
+                          {/* Reaction Picker */}
+                          <div className="relative">
+                            <ReactionPicker
+                              isOpen={activeReactionPicker === msg.id}
+                              onClose={() => setActiveReactionPicker(null)}
+                              onSelectReaction={(reaction) => handleSelectReaction(msg.id, reaction)}
+                              position="top"
+                            />
+                          </div>
                         </div>
                       </div>
                     );
@@ -445,24 +661,83 @@ const ChatArea = ({ selectedConversation, currentUser, currentUserId }) => {
       </div>
 
       <div className="px-8 py-4 bg-white border-t border-gray-200 flex-shrink-0">
-        <div className="flex items-center space-x-3">
-          <button className="p-2 hover:bg-gray-100 rounded-full transition-colors flex-shrink-0">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6 text-gray-500"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
+        {replyTo && !editingMessage && (
+        <ReplyPreview
+          replyTo={replyTo}
+          onCancel={() => setReplyTo(null)}
+        />
+      )}
+      
+      {/* Edit Mode Indicator */}
+      {editingMessage && (
+        <div className="px-8 py-3 bg-amber-50 border-l-4 border-amber-400">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+              <span className="text-sm font-semibold text-amber-700">Edit Message</span>
+            </div>
+            <button
+              onClick={handleCancelEdit}
+              className="text-sm text-amber-600 hover:text-amber-800 font-medium"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 4v16m8-8H4"
-              />
-            </svg>
-          </button>
-          
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+        <div className="flex items-center space-x-3">
+          <div className="px-8 py-4 bg-white border-t border-gray-200 flex-shrink-0">
+          {/* File Preview */}
+          {selectedFile && (
+            <AttachmentPreview
+              file={selectedFile.file}
+              onRemove={handleRemoveFile}
+              onCaptionChange={handleCaptionChange}
+              caption={fileCaption}
+            />
+          )}
+
+          {/* Upload Progress */}
+          {uploadProgress > 0 && uploadProgress < 100 && (
+            <div className="mb-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm text-gray-600">Uploading...</span>
+                <span className="text-sm font-medium text-primary">{uploadProgress}%</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                <div
+                  className="bg-primary h-full rounded-full transition-all duration-300"
+                  style={{ width: `${uploadProgress}%` }}
+                ></div>
+              </div>
+            </div>
+          )}
+
+          <div className="flex items-center space-x-3">
+            {/* Rest of your input area code... */}
+          </div>
+        </div>
+          <button 
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors flex-shrink-0"
+              onClick={() => setIsAttachmentModalOpen(true)}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6 text-gray-500"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+            </button>
           <div className="flex-1">
             <Input
               placeholder="Type a message..."
@@ -477,17 +752,18 @@ const ChatArea = ({ selectedConversation, currentUser, currentUserId }) => {
 
           <button
             className={`p-3 rounded-full transition-all flex-shrink-0 ${
-              message.trim() && !isSending
+              (message.trim() || selectedFile) && !isSending
                 ? 'bg-primary hover:bg-primary-dark text-white shadow-md hover:shadow-lg'
                 : 'bg-gray-200 text-gray-400 cursor-not-allowed'
             }`}
-            onClick={handleSendMessage}
-            disabled={!message.trim() || isSending}
+            // onClick={handleSendMessage}
+            // disabled={(!message.trim() && !selectedFile) || isSending}
+            onClick={editingMessage ? handleSaveEdit : handleSendMessage}
+            disabled={(!message.trim() && !selectedFile) || isSending}
           >
-            {isSending ? (
-              <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            {editingMessage ? (
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             ) : (
               <svg
@@ -504,9 +780,15 @@ const ChatArea = ({ selectedConversation, currentUser, currentUserId }) => {
                 <polygon points="22 2 15 22 11 13 2 9 22 2" />
               </svg>
             )}
+
           </button>
         </div>
       </div>
+      <AttachmentModal
+      isOpen={isAttachmentModalOpen}
+      onClose={() => setIsAttachmentModalOpen(false)}
+      onSelectType={handleAttachmentTypeSelect}
+    />
     </>
   );
 };

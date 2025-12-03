@@ -163,7 +163,7 @@ const ParticipantViewModal = ({ isOpen, onClose, event, currentUserId }) => {
                 <span className="text-sm font-medium text-gray-900">Participants</span>
               </div>
 
-              <div className="space-y-2">
+              {/* <div className="space-y-2">
                 {localParticipants?.map(participant => {
                   const isCurrentUser = participant.employee.id === currentUserId;
                   return (
@@ -197,7 +197,70 @@ const ParticipantViewModal = ({ isOpen, onClose, event, currentUserId }) => {
                     </div>
                   );
                 })}
-              </div>
+              </div> */}
+
+              <div className="space-y-2">
+              {localParticipants?.map(participant => {
+                // Check if external participant
+                const isExternal = participant.is_external || !participant.employee;
+                const isCurrentUser = !isExternal && participant.employee?.id === currentUserId;
+                
+                return (
+                  <div 
+                    key={participant.id} 
+                    className={`flex items-center justify-between p-3 rounded-lg transition-all ${
+                      isCurrentUser ? 'bg-blue-50 border-2 border-blue-200' : 'bg-gray-50'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      {isExternal ? (
+                        // External participant avatar
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-pink-500 flex items-center justify-center text-white font-semibold">
+                          {participant.external_name?.[0]?.toUpperCase() || 'G'}
+                        </div>
+                      ) : (
+                        // Internal participant avatar
+                        participant.employee?.user?.profile_picture ? (
+                          <img
+                            src={participant.employee.user.profile_picture}
+                            alt=""
+                            className="w-10 h-10 rounded-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-teal-400 to-blue-500 flex items-center justify-center text-white font-semibold">
+                            {participant.employee?.user?.first_name?.[0] || ''}
+                            {participant.employee?.user?.last_name?.[0] || ''}
+                          </div>
+                        )
+                      )}
+                      <div>
+                        <div className="text-sm font-medium text-gray-900">
+                          {isExternal ? (
+                            <>
+                              {participant.external_name || 'Guest'}
+                              <span className="ml-2 text-xs text-purple-600 bg-purple-100 px-2 py-0.5 rounded">
+                                External
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              {participant.employee?.user?.first_name || ''} {participant.employee?.user?.last_name || ''}
+                              {isCurrentUser && <span className="ml-2 text-blue-600">(You)</span>}
+                            </>
+                          )}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {isExternal 
+                            ? participant.external_email 
+                            : participant.employee?.department || 'No Department'}
+                        </div>
+                      </div>
+                    </div>
+                    {getStatusBadge(participant.status)}
+                  </div>
+                );
+              })}
+            </div>
             </div>
 
             {/* User Status Update Section */}

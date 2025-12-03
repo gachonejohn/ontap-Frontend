@@ -34,7 +34,7 @@ export default function DashboardLayout() {
         }`}
       >
         <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-        <div className="flex-1 px-4 pt-[45px] mt-[40px] pb-8 bg-gray-100/50 overflow-x-hidden">
+        <div className="flex-1 px-4 pt-[45px] mt-[40px] pb-8 bg-gray-50 overflow-x-hidden">
           <Outlet />
         </div>
       </div>

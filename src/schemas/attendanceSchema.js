@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 export const overtimeRequestSchema = z.object({
+    category: z.string().min(1,"Category is required"),
     date: z.string().min(1, 'Date is required'),
     total_hours: z.coerce.number().min(1, 'Hours must be at least 1').max(12, 'Hours cannot exceed 12'),
     reason: z.string().min(1, 'Reason is required').max(500, 'Reason cannot exceed 500 characters'),

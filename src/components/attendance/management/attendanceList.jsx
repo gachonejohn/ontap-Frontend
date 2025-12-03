@@ -1,22 +1,21 @@
-import { useState, useMemo, useRef, useCallback, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import FilterSelect from '@components/common/FilterSelect';
-import Pagination from '@components/common/pagination';
-import NoDataFound from '@components/common/NoData';
-import ContentSpinner from '@components/common/spinners/dataLoadingSpinner';
-import { useFilters } from '@hooks/useFIlters';
-import { useGetDepartmentsQuery } from '@store/services/companies/companiesService';
-import {
-  useGetGroupedAttendaceQuery,
-  useGetCompanyAttendaceListQuery,
-} from '@store/services/attendance/attendanceService';
-import { attendanceStatusOptions, PAGE_SIZE } from '@constants/constants';
-import { formatClockTime, formatHoursWorked, YearMonthCustomDate } from '@utils/dates';
-import { FiChevronDown, FiChevronUp, FiEye } from 'react-icons/fi';
-import ButtonDropdown from '@components/common/ActionsPopover';
 import DataTable from '@components/common/DataTable';
+import FilterSelect from '@components/common/FilterSelect';
+import NoDataFound from '@components/common/NoData';
+import Pagination from '@components/common/pagination';
+import ContentSpinner from '@components/common/spinners/dataLoadingSpinner';
+import { attendanceStatusOptions, PAGE_SIZE } from '@constants/constants';
+import { useFilters } from '@hooks/useFIlters';
+import {
+  useGetCompanyAttendaceListQuery,
+  useGetGroupedAttendaceQuery,
+} from '@store/services/attendance/attendanceService';
+import { useGetDepartmentsQuery } from '@store/services/companies/companiesService';
+import { formatHoursWorked, YearMonthCustomDate } from '@utils/dates';
+import { useEffect, useMemo, useState } from 'react';
+import { FiChevronDown, FiChevronUp, FiEye } from 'react-icons/fi';
 import { GoSearch } from 'react-icons/go';
 import { PiBuildingApartment } from 'react-icons/pi';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 const AttendanceList = () => {
   const [searchParams] = useSearchParams();
