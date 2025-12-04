@@ -12,7 +12,7 @@ export const payslipApi = apiSlice.injectEndpoints({
         if (employee_id) params.append("employee_id", employee_id);
 
         return {
-          url: `payroll/payslips/payslip/?${params.toString()}`,
+          url: `payroll/payslips/?${params.toString()}`,
           method: "GET",
         };
       },
@@ -21,7 +21,7 @@ export const payslipApi = apiSlice.injectEndpoints({
 
     getPayslipById: builder.query({
       query: (id) => ({
-        url: `payroll/payslips/payslip/${id}/`,
+        url: `payroll/payslips/${id}/`,
         method: "GET",
       }),
       providesTags: (result, error, id) => [{ type: "Payslips", id }],
