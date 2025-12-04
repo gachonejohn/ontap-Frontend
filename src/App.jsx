@@ -69,6 +69,7 @@ function App() {
             <Route path="payroll" element={<Payroll />} />
             <Route path="payslips" element={<PaySlip/>} />
             <Route path="payroll/:id" element={<PayslipDetails />} />
+            {/* <Route path="payslips" element={<PayslipContent />} /> */}
             <Route path="trainings" element={<HRTrainings />} />
             <Route path="cards" element={<CardsContent />} />
             <Route path="announcements" element={<Announcements />} />

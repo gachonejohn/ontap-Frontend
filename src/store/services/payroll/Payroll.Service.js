@@ -18,12 +18,15 @@ export const payrollService = apiSlice.injectEndpoints({
     }),
     //
     getGroupedPayslips: builder.query({
-      query: ({ page, page_size, department } = {}) => {
+      query: ({ page, page_size, department,period,status,search } = {}) => {
         const queryParams = {};
         if (page) queryParams.page = page;
         if (page_size) queryParams.page_size = page_size;
 
         if (department) queryParams.department = department;
+        if (period) queryParams.period = period;
+        if (status) queryParams.status = status;
+        if (search) queryParams.search = search;
         return {
           url: `payroll/payslips/department-grouped-payslips-summary/`,
           method: 'GET',

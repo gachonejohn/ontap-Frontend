@@ -3,11 +3,13 @@ import { apiSlice } from "../../api/apiSlice";
 export const payslipApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getPayslips: builder.query({
-      query: ({ page, page_size, search, status, employee_id } = {}) => {
+      query: ({ page, page_size, search, status, employee_id,year,month } = {}) => {
         const params = new URLSearchParams();
         if (page) params.append("page", page);
         if (page_size) params.append("page_size", page_size);
         if (search) params.append("search", search);
+        if (month) params.append("month", month);
+        if (year) params.append("year", year);
         if (status) params.append("status", status);
         if (employee_id) params.append("employee_id", employee_id);
 
