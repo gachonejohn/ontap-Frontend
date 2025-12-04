@@ -63,6 +63,15 @@ const Payslips = () => {
 
   const columns = [
     {
+      header: 'Employee',
+      accessor: 'employee',
+      cell: (item) => (
+        <span className="text-sm text-gray-700">
+          {item.payroll_record.employee?.full_name || 'N/A'}
+        </span>
+      ),
+    },
+    {
       header: 'Pay Period',
       accessor: 'period',
       cell: (item) => (
