@@ -34,6 +34,7 @@ import Payroll from "@components/payroll";
 import PaySlip from "@components/payslip";
 import PayslipDetails from "@components/payroll/payslips/PayslipDetails";
 
+
 function App() {
   return (
     <Router>
