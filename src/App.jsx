@@ -32,6 +32,8 @@ import CreateEmployeegWizard from "@components/employees/Onboarding";
 import { CreateNewEmployee } from "@components/employees/Onboarding/CreateEmployee";
 import Payroll from "@components/payroll";
 import PaySlip from "@components/payslip";
+import PayslipDetails from "@components/payroll/payslips/PayslipDetails";
+
 
 function App() {
   return (
