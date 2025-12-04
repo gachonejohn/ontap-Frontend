@@ -10,7 +10,7 @@ export default function PayrollContent() {
   const isPayrollRoute = location.pathname.includes('/payroll');
 
   const payrollPermissions = user?.role?.permissions?.find(
-    (p) => p.feature_code === "payroll_settings"
+    (p) => p.feature_code === "payroll"
   );
 
   const canViewAll = payrollPermissions?.can_view_all;
