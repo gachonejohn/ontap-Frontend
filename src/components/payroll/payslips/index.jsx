@@ -254,6 +254,7 @@ const GroupedPayslips = () => {
         </div>
 
         <div className="flex gap-2">
+         
           <FilterSelect
             options={departmentsOptions}
             value={
@@ -266,6 +267,34 @@ const GroupedPayslips = () => {
             placeholder="All Departments"
             defaultLabel="All Departments"
           />
+          <FilterSelect
+                          options={payrollStatusOptions}
+                          value={
+                            payrollStatusOptions.find(
+                              (option) => option.value === filters.status
+                            ) || {
+                              value: '',
+                              label: 'All Status',
+                            }
+                          }
+                          onChange={handleStatusChange}
+                          placeholder=""
+                          defaultLabel="All Status"
+                        />
+                        <FilterSelect
+                          options={payrollPeriodOptions}
+                          value={
+                            payrollPeriodOptions.find(
+                              (option) => option.value === filters.period
+                            ) || {
+                              value: '',
+                              label: 'Select Period',
+                            }
+                          }
+                          onChange={handlePayrollPeriodChange}
+                          placeholder="Select Period"
+                          defaultLabel="Select Period"
+                        />
         </div>
       </div>
 

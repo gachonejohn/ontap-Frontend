@@ -7,11 +7,12 @@ import FilterSelect from '@components/common/FilterSelect';
 import NoDataFound from '@components/common/NoData';
 import Pagination from '@components/common/pagination';
 import ContentSpinner from '@components/common/spinners/dataLoadingSpinner';
-import { PAGE_SIZE, payrollStatusOptions } from '@constants/constants';
+import { PAGE_SIZE, payrollStatusOptions,monthOptions } from '@constants/constants';
 import { useFilters } from '@hooks/useFIlters';
 import { useGetPayslipsQuery } from '@store/services/payslips/payslipService';
 import { useGetPayrollPeriodsQuery } from '@store/services/payroll/Payroll.Service';
 import { formatCurrencyWithSymbol } from '@utils/formatCurrency';
+import PayslipDetailsModal from '@components/payroll/payslips/PayslipDetails';
 
 const Payslips = () => {
   const [searchParams] = useSearchParams();
@@ -23,6 +24,8 @@ const Payslips = () => {
       search: searchParams.get('search') || '',
       period: searchParams.get('period') || '',
       status: searchParams.get('status') || '',
+      year: searchParams.get('year') || '',
+      month: searchParams.get('month') || '',
     },
     initialPage: currentPageParam,
     navigate,
@@ -45,16 +48,32 @@ const Payslips = () => {
 
   const { data: periodsData } = useGetPayrollPeriodsQuery({}, { refetchOnMountOrArgChange: true });
 
-  // const payrollPeriodOptions =
-  //   periodsData?.map((item) => ({ value: item.id, label: item.period_label })) || [];
-  //   console.log('Payroll Period Options:', payrollPeriodOptions);
+  const payrollPeriodOptions =
+    periodsData?.map((item) => ({ value: item.id, label: item.period_label })) || [];
+    console.log('Payroll Period Options:', payrollPeriodOptions);
 
-  // const handlePayrollPeriodChange = (selectedOption) => {
-  //   handleFilterChange({
-  //     period: selectedOption ? selectedOption.value : '',
-  //   });
-  // };
+  const handlePayrollPeriodChange = (selectedOption) => {
+    handleFilterChange({
+      period: selectedOption ? selectedOption.value : '',
+    });
+  };
 
+  const handleMonthChange = (selectedOption) => {
+  handleFilterChange({
+    month: selectedOption ? selectedOption.value : '',
+  });
+};
+
+  const handleYearChange = (selectedOption) => {
+    handleFilterChange({
+      year: selectedOption ? selectedOption.value : '',
+    });
+  };
+const currentYear = new Date().getFullYear();
+  const yearOptions = Array.from({ length: 50 }, (_, i) => ({
+    value: currentYear - i,
+    label: `${currentYear - i}`,
+  }));
   const handleStatusChange = (selectedOption) => {
     handleFilterChange({
       status: selectedOption ? selectedOption.value : '',
@@ -145,12 +164,9 @@ const Payslips = () => {
       header: 'Actions',
       accessor: 'actions',
       cell: (item) => (
-        <button
-          onClick={() => navigate(`/payroll/${item.id}`)}
-          className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-        >
-          <FiEye className="w-4 h-4" />
-        </button>
+         <>
+          <PayslipDetailsModal payslip={item} />
+        </>
       ),
     },
   ];
@@ -168,33 +184,34 @@ const Payslips = () => {
         </div>
 
         {/* Filters */}
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <div className="relative w-full lg:w-96 border bg-white border-gray-300 flex items-center gap-2 text-gray-500 px-3 rounded-lg shadow-sm">
-            <GoSearch size={20} />
-            <input
-              type="text"
-              name="search"
-              value={filters.search}
-              onChange={handleFilterChange}
-              placeholder="search payslips..."
-              className="w-full bg-white text-gray-900 text-sm px-2 py-2.5 bg-transparent outline-none"
-            />
-          </div>
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-end">
+         
 
           <div className="flex flex-col sm:flex-row gap-2">
-            {/* <FilterSelect
-              options={payrollPeriodOptions}
+            <FilterSelect
+              options={yearOptions}
               value={
-                payrollPeriodOptions.find((option) => option.value === filters.period) || {
+                yearOptions.find((option) => option.value === filters.year) || {
                   value: '',
-                  label: 'All Periods',
+                  label: 'Year',
                 }
               }
-              onChange={handlePayrollPeriodChange}
-              placeholder="All Periods"
-              defaultLabel="All Periods"
-            /> */}
-
+              onChange={handleYearChange}
+              placeholder="Year"
+              defaultLabel="Reset"
+            />
+<FilterSelect
+      options={monthOptions}
+      value={
+        monthOptions.find((option) => option.value === Number(filters.month)) || {
+          value: '',
+          label: 'Month',
+        }
+      }
+      onChange={handleMonthChange}
+      placeholder="Month"
+      defaultLabel="Month"
+    />
             <FilterSelect
               options={payrollStatusOptions}
               value={
