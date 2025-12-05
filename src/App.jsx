@@ -1,12 +1,12 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Signin from "./auth/Signin";
-import Staffcycle from "./dashboards/hr/components/Staffcycle";
+
 import Employees from "./components/employees";
 import EmployeeDetails from "./components/employees/EmployeeDetails";
 import LeaveContent from "./components/leaves";
 import Performance from "./components/performance";
 import PayrollContent from "./components/payroll/settings";
-import HRTrainings from "./dashboards/hr/components/Trainings";
+// import HRTrainings from "./dashboards/hr/components/Trainings";
 import CardsContent from "./components/cards";
 import Announcements from "./components/announcements";
 import Settings from "./components/settings";
@@ -53,7 +53,7 @@ function App() {
               <Route path="templates/:id" element={<TemplateDetails />} />
               <Route path="steps" element={<Steps />} />
             </Route>
-            <Route path="staffcycle" element={<Staffcycle />} />
+   
             <Route path="employees" element={<Employees />} />
             <Route path="employees/new" element={<CreateNewEmployee />} />
             <Route path="employees/:id" element={<EmployeeDetails />} />
@@ -70,7 +70,7 @@ function App() {
             <Route path="payslips" element={<PaySlip/>} />
             <Route path="payroll/:id" element={<PayslipDetails />} />
             {/* <Route path="payslips" element={<PayslipContent />} /> */}
-            <Route path="trainings" element={<HRTrainings />} />
+            {/* <Route path="trainings" element={<HRTrainings />} /> */}
             <Route path="cards" element={<CardsContent />} />
             <Route path="announcements" element={<Announcements />} />
             {/* Settings */}
