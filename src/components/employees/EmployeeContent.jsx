@@ -2,8 +2,7 @@ import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import DropdownAuthenticationModal from "../../dashboards/employee/components/DropdownAuthenticationModal";
-import LeaveModal from "../../dashboards/employee/components/LeaveModal.js";
+
 import LogTaskModal from "../tasks/LogTaskModal";
 import TaskModal from "../tasks/TaskModal";
 import {
@@ -857,13 +856,7 @@ const EmployeeDashboardContent = () => {
         </div>
       </div>
 
-      {/* Modals */}
-      <LeaveModal
-        isOpen={isLeaveModalOpen}
-        onClose={() => setIsLeaveModalOpen(false)}
-        onSubmit={handleLeaveSubmit}
-      />
-
+   
       <LogTaskModal
         isOpen={isLogTaskModalOpen}
         onClose={() => setIsLogTaskModalOpen(false)}
@@ -878,12 +871,6 @@ const EmployeeDashboardContent = () => {
         onSubmit={handleCreateTask}
       />
 
-      <DropdownAuthenticationModal
-        isOpen={isAuthModalOpen}
-        onClose={() => setIsAuthModalOpen(false)}
-        onAuthenticate={handleAuthentication}
-        position={eyeIconPosition}
-      />
 
       <ActionModal
         isOpen={isModalOpen}
