@@ -3,12 +3,12 @@ import PAYETax from "./PAYETax";
 import NSSF from "./NSSF";
 import SHIF from "./SHIF";
 import AHL from "./AHL";
-import OvertimePayroll from "../Overtime Payroll";
-import PayrollRules from "../Payroll Rules";
+import OvertimePayroll from "../OvertimePayroll";
+import PayrollRules from "../PayrollRules";
 import Allowances from "./Allowances";
 import Deductions from "./Deductions";
-import StatutoryDeductions from "./Statutory Deductions";
-import AdjustmentRates from "../Adjustment Rates";
+import StatutoryDeductions from "./StatutoryDeductions";
+import AdjustmentRates from "../AdjustmentRates";
 
 export default function MainPayrollContent() {
   const [activeTab, setActiveTab] = useState("paye");
