@@ -104,7 +104,7 @@ export default function NSSF({ currentPage, onPageChange }) {
           id: editingId,
           tier_type: formData.tier_type,
           lower_limit: formData.lower_limit,
-          upper_limit: formData.upper_limit,
+          upper_limit: formData.upper_limit || null,
           employee_rate_percentage: parseFloat(formData.employee_rate_percentage),
           employer_rate_percentage: parseFloat(formData.employer_rate_percentage),
           is_active: formData.is_active,
@@ -116,7 +116,7 @@ export default function NSSF({ currentPage, onPageChange }) {
         const createData = {
           tier_type: formData.tier_type,
           lower_limit: formData.lower_limit,
-          upper_limit: formData.upper_limit,
+          upper_limit: formData.upper_limit || null,
           employee_rate_percentage: parseFloat(formData.employee_rate_percentage),
           employer_rate_percentage: parseFloat(formData.employer_rate_percentage),
           is_active: formData.is_active,
@@ -178,23 +178,11 @@ export default function NSSF({ currentPage, onPageChange }) {
     }
   };
 
-  const getAvailableTierTypes = () => {
-    if (nssfTiersData?.results && nssfTiersData.results.length > 0) {
-      const existingTiers = {};
-      nssfTiersData.results.forEach(tier => {
-        existingTiers[tier.tier_type] = tier.tier_type_display || TIER_TYPE_DISPLAY[tier.tier_type];
-      });
-      
-      return Object.entries(existingTiers).map(([value, display]) => ({
-        value,
-        display
-      }));
-    } else {
-      return [
-        { value: TIER_TYPES.TIER_1, display: TIER_TYPE_DISPLAY[TIER_TYPES.TIER_1] },
-        { value: TIER_TYPES.TIER_2, display: TIER_TYPE_DISPLAY[TIER_TYPES.TIER_2] }
-      ];
-    }
+    const getAvailableTierTypes = () => {
+    return [
+      { value: TIER_TYPES.TIER_1, display: TIER_TYPE_DISPLAY[TIER_TYPES.TIER_1] },
+      { value: TIER_TYPES.TIER_2, display: TIER_TYPE_DISPLAY[TIER_TYPES.TIER_2] }
+    ];
   };
 
   return (
@@ -279,7 +267,7 @@ export default function NSSF({ currentPage, onPageChange }) {
                   <div className="flex justify-center items-center rounded-lg border border-neutral-200 w-full h-11 bg-gray-100">
                     <div className="flex flex-row justify-between items-center px-6 w-full">
                       <div className="font-inter text-xs text-neutral-900 leading-snug tracking-normal font-medium">
-                        {nssfTiersData?.results?.find(t => t.id === selectedNssfTierId)?.employee_rate_percentage || '6'}
+                        {nssfTiersData?.results?.find(t => t.id === selectedNssfTierId)?.employee_rate_percentage || 'N/A'}
                       </div>
                     </div>
                   </div>
@@ -291,7 +279,7 @@ export default function NSSF({ currentPage, onPageChange }) {
                   <div className="flex justify-center items-center rounded-lg border border-neutral-200 w-full h-11 bg-gray-100">
                     <div className="flex flex-row justify-between items-center px-6 w-full">
                       <div className="font-inter text-xs text-neutral-900 leading-snug tracking-normal font-medium">
-                        {nssfTiersData?.results?.find(t => t.id === selectedNssfTierId)?.employer_rate_percentage || '6'}
+                        {nssfTiersData?.results?.find(t => t.id === selectedNssfTierId)?.employer_rate_percentage || 'N/A'}
                       </div>
                     </div>
                   </div>
@@ -312,7 +300,7 @@ export default function NSSF({ currentPage, onPageChange }) {
                   <div className="flex justify-center items-center rounded-lg border border-neutral-200 w-full h-11 bg-gray-100">
                     <div className="flex flex-row justify-between items-center px-6 w-full">
                       <div className="font-inter text-xs text-neutral-900 leading-snug tracking-normal font-medium">
-                        {nssfTiersData?.results?.find(t => t.id === selectedNssfTierId)?.lower_limit ? parseFloat(nssfTiersData.results.find(t => t.id === selectedNssfTierId).lower_limit).toLocaleString() : '0'}
+                        {nssfTiersData?.results?.find(t => t.id === selectedNssfTierId)?.lower_limit ? parseFloat(nssfTiersData.results.find(t => t.id === selectedNssfTierId).lower_limit).toLocaleString() : 'N/A'}
                       </div>
                     </div>
                   </div>
@@ -324,7 +312,7 @@ export default function NSSF({ currentPage, onPageChange }) {
                   <div className="flex justify-center items-center rounded-lg border border-neutral-200 w-full h-11 bg-gray-100">
                     <div className="flex flex-row justify-between items-center px-6 w-full">
                       <div className="font-inter text-xs text-neutral-900 leading-snug tracking-normal font-medium">
-                        {nssfTiersData?.results?.find(t => t.id === selectedNssfTierId)?.upper_limit ? parseFloat(nssfTiersData.results.find(t => t.id === selectedNssfTierId).upper_limit).toLocaleString() : '36,000'}
+                        {nssfTiersData?.results?.find(t => t.id === selectedNssfTierId)?.upper_limit ? parseFloat(nssfTiersData.results.find(t => t.id === selectedNssfTierId).upper_limit).toLocaleString() : 'N/A'}
                       </div>
                     </div>
                   </div>
@@ -346,13 +334,13 @@ export default function NSSF({ currentPage, onPageChange }) {
                     <div className="flex justify-center items-center rounded-lg border border-neutral-200 w-full h-11 bg-gray-100">
                       <div className="flex flex-row justify-between items-center px-6 w-full">
                         <div className="font-inter text-xs text-neutral-900 leading-snug tracking-normal font-medium">
-                          {nssfTiersData?.results?.find(tier => tier.tier_type === TIER_TYPES.TIER_1)?.upper_limit ? parseFloat(nssfTiersData.results.find(tier => tier.tier_type === TIER_TYPES.TIER_1).upper_limit).toLocaleString() : '7,000'}
+                          {nssfTiersData?.results?.find(tier => tier.tier_type === TIER_TYPES.TIER_1)?.upper_limit ? parseFloat(nssfTiersData.results.find(tier => tier.tier_type === TIER_TYPES.TIER_1).upper_limit).toLocaleString() : 'N/A'}
                         </div>
                       </div>
                     </div>
                   </div>
                   <div className="font-inter text-sm text-gray-600 leading-snug tracking-normal font-normal">
-                    Current: KSh {nssfTiersData?.results?.find(tier => tier.tier_type === TIER_TYPES.TIER_1)?.upper_limit ? parseFloat(nssfTiersData.results.find(tier => tier.tier_type === TIER_TYPES.TIER_1).upper_limit).toLocaleString() : '7,000'} (Lower earnings)
+                    Current: KSh {nssfTiersData?.results?.find(tier => tier.tier_type === TIER_TYPES.TIER_1)?.upper_limit ? parseFloat(nssfTiersData.results.find(tier => tier.tier_type === TIER_TYPES.TIER_1).upper_limit).toLocaleString() : 'N/A'} (Lower earnings)
                   </div>
                 </div>
                 <div className="flex flex-col justify-start items-start gap-2 flex-1">
@@ -363,13 +351,13 @@ export default function NSSF({ currentPage, onPageChange }) {
                     <div className="flex justify-center items-center rounded-lg border border-neutral-200 w-full h-11 bg-gray-100">
                       <div className="flex flex-row justify-between items-center px-6 w-full">
                         <div className="font-inter text-xs text-neutral-900 leading-snug tracking-normal font-medium">
-                          {nssfTiersData?.results?.find(tier => tier.tier_type === TIER_TYPES.TIER_2)?.upper_limit ? parseFloat(nssfTiersData.results.find(tier => tier.tier_type === TIER_TYPES.TIER_2).upper_limit).toLocaleString() : '36,000'}
+                          {nssfTiersData?.results?.find(tier => tier.tier_type === TIER_TYPES.TIER_2)?.upper_limit ? parseFloat(nssfTiersData.results.find(tier => tier.tier_type === TIER_TYPES.TIER_2).upper_limit).toLocaleString() : 'N/A'}
                         </div>
                       </div>
                     </div>
                   </div>
                   <div className="font-inter text-sm text-gray-600 leading-snug tracking-normal font-normal">
-                    Current: KSh {nssfTiersData?.results?.find(tier => tier.tier_type === TIER_TYPES.TIER_2)?.upper_limit ? parseFloat(nssfTiersData.results.find(tier => tier.tier_type === TIER_TYPES.TIER_2).upper_limit).toLocaleString() : '36,000'} (Pensionable earnings)
+                    Current: KSh {nssfTiersData?.results?.find(tier => tier.tier_type === TIER_TYPES.TIER_2)?.upper_limit ? parseFloat(nssfTiersData.results.find(tier => tier.tier_type === TIER_TYPES.TIER_2).upper_limit).toLocaleString() : 'N/A'} (Pensionable earnings)
                   </div>
                 </div>
               </div>
@@ -481,7 +469,7 @@ export default function NSSF({ currentPage, onPageChange }) {
                 </div>
                 <div className="flex flex-col gap-2">
                   <label className="text-sm font-medium text-gray-700">
-                    Upper Limit (KES) <span className="text-red-500">*</span>
+                    Upper Limit (KES)
                   </label>
                   <input
                     type="number"
@@ -491,7 +479,6 @@ export default function NSSF({ currentPage, onPageChange }) {
                     onChange={(e) =>
                       setFormData({ ...formData, upper_limit: e.target.value })
                     }
-                    required
                     className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
                     placeholder="e.g., 6000"
                   />
@@ -574,7 +561,6 @@ export default function NSSF({ currentPage, onPageChange }) {
                   disabled={
                     actionLoading || 
                     !formData.lower_limit || 
-                    !formData.upper_limit || 
                     !formData.employee_rate_percentage || 
                     !formData.employer_rate_percentage
                   }
