@@ -33,7 +33,7 @@ import { CreateNewEmployee } from "@components/employees/Onboarding/CreateEmploy
 import Payroll from "@components/payroll";
 import PaySlip from "@components/payslip";
 import PayslipDetails from "@components/payroll/payslips/PayslipDetails";
-
+import FlippableCard from "@components/digitalcards/DigitalCards";
 
 function App() {
   return (
@@ -71,7 +71,8 @@ function App() {
             <Route path="payroll/:id" element={<PayslipDetails />} />
             {/* <Route path="payslips" element={<PayslipContent />} /> */}
             {/* <Route path="trainings" element={<HRTrainings />} /> */}
-            <Route path="cards" element={<CardsContent />} />
+            {/* <Route path="cards" element={<CardsContent />} /> */}
+            <Route path="cards" element={<FlippableCard />} />
             <Route path="announcements" element={<Announcements />} />
             {/* Settings */}
             <Route path="settings" element={<Settings />} />
