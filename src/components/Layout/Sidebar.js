@@ -64,13 +64,13 @@ const menuItems = [
     icon: "/images/records.png",
     whiteIcon: "/images/records.png",
   },
-  {
-    code: "trainings",
-    id: "trainings",
-    label: "Trainings",
-    icon: "/images/trainings.png",
-    whiteIcon: "/images/trainings.png",
-  },
+  // {
+  //   code: "trainings",
+  //   id: "trainings",
+  //   label: "Trainings",
+  //   icon: "/images/trainings.png",
+  //   whiteIcon: "/images/trainings.png",
+  // },
   {
     code: "leaves",
     id: "leaves",
@@ -92,13 +92,13 @@ const menuItems = [
     icon: "/images/announcements.png",
     whiteIcon: "/images/whiteannouncements.png",
   },
-  {
-    code: "staffcycle",
-    id: "staffcycle",
-    label: "Staff Cycle",
-    icon: "/images/myprofile2.png",
-    whiteIcon: "/images/whiteprofile.png",
-  },
+  // {
+  //   code: "staffcycle",
+  //   id: "staffcycle",
+  //   label: "Staff Cycle",
+  //   icon: "/images/myprofile2.png",
+  //   whiteIcon: "/images/whiteprofile.png",
+  // },
   {
     code: "employees",
     id: "employees",

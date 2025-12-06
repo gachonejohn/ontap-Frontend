@@ -21,7 +21,6 @@ export default function Allowances({ currentPage, onPageChange }) {
   const [actionLoading, setActionLoading] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
-  const [allAllowances, setAllAllowances] = useState([]);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -45,12 +44,6 @@ export default function Allowances({ currentPage, onPageChange }) {
   const [createAllowance] = useCreateAllowanceMutation();
   const [updateAllowance] = useUpdateAllowanceMutation();
   const [deleteAllowance] = useDeleteAllowanceMutation();
-
-  useEffect(() => {
-    if (allowancesData?.results) {
-      setAllAllowances(allowancesData.results);
-    }
-  }, [allowancesData]);
 
   const handleCreateClick = () => {
     setEditingId(null);
@@ -205,14 +198,14 @@ export default function Allowances({ currentPage, onPageChange }) {
 
         {/* Table Content */}
         <div className="w-full px-6 pt-6">
-          {isLoading && allAllowances.length === 0 ? (
+          {isLoading ? (
             <div className="flex justify-center py-12">
               <ContentSpinner />
             </div>
-          ) : allAllowances && allAllowances.length > 0 ? (
+          ) : allowancesData && allowancesData.results && allowancesData.results.length > 0 ? (
             <>
               <DataTable
-                data={allAllowances}
+                data={allowancesData.results}
                 columns={columns}
                 isLoading={isFetching}
                 stripedRows={true}

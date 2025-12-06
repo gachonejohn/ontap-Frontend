@@ -167,50 +167,16 @@ export const payrollApi = apiSlice.injectEndpoints({
       invalidatesTags: ["PayrollAdjustmentRates"],
     }),
 
-    getAllowances: builder.query({
-      queryFn: async (args, api, extraOptions, baseQuery) => {
-        try {
-          const allowances = [];
-          let currentId = 1;
-          let consecutiveFailures = 0;
-          const maxConsecutiveFailures = 5; 
-          const maxAttempts = 100; 
-
-          while (consecutiveFailures < maxConsecutiveFailures && currentId <= maxAttempts) {
-            try {
-              const result = await baseQuery({
-                url: `payroll/allowance/${currentId}/`,
-                method: "GET",
-              });
-
-              if (result.data) {
-                allowances.push({
-                  ...result.data,
-                  id: currentId
-                });
-                consecutiveFailures = 0; 
-              } else if (result.error) {
-                consecutiveFailures++;
-              }
-            } catch (error) {
-              consecutiveFailures++;
-            }
-
-            currentId++;
-          }
-
-          allowances.sort((a, b) => (b.id || 0) - (a.id || 0));
-
-          return { 
-            data: { 
-              results: allowances, 
-              count: allowances.length,
-              next: null 
-            } 
-          };
-        } catch (error) {
-          return { error };
-        }
+        getAllowances: builder.query({
+      query: ({ page, page_size } = {}) => {
+        const params = new URLSearchParams();
+        if (page) params.append("page", page);
+        if (page_size) params.append("page_size", page_size);
+    
+        return {
+          url: `payroll/allowances/?${params.toString()}`,
+          method: "GET",
+        };
       },
       providesTags: ["Allowances"],
     }),

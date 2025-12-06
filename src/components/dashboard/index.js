@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { toast } from "react-toastify";
-import ActionsDropdown from '../../dashboards/hr/components/ActionsDropdown';
+
 import TaskCompletionChart from './charts/TaskCompletionChart';
-import TrainingProgressChart from '../../dashboards/hr/components/TrainingProgressChart';
+
 import { useAppSelector } from '../../store/hooks';
 import EmployeeDashboardContent from '../employees/EmployeeContent';
 import { useGetEmployeesQuery } from '@store/services/employees/employeesService';
@@ -369,36 +369,7 @@ export default function Dashboard() {
               </div>
               <TaskCompletionChart data={taskCompletionData} />
             </div>
-            <div className="flex flex-col gap-4 p-4 rounded-xl shadow-sm bg-white">
-              <div className="text-lg text-neutral-900 font-semibold">Training Progress</div>
-              <div className="flex justify-center">
-                <TrainingProgressChart
-                  data={trainingData}
-                  onSegmentClick={handleTrainingSegmentClick}
-                />
-              </div>
-              <div className="flex flex-col gap-2 text-sm text-gray-600">
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-teal-500"></div>
-                    <span>Completed</span>
-                  </div>
-                  <span>68%</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-cyan-400"></div>
-                    <span>In Progress</span>
-                  </div>
-                  <span>25%</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <div className="w-3 h-3 rounded-full bg-gray-300"></div>
-                  <span>Not Started</span>
-                  <span>7%</span>
-                </div>
-              </div>
-            </div>
+         
           </div>
 
           {/* Bottom Section */}
@@ -429,81 +400,7 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Digital Cards */}
-            <div className="flex flex-col gap-4 p-4 rounded-xl shadow-sm bg-white">
-              <div className="text-lg text-neutral-900 font-semibold">Digital Cards Management</div>
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm text-left">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="py-3 px-4 font-medium text-gray-600">Employee</th>
-                      <th className="py-3 px-4 font-medium text-gray-600">ID Card</th>
-                      <th className="py-3 px-4 font-medium text-gray-600">Business Card</th>
-                      <th className="py-3 px-4 font-medium text-gray-600">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr className="border-b">
-                      <td className="py-3 px-4">
-                        <div className="text-sm text-neutral-900">Sarah Johnson</div>
-                        <div className="text-xs text-gray-600">Engineering</div>
-                      </td>
-                      <td className="py-3 px-4">
-                        <span className="px-2 py-1 rounded-full bg-black text-white text-xs">
-                          Issued
-                        </span>
-                      </td>
-                      <td className="py-3 px-4">
-                        <span className="px-2 py-1 rounded-full bg-black text-white text-xs">
-                          Issued
-                        </span>
-                      </td>
-                      <td className="py-3 px-4">
-                        <ActionsDropdown />
-                      </td>
-                    </tr>
-                    <tr className="border-b">
-                      <td className="py-3 px-4">
-                        <div className="text-sm text-neutral-900">Michael Chen</div>
-                        <div className="text-xs text-gray-600">Product</div>
-                      </td>
-                      <td className="py-3 px-4">
-                        <span className="px-2 py-1 rounded-full bg-black text-white text-xs">
-                          Issued
-                        </span>
-                      </td>
-                      <td className="py-3 px-4">
-                        <span className="px-2 py-1 rounded-full bg-gray-200 text-gray-700 text-xs">
-                          Pending
-                        </span>
-                      </td>
-                      <td className="py-3 px-4">
-                        <ActionsDropdown />
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="py-3 px-4">
-                        <div className="text-sm text-neutral-900">Victor Josh</div>
-                        <div className="text-xs text-gray-600">Design</div>
-                      </td>
-                      <td className="py-3 px-4">
-                        <span className="px-2 py-1 rounded-full bg-red-600 text-white text-xs">
-                          Revoked
-                        </span>
-                      </td>
-                      <td className="py-3 px-4">
-                        <span className="px-2 py-1 rounded-full bg-black text-white text-xs">
-                          Issued
-                        </span>
-                      </td>
-                      <td className="py-3 px-4">
-                        <ActionsDropdown />
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
+          
           </div>
 
           {/* Action Modal */}
